@@ -1,24 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-
+import MainPage from "./pages/mainpage.js";
 function App() {
   return (
     // wwmt 첫커밋앤푸시~~^^
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <MainPage />
     </div>
   );
 }
