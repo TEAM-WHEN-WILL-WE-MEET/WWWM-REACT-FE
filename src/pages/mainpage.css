@@ -277,6 +277,7 @@
 } 
 .react-calendar__tile:hover{
   cursor: pointer;
+  background-color: #fff2c4;
 }   
 
 /* 연도/월 선택 네비게이션 바
@@ -297,7 +298,12 @@
   font-size: 14px;
   font-weight: 400;
 }
-
+.react-calendar__month-view__days__day--neighboringMonth:hover,
+.react-calendar__decade-view__years__year--neighboringDecade:hover,
+.react-calendar__century-view__decades__decade--neighboringCentury:hover{
+    background-color: #fafafa;
+    cursor: default;
+}
 .react-calendar__tile--now {
     /* 기존 스타일 주석 처리됨 */
     background-color: none;

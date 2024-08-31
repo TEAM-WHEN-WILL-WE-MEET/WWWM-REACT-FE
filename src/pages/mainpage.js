@@ -1,102 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
-// import 'react-calendar/dist/Calendar.css'; // 기본 켈린더 라이브러리 css import
 import './mainpage.css'; 
 import moment from "moment";
 
 const MainPage = () => {
-
-  const [calendarMonth, setCalendarMonth] = useState('');
-
-//   const handleMonthChange = (e) => {
-//     const monthValue = e.target.value;
-//     setCalendarMonth(monthValue);
-//     const newDate = new Date(calendarDate.getFullYear(), monthValue - 1);
-//     setCalendarDate(newDate);
-//   };
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 드롭다운 메뉴의 열림/닫힘 상태 관리
-
-  // const handleYearChange = (e) => {
-  //   // 연도 변경 핸들러
-  //   const newYear = e.target.value;
-  //   const newDate = new Date(newYear, calendarDate.getMonth(), calendarDate.getDate());
-  //   setCalendarDate(newDate); // 새로운 연도와 기존 월, 날짜를 사용해 캘린더 날짜 업데이트
-  // };
-
-  // const [calendarDate, setCalendarDate] = useState(new Date()); // 초기 캘린더 날짜 설정
-  // const handleMonthChange = (e) => {
-  //   // 월 변경 핸들러
-  //   const newMonth = e.target.value;
-  //   const newDate = new Date(calendarDate.getFullYear(), newMonth - 1, calendarDate.getDate());
-  //   setCalendarDate(newDate); // 새로운 월과 기존 연도, 날짜를 사용해 캘린더 날짜 업데이트
-  // };
+  const [eventName, setEventName] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [selectedDates, setSelectedDates] = useState([]); 
+  const [savedDates, setSavedDates] = useState({});
 
-  const handleMonthChange = (e) => {
-    const newMonth = e.target.value - 1; // 입력값은 1-12이므로 0-11로 조정
-    const newDate = new Date(calendarDate.getFullYear(), newMonth, 1);
-    setCalendarDate(newDate);
+  const handleInputChange = (e) => {
+    setEventName(e.target.value);
   };
 
-  const handleDateClick = (date) => {
-    setCalendarDate(date);
+  const handleFocus = () => {
+    setIsFocused(true);
   };
 
-  const toggleDropdown = () => {
-    // 드롭다운 메뉴 열림/닫힘 토글
-    setIsDropdownOpen(!isDropdownOpen);
+  const handleBlur = () => {
+    setIsFocused(false);
   };
-  const [selectedDates, setSelectedDates] = useState([]); // 선택된 날짜를 저장할 상태 배열
 
-  // const handleDateChange = (date) => {
-  //   if (selectedDates.some(selectedDate => selectedDate.toDateString() === date.toDateString())) {
-  //     // 이미 선택된 날짜를 다시 클릭한 경우 배열에서 해당 날짜를 제거
-  //     setSelectedDates(selectedDates.filter(selectedDate => selectedDate.toDateString() !== date.toDateString()));
-  //   } else {
-  //     // 선택되지 않은 날짜 클릭한 경우, 배열에 추가
-  //     setSelectedDates([...selectedDates, date]);
-  //   }
-  // };
   const handleDateChange = (date) => {
-    // 달이 변경되었는지 확인
-    const isSameMonth = calendarDate.getMonth() === date.getMonth();
-        // 달이 변경되었으면 calendarDate 상태를 업데이트
-        if (!isSameMonth) {
-          setCalendarDate(new Date(date.getFullYear(), date.getMonth(), 1));
-        }
-    if (selectedDates.some(selectedDate => selectedDate.toDateString() === date.toDateString())) {
-      // 이미 선택된 날짜를 다시 클릭한 경우 배열에서 해당 날짜를 제거
-      setSelectedDates(selectedDates.filter(selectedDate => selectedDate.toDateString() !== date.toDateString()));
-    } else {
-      // 선택되지 않은 날짜 클릭한 경우, 배열에 추가
-      setSelectedDates([...selectedDates, date]);
-    }
-  
+    const dateString = moment(date).format("YYYY-MM-DD");
+    const monthKey = moment(calendarDate).format("YYYY-MM");
 
+    // 현재 달의 선택된 날짜를 저장
+    setSavedDates(prevSavedDates => {
+      const currentMonthDates = prevSavedDates[monthKey] || [];
+      let updatedMonthDates;
+
+      if (currentMonthDates.includes(dateString)) {
+        // 이미 선택된 날짜를 다시 클릭한 경우 배열에서 제거
+        updatedMonthDates = currentMonthDates.filter(d => d !== dateString);
+      } else {
+        // 선택되지 않은 날짜 클릭 시 배열에 추가
+        updatedMonthDates = [...currentMonthDates, dateString];
+      }
+
+      return {
+        ...prevSavedDates,
+        [monthKey]: updatedMonthDates
+      };
+    });
+
+    // 현재 달의 선택된 날짜를 즉시 반영
+    setSelectedDates(prevSelectedDates => {
+      if (prevSelectedDates.includes(dateString)) {
+        return prevSelectedDates.filter(d => d !== dateString);
+      } else {
+        return [...prevSelectedDates, dateString];
+      }
+    });
   };
-  
+
   const tileClassName = ({ date, view }) => {
-    // 날짜가 선택된 날짜 배열에 포함되어 있을 때 특정 클래스를 적용
-    if (selectedDates.some(selectedDate => selectedDate.toDateString() === date.toDateString())) {
+    const dateString = moment(date).format("YYYY-MM-DD");
+    if (selectedDates.includes(dateString)) {
       return 'selected-date';
     }
     return null;
   };
-  const [eventName, setEventName] = useState(""); // 초기 텍스트 설정
 
-  const handleInputChange = (e) => {
-    setEventName(e.target.value); // 사용자가 입력한 값을 상태로 관리
+  useEffect(() => {
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    setSelectedDates(savedDates[currentMonthKey] || []); // 새로운 달로 이동할 때 해당 달의 선택된 날짜를 불러옴
+  }, [calendarDate, savedDates]);
+
+  const handleMonthChange = (e) => {
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+
+    // 현재 달의 선택된 날짜들을 저장
+    if (selectedDates.length > 0) {
+      setSavedDates(prevSavedDates => ({
+        ...prevSavedDates,
+        [currentMonthKey]: selectedDates,
+      }));
+    }
+
+    // 새로운 달로 이동
+    const newMonth = parseInt(e.target.value, 10) - 1;
+    const newDate = new Date(calendarDate.getFullYear(), newMonth, 1);
+    setCalendarDate(newDate);
+
+    // 새로운 달로 이동할 때 이전 선택 상태를 불러옴
+    const newMonthKey = moment(newDate).format("YYYY-MM");
+    setSelectedDates(savedDates[newMonthKey] || []); 
   };
-  const [isFocused, setIsFocused] = useState(false); // 포커스 상태 관리
 
-  const handleFocus = () => {
-    setIsFocused(true); // 입력 필드가 포커스될 때 상태 변경
+  const tileDisabled = ({ date, view }) => {
+    return view === 'month' && date.getMonth() !== calendarDate.getMonth();
   };
-
-  const handleBlur = () => {
-    setIsFocused(false); // 입력 필드에서 포커스가 해제될 때 상태 변경
-  };
-
 
   return (
     <div className="main-container">
@@ -116,9 +111,11 @@ const MainPage = () => {
           {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
         </div>
         <div className="dropdown">
-          {/* <select className="select-month" onChange={handleMonthChange}> */}
-          <select className="select-month" value={calendarDate.getMonth() + 1} onChange={handleMonthChange}>
-            <option value="" disabled selected>날짜 선택</option>
+          <select
+            className="select-month"
+            value={calendarDate.getMonth() + 1}
+            onChange={handleMonthChange}
+          >
             {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
               <option key={month} value={month}>
                 {month}월
@@ -126,37 +123,20 @@ const MainPage = () => {
             ))}
           </select>
         </div>
-        {/* <span onClick={toggleDropdown} >
-          {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
-        </span>
-        {isDropdownOpen && (
-          <div className="dropdown">
-            <select className='select-month' value={calendarDate.getMonth() + 1} onChange={handleMonthChange}>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <option key={month} value={month}>
-                  {month}월
-                </option>
-              ))}
-            </select>
-          </div>
-        )} */}
       </div>
       <div className="calendar">
-        {/* 캘린더 컴포넌트 */}
         <Calendar 
           value={calendarDate}
-          onChange={handleDateChange} // 날짜가 변경될 때 처리하는 핸들러
-          tileClassName={tileClassName} // 각 타일에 동적으로 클래스를 추가       
-          locale="ko-KR" // 한국어 로케일 적용
-          calendarType="gregory" // 일요일 부터 시작
-          onClickDay={handleDateClick} 
-          navigationLabel={null}      
-          formatDay={(locale, date) => moment(date).format("DD")} // 날'일' 제외하고 숫자만 보이도록 설정
-          showNeighboringMonth={true} // 이웃 달의 날짜 보이기
-       /> 
+          locale="ko-KR"
+          calendarType="gregory"
+          onClickDay={handleDateChange}
+          tileClassName={tileClassName}
+          formatDay={(locale, date) => moment(date).format("DD")}
+          showNeighboringMonth={true}
+          tileDisabled={tileDisabled}
+        /> 
       </div>
     </div>
-
   );
 };
 
