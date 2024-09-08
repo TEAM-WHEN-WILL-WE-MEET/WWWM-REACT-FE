@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
-import './mainpage.css'; 
+import './MonthView.css'; 
 import moment from "moment";
 
-const MainPage = () => {
+const MonthView = () => {
   const [eventName, setEventName] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [selectedDates, setSelectedDates] = useState([]); 
   const [savedDates, setSavedDates] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState(''); 
 
   const handleInputChange = (e) => {
     setEventName(e.target.value);
@@ -81,6 +82,7 @@ const MainPage = () => {
 
     // 새로운 달로 이동
     const newMonth = parseInt(e.target.value, 10) - 1;
+    setSelectedMonth(e.target.value);
     const newDate = new Date(calendarDate.getFullYear(), newMonth, 1);
     setCalendarDate(newDate);
 
@@ -110,12 +112,14 @@ const MainPage = () => {
         <div className="date-display">
           {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
         </div>
-        <div className="dropdown">
+        <div className="dropdown" >
           <select
             className="select-month"
-            value={calendarDate.getMonth() + 1}
+            value={selectedMonth || ''}
+            // value={calendarDate.getMonth() + 1}
             onChange={handleMonthChange}
           >
+             <option value="" disabled>한달 보기</option> 
             {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
               <option key={month} value={month}>
                 {month}월
@@ -140,4 +144,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default MonthView;

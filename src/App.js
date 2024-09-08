@@ -1,8 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import MainPage from "./pages/mainpage";
+import MonthView from "./pages/MonthView";
+import WeekView from "./pages/WeekView";
+import Invite from "./pages/invite";
+
 import LandingPage from "./pages/LandingPage";
+import TimePicker from './components/TimePicker';
 
 function App() {
   return (
@@ -10,7 +14,21 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/main" element={<MainPage />} />
+          <Route path="/MonthView" 
+            element={<> 
+            <MonthView /> <TimePicker /> 
+            </>} 
+          />
+          <Route path="/WeekView" 
+            element={<> 
+            <WeekView /> <TimePicker /> 
+            </>} 
+          />
+          <Route path="/invite" 
+            element={<> 
+            <Invite /> 
+            </>} 
+          />
         </Routes>
       </div>
     </Router>

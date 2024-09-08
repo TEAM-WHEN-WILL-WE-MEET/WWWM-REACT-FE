@@ -1,0 +1,23 @@
+[33mcommit 80e8f1f958d124e640d574c820a541a9ef4d0fd3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: hyunju1211 <hyunju0411@konkuk.ac.kr>
+Date:   Sat Aug 31 23:25:41 2024 +0900
+
+    Create Mainpage calendar logic and layout and etc.
+
+[33mcommit 3e323aaa6b3f6195ff86b45777dea5d31e6b2f74[m
+Author: hyunju1211 <hyunju0411@konkuk.ac.kr>
+Date:   Sat Aug 31 21:23:13 2024 +0900
+
+    Switches calendar on neighborhood click, but dropdown menu broken
+
+[33mcommit a4149e9debe221ec4e929cfddb768d97e6382874[m
+Author: hyunju1211 <hyunju0411@konkuk.ac.kr>
+Date:   Fri Aug 30 17:28:40 2024 +0900
+
+    First commit and push
+
+[33mcommit e684f06115ac472cb4e19cf2a2a8d6690c576f2a[m
+Author: hyunju1211 <hyunju0411@konkuk.ac.kr>
+Date:   Fri Aug 30 17:22:19 2024 +0900
+
+    Initialize project using Create React App
