@@ -1,12 +1,19 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import MainPage from "./pages/mainpage.js";
+import MainPage from "./pages/mainpage";
+import LandingPage from "./pages/LandingPage";
+
 function App() {
   return (
-    // wwmt 첫커밋앤푸시~~^^
-    <div className="App">
-      <MainPage />
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/main" element={<MainPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
