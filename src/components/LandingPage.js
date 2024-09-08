@@ -11,7 +11,7 @@ const Header = () => (
 const Problem = () => (
   <section className="problem">
     <div className="problem-logo-div"></div>
-    <h3> 다들 한번쯤 이런 적 있으시죠? 😫</h3>
+    <h3>다들 한번쯤 이런 적 있으시죠? 😫</h3>
     <p>카톡에서 "언제 괜찮아요?" 무한 반복하기</p>
     <p>매번 지겹게 캘린더 스크린샷 올리기</p>
     <p>투표 만들고 결과 정리하느라 시간 쓰기</p>
@@ -31,7 +31,8 @@ const Features = () => (
     <h3>이렇게 해결해 드려요! 💪</h3>
     <FeatureCard
       icon="🚀"
-      title="원클릭 약속방 생성"
+      title="원터치
+       약속방 생성"
       description="클릭 한 번으로 약속 잡기 시작!"
     />
     <FeatureCard
