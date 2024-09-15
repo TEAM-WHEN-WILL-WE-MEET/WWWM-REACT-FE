@@ -1,324 +1,221 @@
 .time-picker-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-    padding:20px;
-  }
-  
-  .time-label {
-    color: #444444;
-    font-family: "Pretendard-Medium", Helvetica;
-    font-size: 14px;
-    font-weight: 500;
-    margin-left:0;
-    margin-bottom: 10px;
-    text-align: left;
-    width:100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  padding: 20px;
+}
 
-  }
-  
-  .time-range {
-    display: flex;
-    align-items: center;
-    background-color: #ffffff;
-    border: 1px solid #f2f2f2;
-    border-radius: 6px;
-    /* width:320px; */
-    height: 48px;
-    padding: 0 27px;
-    gap:10px;
-  }
-  .time-range.disabled {
-    pointer-events: none; /* 클릭을 막음 */
-    background-color: #fafafa !important;
+.time-label {
+  color: #444444;
+  font-family: "Pretendard-Medium", Helvetica;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 0;
+  margin-bottom: 10px;
+  text-align: left;
+  width: 100%;
+}
 
-  }
-  
-  .time-separator {
-    width: 16px;          
-    height: 1px;          
-    background-color: black; 
-    display: inline-block; 
-    margin: 0 8px;        
-    vertical-align: middle; 
-  }
-  
-  .time-button {
-    background-color: white;
-    border:none;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    /* width:230px; */
-    padding: 14px 21px;
-  }
-  .time-button.disabled{
-    
-  }
-/* 기본 토글 컨테이너 */
+.time-range {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #f2f2f2;
+  border-radius: 6px;
+  height: 48px;
+  padding: 0 27px;
+  gap: 10px;
+}
+
+.time-range.disabled {
+  pointer-events: none;
+  background-color: #fafafa !important;
+}
+
+.time-separator {
+  width: 16px;
+  height: 1px;
+  background-color: black;
+  display: inline-block;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+
+.time-button {
+  background-color: white;
+  border: none;
+  padding: 14px 21px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.time-button.disabled {
+  /* 필요한 경우 스타일 추가 */
+}
+
+/* 하루 종일 토글 스타일 */
 .all-day-toggle {
-    display: flex;
-    flex-direction: row;
-    align-items: right;
-    justify-content: flex-end; /* 오른쪽 정렬 */
-    width: 100%;
-    margin-top:10px;
-  }
-  
-  /* 토글 스위치 기본 스타일 */
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px; /* 너비 */
-    height: 34px; /* 높이 */
-    margin-left: 10px; /* 라벨과 간격 */
-    padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 10px;
+}
 
-    margin-right:-24px;
-  }
-  label{
-    padding: 0;
-    color: #767676;
-    font-family: "Pretendard-Medium", Helvetica;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  /* 숨겨진 체크박스 */
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  /* 슬라이더 */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-    width:24px;
-    height: 14px;
-  }
-  
-  /* 슬라이더의 원 (토글 버튼) */
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 12px;
-    width: 12px;
-    top:1px;
-    left: 0px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* 체크 상태일 때 배경색을 변경 */
-  input:checked + .slider {
-    background-color: #000000; /* 녹색 */
-  }
-  
-  /* 체크 상태일 때 원을 오른쪽으로 이동 */
-  input:checked + .slider:before {
-    transform: translateX(12px); /* 오른쪽으로 이동 */
-  }
-  
-  /* 토글의 활성화된 상태 */
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
-  
-  
-  .create-calendar-button {
-    margin-top: 20px;
-     padding: 10px 20px;
-    background-color: #ffffff;
-    border: 1px solid;
-    border-color: #444444;
-    border-radius: 8px;
-    box-shadow: 2px 2px 0px #444444;
-    height: 48px;
-    width:320px;
-  }
-  .create-calendar-button:hover{
-    cursor: pointer;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #ffffff;
-    border: 1px solid;
-    border-color: #767676;
-    border-radius: 12px;
-    height: 166px;
-    width:276px;
-  }
-  
-  /* .time-select {
-    max-height: 200px;
-    overflow-y: auto;
-  } */
-  .time-select-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .hour-select, .minute-select {
-    max-height: 150px;
-    overflow: hidden;
-    margin: 0 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .time-option {
-    padding: 10px;
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
-    border-bottom: 1px solid lightgray; /* 얇은 회색 경계선 추가 */
-    color: gray; /* 기본 회색 */
-    color: #242424;
-    padding: 19px 25px;
-    font-family: "Pretendard-Medium", Helvetica;
-    font-size: 18px;
-    font-weight: 500;
-  }
-  
-  .time-option.selected {
-    color: black; /* 중앙 항목은 검은색 */
-  }
-  
-  .time-separator2 {
-    font-size: 24px;
-    margin: 0 10px;
-  }
-  
-  .hour-select::-webkit-scrollbar, .minute-select::-webkit-scrollbar{
-    display: NONE;
-  }
-  .time-option {
-    padding: 10px;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .time-separator {
-    font-size: 24px;
-    margin: 0 10px;
-  }
-  
-  .time-option {
-    padding: 10px;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .time-option:hover {
-    background-color: #f0f0f0;
-  }
-  .time-select-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%; /* 전체 너비를 차지 */
-    height: auto;
-  }
-  
-  .hour-select, .minute-select {
-    display: flex;
-    flex-direction: column; /* 아이템을 세로로 정렬 */
-    justify-content: center;
-    align-items: center;
-    max-height: 150px; /* 리스트가 보이도록 적절한 높이 설정 */
-    overflow-y: auto; /* 스크롤 숨김 */
-  }
-  
-  .time-option {
-    padding: 20px; /* 각 항목에 패딩 추가로 공간 확보 */
-    cursor: pointer;
-    text-align: center;
-    width: 100px; /* 너비를 충분히 확보 */
-    border-bottom: 1px solid lightgray; /* 얇은 회색 경계선 */
-    color: gray; /* 기본 회색 */
-    font-size: 24px; /* 텍스트 크기를 키워 더 잘 보이도록 */
-  }
-  
-  .time-option.selected {
-    color: black; /* 선택된 항목은 검은색 */
-  }
-  
-  .time-separator {
-    font-size: 48px; /* 구분자(:)의 크기 */
-    margin: 0 10px;
-    color: black;
-  }
-  
-  .modal-content {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 300px; /* 모달창 너비 */
-    margin: 0 auto;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* 반투명 검정색 배경 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 14px;
+  margin-left: 10px;
+  padding: 0;
+  margin-right: -24px;
+}
+
+label {
+  padding: 0;
+  color: #767676;
+  font-family: "Pretendard-Medium", Helvetica;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* 숨겨진 체크박스 */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 슬라이더 */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+/* 슬라이더의 원 */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  top: 1px;
+  left: 0px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 체크 상태 */
+input:checked + .slider {
+  background-color: #000000;
+}
+
+input:checked + .slider:before {
+  transform: translateX(12px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.create-calendar-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  box-shadow: 2px 2px 0px #444444;
+  height: 48px;
+  width: 320px;
+}
+
+.create-calendar-button:hover {
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border: 1px solid #767676;
+  border-radius: 12px;
+  width: 276px;
+  /* 높이를 자동으로 설정하여 내용에 맞게 조정 */
+  height: auto;
+}
+
+.time-select-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px auto;
+}
+
+.hour-select,
+.minute-select {
+  max-height: 200px; /* 필요에 따라 높이 조정 */
+  overflow-y: auto; /* 스크롤 가능하게 변경 */
+  margin: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-option {
+  padding: 19px 25px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  border-bottom: 1px solid lightgray;
+  color: #242424;
+  font-family: "Pretendard-Medium", Helvetica;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.time-option.selected {
+  color: black;
+}
+
+.time-option:hover {
+  background-color: #f0f0f0;
+}
+
+.time-separator2 {
+  font-size: 24px;
+  margin: 0 10px;
+  color: black;
+}
+
+/* 스크롤바 숨기기 (필요 시) */
+.hour-select::-webkit-scrollbar,
+.minute-select::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}

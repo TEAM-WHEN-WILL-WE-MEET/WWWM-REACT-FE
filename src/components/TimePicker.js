@@ -39,37 +39,69 @@ const [selectedMinuteIndex, setSelectedMinuteIndex] = useState(0);  // 선택된
 //     }
 //     setIsModalOpen(false); // 선택 후 모달 닫기
 // };
-const handleTimeSelect = (value, type) => {
-    const formattedValue = value.toString().padStart(2, '0');
 
-    if (type === 'hour') {
-        if (isSelectingStartTime) {
-            setStartTime((prev) => {
-                // prev가 없으면 기본값 "00:00" 사용
-                const [prevHour, prevMinute] = (prev || "00:00").split(':');
-                return `${formattedValue}:${prevMinute}`;
-            });
-        } else {
-            setEndTime((prev) => {
-                const [prevHour, prevMinute] = (prev || "00:00").split(':');
-                return `${formattedValue}:${prevMinute}`;
-            });
-        }
-    } else if (type === 'minute') {
-        if (isSelectingStartTime) {
-            setStartTime((prev) => {
-                const [prevHour, prevMinute] = (prev || "00:00").split(':');
-                return `${prevHour}:${formattedValue}`;
-            });
-        } else {
-            setEndTime((prev) => {
-                const [prevHour, prevMinute] = (prev || "00:00").split(':');
-                return `${prevHour}:${formattedValue}`;
-            });
-        }
+const handleTimeSelect = (value, type) => {
+  // value는 이미 패딩된 문자열이므로 그대로 사용
+  const formattedValue = value;
+
+  if (type === 'hour') {
+    if (isSelectingStartTime) {
+      setStartTime((prev) => {
+        const [prevHour, prevMinute] = (prev || "00:00").split(':');
+        return `${formattedValue}:${prevMinute}`;
+      });
+    } else {
+      setEndTime((prev) => {
+        const [prevHour, prevMinute] = (prev || "00:00").split(':');
+        return `${formattedValue}:${prevMinute}`;
+      });
     }
-    setIsModalOpen(false); // 선택 후 모달 닫기
+  } else if (type === 'minute') {
+    if (isSelectingStartTime) {
+      setStartTime((prev) => {
+        const [prevHour, prevMinute] = (prev || "00:00").split(':');
+        return `${prevHour}:${formattedValue}`;
+      });
+    } else {
+      setEndTime((prev) => {
+        const [prevHour, prevMinute] = (prev || "00:00").split(':');
+        return `${prevHour}:${formattedValue}`;
+      });
+    }
+  }
+  setIsModalOpen(false); // 선택 후 모달 닫기
 };
+// const handleTimeSelect = (value, type) => {
+//     const formattedValue = value.toString().padStart(2, '0');
+
+//     if (type === 'hour') {
+//         if (isSelectingStartTime) {
+//             setStartTime((prev) => {
+//                 // prev가 없으면 기본값 "00:00" 사용
+//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
+//                 return `${formattedValue}:${prevMinute}`;
+//             });
+//         } else {
+//             setEndTime((prev) => {
+//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
+//                 return `${formattedValue}:${prevMinute}`;
+//             });
+//         }
+//     } else if (type === 'minute') {
+//         if (isSelectingStartTime) {
+//             setStartTime((prev) => {
+//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
+//                 return `${prevHour}:${formattedValue}`;
+//             });
+//         } else {
+//             setEndTime((prev) => {
+//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
+//                 return `${prevHour}:${formattedValue}`;
+//             });
+//         }
+//     }
+//     setIsModalOpen(false); // 선택 후 모달 닫기
+// };
 
   
   const handleAllDayToggle = () => {
@@ -145,22 +177,25 @@ const handleTimeSelect = (value, type) => {
                 <div
                 key={`hour-${i}`}
                 className="time-option"
+                // onClick={() => handleTimeSelect(i < 10 ? `0${i}` : `${i}`, 'hour')}
                 onClick={() => handleTimeSelect(i < 10 ? `0${i}` : `${i}`, 'hour')}
                 >
                     {i < 10 ? `0${i}` : `${i}`}
-                
+
                 </div>
             ))}
             </div>
             <div className="time-separator2">:</div>
             <div className="minute-select">
-            {Array.from({ length: 6 }, (undefined, i) => (
+            {Array.from({ length: 6 }, (_, i) => (
                 <div
                 key={`minute-${i}`}
                 className="time-option"
                 onClick={() => handleTimeSelect(i * 10 < 10 ? `0${i * 10}` : `${i * 10}`, 'minute')}
                 >
+                {/* {i * 10 < 10 ? `0${i * 10}` : `${i * 10}`} */}
                 {i * 10 < 10 ? `0${i * 10}` : `${i * 10}`}
+
                 </div>
             ))}
             </div>
