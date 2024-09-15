@@ -181,7 +181,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr) !important; /* 7열 그리드 설정, 각 열의 너비가 동일함 */
   gap: 0px; /* 타일 간의 간격을 설정할 수 있음 */
-  
+
   
 }
 .react-calendar--doubleView {
@@ -274,6 +274,8 @@
     min-height: 45px;
     margin-left:4px;
     padding: 0;
+    transition: background-color 0.3s ease;
+
 } 
 .react-calendar__tile:hover{
   cursor: pointer;

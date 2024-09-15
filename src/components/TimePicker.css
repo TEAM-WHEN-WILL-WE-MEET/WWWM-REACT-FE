@@ -31,7 +31,7 @@
   }
   .time-range.disabled {
     pointer-events: none; /* 클릭을 막음 */
-    background-color: #fafafa;
+    background-color: #fafafa !important;
 
   }
   
@@ -53,7 +53,9 @@
     /* width:230px; */
     padding: 14px 21px;
   }
-  
+  .time-button.disabled{
+    
+  }
 /* 기본 토글 컨테이너 */
 .all-day-toggle {
     display: flex;
