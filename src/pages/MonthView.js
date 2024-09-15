@@ -103,14 +103,27 @@ const MonthView = () => {
 
   //타일 비활성화 조건->true일때
   const tileDisabled = ({ date, view }) => {
-    // console.log(date+"랄ㄹ라"); //Sat Oct 05 2024 00:00:00 GMT+0900 (한국 표준시) 이런식
-    // console.log(view+"룰루"); //month
-    // console.log(date.getMonth()+"dddddd"); //9
-    // console.log("ㅇㅇㅇㅇ"+calendarDate.getMonth()); //8???
-    // return view === 'month' && date.getMonth() !== calendarDate.getMonth();
-    // return true;
-    return false; //임시 반환값
-    //return 현재달(맨처음 클릭한달?) =< 지금 클릭한 달 숫자일때만 false반환
+    // // console.log(date+"랄ㄹ라"); //Sat Oct 05 2024 00:00:00 GMT+0900 (한국 표준시) 이런식
+    // // console.log(view+"룰루"); //month
+    // // console.log(date.getMonth()+"dddddd"); //9
+    // // console.log("ㅇㅇㅇㅇ"+calendarDate.getMonth()); //8???
+    // // return view === 'month' && date.getMonth() !== calendarDate.getMonth();
+    // // return true;
+    // return false; //임시 반환값
+    // //return 현재달(맨처음 클릭한달?) =< 지금 클릭한 달 숫자일때만 false반환
+    if (view === 'month') {
+      // 현재 선택된 달의 연도와 월
+      const currentYear = calendarDate.getFullYear();
+      const currentMonth = calendarDate.getMonth();
+  
+      // 타일의 날짜의 연도와 월
+      const tileYear = date.getFullYear();
+      const tileMonth = date.getMonth();
+  
+      // 현재 달과 타일의 날짜의 달이 다르면 true 반환하여 비활성화
+      return currentYear !== tileYear || currentMonth !== tileMonth;
+    }
+    return false;
   };
 
   // const DatePicker = ({ activeStartDate }) => {
@@ -191,6 +204,7 @@ const MonthView = () => {
           formatDay={(locale, date) => moment(date).format("DD")}
           showNeighboringMonth={true}
           tileDisabled={tileDisabled}
+          minDate={new Date(new Date().setHours(0, 0, 0, 0))}  //오늘 포함한 이후의 날짜만 선택가능
           // activeStartDate={startDate}
         /> 
       </div>
