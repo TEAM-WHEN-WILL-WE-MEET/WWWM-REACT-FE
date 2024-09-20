@@ -5,6 +5,7 @@ import MonthView from "./pages/MonthView";
 import WeekView from "./pages/WeekView";
 import Invite from "./pages/invite";
 
+
 import LandingPage from "./pages/LandingPage";
 import TimePicker from './components/TimePicker';
 
@@ -24,6 +25,7 @@ function App() {
             <WeekView /> <TimePicker /> 
             </>} 
           />
+         
           <Route path="/invite" 
             element={<> 
             <Invite /> 

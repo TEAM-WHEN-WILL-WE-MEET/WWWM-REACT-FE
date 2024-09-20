@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import './WeekView.css'; 
 import moment from "moment";
+import { useNavigate } from 'react-router-dom';
 
 const WeekView = () => {
   const [eventName, setEventName] = useState("");
@@ -9,6 +10,8 @@ const WeekView = () => {
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   const [selectedDays, setSelectedDays] = useState([]);
 
+  const [viewMode, setViewMode] = useState('month'); // 월/주 선택 'month' 또는 'week'
+  const navigate = useNavigate();
   const handleDayClick = (day) => {
     setSelectedDays((prevSelectedDays) => {
       if (prevSelectedDays.includes(day)) {
@@ -50,8 +53,21 @@ const WeekView = () => {
       />
       <div className="weekday-selector">
         <div className="week-header">
-          <label className="labelWeek">일주일</label>
-          <button className="view-week-button">일주일 보기</button>
+          <label className="labelWeek">요일 선택</label>
+          <div className="view-mode-toggle2">
+            <button
+              className="toggle-the-other-month"
+              onClick={() => navigate('/MonthView')}
+            >
+              월
+            </button>
+            <button
+              className='active'
+              onClick={() => navigate('/WeekView')}
+            >
+              주
+            </button>
+          </div>
         </div>
       <div className="days-container">
         {days.map((day, index) => (

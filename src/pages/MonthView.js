@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef  } from 'react';
+import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
+import { useNavigate } from 'react-router-dom';
 import './MonthView.css'; 
 import moment from "moment";
 
@@ -9,7 +10,16 @@ const MonthView = () => {
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [selectedDates, setSelectedDates] = useState([]); 
   const [savedDates, setSavedDates] = useState({});
-  const [selectedMonth, setSelectedMonth] = useState(''); 
+
+  const [isMonthModalOpen, setIsMonthModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('month'); // 'month' 또는 'year'
+  const [selectedYear, setSelectedYear] = useState(calendarDate.getFullYear());
+
+  const [viewMode, setViewMode] = useState('month'); // 월/주 선택 'month' 또는 'week'
+  const navigate = useNavigate();
+  // 연도 범위 설정
+  const currentYear = new Date().getFullYear();
+  const yearRange = Array.from({ length: 3 }, (_, i) => currentYear + i);
 
   const handleInputChange = (e) => {
     setEventName(e.target.value);
@@ -23,12 +33,12 @@ const MonthView = () => {
     setIsFocused(false);
   };
 
-  //타일 클릭시, 해당 날 반환
+  // 날짜 클릭 핸들러
   const handleDateChange = (date) => {
     const dateString = moment(date).format("YYYY-MM-DD");
     const monthKey = moment(calendarDate).format("YYYY-MM");
-    console.log(date);
-    // 현재 달의 선택된 날짜를 저장
+
+    // 현재 달의 선택된 날짜들을 저장
     setSavedDates(prevSavedDates => {
       const currentMonthDates = prevSavedDates[monthKey] || [];
       let updatedMonthDates;
@@ -70,95 +80,59 @@ const MonthView = () => {
     setSelectedDates(savedDates[currentMonthKey] || []); // 새로운 달로 이동할 때 해당 달의 선택된 날짜를 불러옴
   }, [calendarDate, savedDates]);
 
-  //드롭다운에서 월(1-12) 선택
-  const handleMonthChange = (e) => {
-    
+  // 모달 열기 함수
+  const openMonthModal = () => {
+    setSelectedYear(calendarDate.getFullYear());
+    setIsMonthModalOpen(true);
+    setModalMode('month'); // 모달 모드를 초기화
+  };
+
+  // 모달 내 연도 선택 핸들러
+  const handleYearSelectInModal = (year) => {
+    setSelectedYear(year);
+    setModalMode('month'); // 다시 월 선택 모드로 변경
+  };
+
+  // 월 선택 핸들러
+  const handleMonthSelect = (monthIndex) => {
     // 현재 달의 선택된 날짜들을 저장
     const currentMonthKey = moment(calendarDate).format("YYYY-MM");
-    console.log(currentMonthKey);
-    // 현재 무슨달인지 console.log에 출력
     if (selectedDates.length > 0) {
-      setSavedDates(prevSavedDates => ({
+      setSavedDates((prevSavedDates) => ({
         ...prevSavedDates,
         [currentMonthKey]: selectedDates,
       }));
-      console.log("현재 선택된 날짜: "+selectedDates);
-      //새로운 달로 이동하기전에 현재달에서 무슨무슨 날 선택된건지 출력
     }
 
-    // 새로운 달로 이동
-    const newMonth = parseInt(e.target.value, 10)-1;
-    setSelectedMonth(e.target.value);
-    console.log(newMonth);
-    //무슨 달로 이동한건지 출력
-    const newDate = new Date(calendarDate.getFullYear(), newMonth, 1);
+    // 새로운 연도와 월로 이동
+    const newDate = new Date(selectedYear, monthIndex, 1);
     setCalendarDate(newDate);
-    console.log(newDate);
-    console.log(calendarDate);
-    // 새로운 달로 이동할 때 이전 선택 상태를 불러옴
+
+    // 새로운 달의 선택된 날짜를 불러옴
     const newMonthKey = moment(newDate).format("YYYY-MM");
     setSelectedDates(savedDates[newMonthKey] || []);
 
+    // 모달 닫기 및 모드 초기화
+    setIsMonthModalOpen(false);
+    setModalMode('month');
   };
 
-  //타일 비활성화 조건->true일때
+  // 타일 비활성화 조건
   const tileDisabled = ({ date, view }) => {
-    // // console.log(date+"랄ㄹ라"); //Sat Oct 05 2024 00:00:00 GMT+0900 (한국 표준시) 이런식
-    // // console.log(view+"룰루"); //month
-    // // console.log(date.getMonth()+"dddddd"); //9
-    // // console.log("ㅇㅇㅇㅇ"+calendarDate.getMonth()); //8???
-    // // return view === 'month' && date.getMonth() !== calendarDate.getMonth();
-    // // return true;
-    // return false; //임시 반환값
-    // //return 현재달(맨처음 클릭한달?) =< 지금 클릭한 달 숫자일때만 false반환
     if (view === 'month') {
       // 현재 선택된 달의 연도와 월
       const currentYear = calendarDate.getFullYear();
       const currentMonth = calendarDate.getMonth();
-  
+
       // 타일의 날짜의 연도와 월
       const tileYear = date.getFullYear();
       const tileMonth = date.getMonth();
-  
+
       // 현재 달과 타일의 날짜의 달이 다르면 true 반환하여 비활성화
       return currentYear !== tileYear || currentMonth !== tileMonth;
     }
     return false;
   };
-
-  // const DatePicker = ({ activeStartDate }) => {
-  //   const [startDate, setStartDate] = useState(activeStartDate);
-  //   const refCalendarContainer = useRef(null);
-  
-  //   const handleNavigationClick = () => {
-  //     const refNode = refCalendarContainer.current;
-  //     const currentCalendarView = refNode.querySelector('.react-calendar__view');
-  //     const activeMonth = new Date(currentCalendarView?.dataset?.activeStartDate || new Date());
-  //     setStartDate(activeMonth);
-  //   };
-  
-  //   useEffect(() => {
-  //     if (activeStartDate instanceof Date) {
-  //       setStartDate(activeStartDate);
-  //     }
-  //   }, [activeStartDate]);
-  
-  //   useEffect(() => {
-  //     const refNode = refCalendarContainer.current;
-  //     const navigationButtons = refNode.querySelectorAll('.react-calendar__navigation__arrow');
-  
-  //     navigationButtons.forEach(button => {
-  //       button.addEventListener('click', handleNavigationClick);
-  //     });
-  
-  //     return () => {
-  //       navigationButtons.forEach(button => {
-  //         button.removeEventListener('click', handleNavigationClick);
-  //       });
-  //     };
-  //   }, []);
-  
-   
 
   return (
     <div className="main-container">
@@ -175,25 +149,26 @@ const MonthView = () => {
       />
       <div className="calendar-header">
         <div className="date-display">
-          {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
+          <span onClick={openMonthModal} style={{ cursor: 'pointer' }}>
+            {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
+          </span>
+  
         </div>
-        <div className="dropdown" >
-          <select
-            className="select-month"
-            value={selectedMonth || ''}
-            // value={calendarDate.getMonth() + 1}
-            onChange={handleMonthChange}
-          >
-             <option value="" disabled>한달 보기</option> 
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-              <option key={month} value={month}>
-                {month}월
-              </option>
-            ))}
-          </select>
-        </div>
+        <div className="view-mode-toggle1">
+            <button
+              className="active"
+              onClick={() => navigate('/MonthView')}
+            >
+              월
+            </button>
+            <button
+              className="toggle-the-other-week"
+              onClick={() => navigate('/WeekView')}
+            >
+              주
+            </button>
+          </div>
       </div>
-      {/* <div className="calendar" ref={refCalendarContainer}> */}
       <div className="calendar">
         <Calendar
           activeStartDate={calendarDate} 
@@ -204,10 +179,47 @@ const MonthView = () => {
           formatDay={(locale, date) => moment(date).format("DD")}
           showNeighboringMonth={true}
           tileDisabled={tileDisabled}
-          minDate={new Date(new Date().setHours(0, 0, 0, 0))}  //오늘 포함한 이후의 날짜만 선택가능
-          // activeStartDate={startDate}
+          minDate={new Date(new Date().setHours(0, 0, 0, 0))}
         /> 
       </div>
+      {isMonthModalOpen && (
+        <div className="monthview-modal-overlay" onClick={() => { setIsMonthModalOpen(false); setModalMode('month'); }}>
+          <div className="monthview-modal-content" onClick={(e) => e.stopPropagation()}>
+            {modalMode === 'month' ? (
+              // 월 선택 
+              <div className="year-month-selector">
+                <div className="year-display-in-modal" onClick={() => setModalMode('year')}>
+                  {selectedYear}년
+                </div>
+                <div className="month-buttons">
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleMonthSelect(i)}
+                      className="month-button"
+                    >
+                      {i + 1}월
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              // 연도 선택 
+              <div className="monthview-year-buttons">
+                {yearRange.map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => handleYearSelectInModal(year)}
+                    className="monthview-year-button"
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
