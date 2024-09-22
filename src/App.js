@@ -4,6 +4,7 @@ import './App.css';
 import MonthView from "./pages/MonthView";
 import WeekView from "./pages/WeekView";
 import Invite from "./pages/invite";
+import EventCalendar from "./pages/eventCalendar";
 
 
 import LandingPage from "./pages/LandingPage";
@@ -29,6 +30,11 @@ function App() {
           <Route path="/invite" 
             element={<> 
             <Invite /> 
+            </>} 
+          />
+          <Route path="/eventCalendar" 
+            element={<> 
+            <EventCalendar /> 
             </>} 
           />
         </Routes>
