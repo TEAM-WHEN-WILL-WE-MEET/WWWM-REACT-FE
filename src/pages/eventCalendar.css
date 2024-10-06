@@ -5,9 +5,13 @@
 
   }
   .event-calendar-header{
-    display: flex;
+
     flex-direction: row;  
     background-color:rgb(255, 255, 255);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width:100%;
   }
   .event-calendar-header-text{
     color: #242424;

@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import './TimePicker.css'; // 스타일링을 위한 css 파일
+import { useNavigate } from 'react-router-dom';
 
-const TimePicker = () => {
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("20:00");
+// const TimePicker = () => {
+  // const TimePicker = ({ jsonData }) => {
+    // const TimePicker = ({ jsonData, setStartTime, setEndTime }) => {
+const TimePicker = ({ jsonData, startTime, endTime, setStartTime, setEndTime }) => {
+
+  // const [startTime, setStartTime] = useState("09:00");
+  // const [endTime, setEndTime] = useState("20:00");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSelectingStartTime, setIsSelectingStartTime] = useState(false);
   const [isAllDay, setIsAllDay] = useState(false);
 
   const [selectedHourIndex, setSelectedHourIndex] = useState(0);  // 선택된 시간 인덱스
-const [selectedMinuteIndex, setSelectedMinuteIndex] = useState(0);  // 선택된 분 인덱스
+  const [selectedMinuteIndex, setSelectedMinuteIndex] = useState(0);  // 선택된 분 인덱스
+  const navigate = useNavigate();
 
   const handleTimeClick = (isStart) => {
     setIsSelectingStartTime(isStart);
@@ -19,7 +25,36 @@ const [selectedMinuteIndex, setSelectedMinuteIndex] = useState(0);  // 선택된
   const handleModalClose = () => {
     setIsModalOpen(false); // 모달창 닫기
   };
+  // const handleCreateCalendar = () => {
+  //   console.log(jsonData);
+  //   // 추가 작업이 필요하면 여기에 작성하세요.
+  // };
+  const handleCreateCalendar = async () => {
+    try {
+      console.log(jsonData);
+      const response = await fetch('http://localhost:8080/api/v1/appointment/createAppointment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+      });
 
+      if (!response.ok) {
+        console.error('서버 응답 에러:', response.statusText);
+        // 추가적인 에러 처리를 여기에 작성하세요.
+        return;
+      }
+
+      const responseData = await response.json();
+
+      // 응답 데이터를 가지고 eventCalendar 페이지로 이동
+      navigate('/eventCalendar', { state: { responseData } });
+    } catch (error) {
+      console.error('데이터 전송 중 오류 발생:', error);
+      // 추가적인 에러 처리를 여기에 작성하세요.
+    }
+  };
 //     const handleTimeSelect = (value, type) => {
 //     // value가 1자리일 경우 0을 앞에 붙여서 두 자릿수로 만듭니다.
 //     const formattedValue = value.toString().padStart(2, '0');
@@ -135,7 +170,7 @@ const handleTimeSelect = (value, type) => {
 
 
       {/* 이벤트 캘린더 만들기 버튼 */}
-      <button className="create-calendar-button">이벤트 캘린더 만들기</button>
+      <button className="create-calendar-button" onClick={handleCreateCalendar}>이벤트 캘린더 만들기</button>
 
       {/* {isModalOpen && (
   <div className="modal-overlay" onClick={handleModalClose}>
