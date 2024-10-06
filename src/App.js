@@ -35,7 +35,8 @@ function App() {
           /> */}
 
           {/* <Route path="/invite" component={InvitePage} /> */}
-          <Route path="/getAppointment" element={<Navigate to="/invite" replace />} />
+          {/* <Route path="/getAppointment" element={<Navigate to="/invite" replace />} /> */}
+          <Route path="/getAppointment" element={<Navigate to={`/invite${window.location.search}`} replace />} />
           <Route path="/invite"   element={<> <Invite /> </>} />
 
           <Route path="/eventCalendar" 

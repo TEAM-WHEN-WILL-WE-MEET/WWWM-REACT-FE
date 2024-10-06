@@ -10,6 +10,7 @@ const Invite = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
   const location = useLocation();
+  
   // URL에서 appointmentId 추출
   const queryParams = new URLSearchParams(location.search);
   const appointmentId = queryParams.get('appointmentId') || '66c4948d11c1407794fb5c22'; // 기본값 설정
