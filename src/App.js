@@ -6,6 +6,7 @@ import WeekView from "./pages/WeekView";
 import Invite from "./pages/invite";
 import EventCalendar from "./pages/eventCalendar";
 import ParentMonth from './pages/ParentMonth';
+import GetAppointmentRedirect from './pages/GetAppointmentRedirect';
 
 
 import LandingPage from "./pages/LandingPage";
@@ -36,7 +37,11 @@ function App() {
 
           {/* <Route path="/invite" component={InvitePage} /> */}
           {/* <Route path="/getAppointment" element={<Navigate to="/invite" replace />} /> */}
-          <Route path="/getAppointment" element={<Navigate to={`/invite${window.location.search}`} replace />} />
+
+          {/* <Route path="/getAppointment" element={<Navigate to={`/invite${window.location.search}`} replace />} /> */}
+          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
+
+         
           <Route path="/invite"   element={<> <Invite /> </>} />
 
           <Route path="/eventCalendar" 

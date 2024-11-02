@@ -1,457 +1,457 @@
 .main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* padding: 20px; */
-    width:auto;
-    height: auto;
-  }
-  .tab{
-    width: 360px;
-    height: 32px;
-    background-color: #f4f4f4;
-    /* background-color: red; */
-    display: block;
-    position: relative;
-    margin-bottom: 16px;
-  }
-  .logo-image {
-    margin-bottom: 40px;
-    align-self: flex-start; 
-  }
-  .calendar-header{
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width:100%;
-  }
-  .date-display {
-    color: #585858;
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 0;
-  }
-  /* 월/주 선택 스와이프 슬라이드 버튼 스타일 */
-  .view-mode-toggle1 {
-    display: flex;
-    align-items: center;
-    height: 20px !important;
-    background-color: #f5f5f5; /* 비활성화된 부분 배경색 */
-    border-radius: 30px; /* 컨테이너 자체를 둥글게 처리 */
-    padding: 5px;
-    padding-left:0px;
-    width:50px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 살짝 그림자 효과 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* padding: 20px; */
+  width:auto;
+  height: auto;
+}
+.tab{
+  width: 360px;
+  height: 32px;
+  background-color: #f4f4f4;
+  /* background-color: red; */
+  display: block;
+  position: relative;
+  margin-bottom: 16px;
+}
+.logo-image {
+  margin-bottom: 40px;
+  align-self: flex-start; 
+}
+.calendar-header{
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width:100%;
+}
+.date-display {
+  color: #585858;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 0;
+}
+/* 월/주 선택 스와이프 슬라이드 버튼 스타일 */
+.view-mode-toggle1 {
+  display: flex;
+  align-items: center;
+  height: 20px !important;
+  background-color: #f5f5f5; /* 비활성화된 부분 배경색 */
+  border-radius: 30px; /* 컨테이너 자체를 둥글게 처리 */
+  padding: 5px;
+  padding-left:0px;
+  width:50px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 살짝 그림자 효과 */
 
-  }
-  .calendar-header:hover{
-    cursor: pointer;
-  }
-
-  
-  .dropdown {
-    background-color: #ffffff;
-    border: 1px solid;
-    border-color: #e4e4e4;
-    border-radius: 12px;
-    outline: none;
-    height: 24px;
-    width: 64px; 
-    color: #767676;
-    font-size: 12px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    align-items: center; 
-    justify-content: center; 
-  }
-  .dropdown:focus{
-    outline: none;
-  }
-  .select-month {
-    appearance: none; /* 기본 화살표 제거 */
-    -webkit-appearance: none; /* Safari, Chrome */
-    -moz-appearance: none; /* Firefox */
-    border: none;
-    background: none; 
-    font-size: inherit;
-    font-weight: inherit;
-    color: inherit;
-    width: 100%; 
-    height: 100%;
-    text-align: center; 
-    color: #767676;
-    font-size: 12px;
-    font-weight: 500;
-
-  }
-  .select-btn{
-    color: #767676;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .select-month:hover{
-    cursor: pointer;
-  }
-  
-  
-  .toggle-the-other-week {
-    width: 50px; 
-    height: 20px ;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    color: #a7a7a7;
-    font-size: 12px;
-    font-weight: 500;
-    background-color: #f5f5f5;
-  }
-  
-  .active {
-    background-color: red;
-    background-color: #ffffff;
-    border: 2px solid;
-    border-color: #767676;
-    border-radius: 13px;
-    height: 30px;
-    width:30px !important;
-    padding: auto;
-  }
-  
-  
-  .toggle-the-other:hover, .active:hover {
-    background-color: lightgray; /* 호버 시 배경 색 */
-  }
-  
-  
+}
+.calendar-header:hover{
+  cursor: pointer;
+}
 
 
-  /* .dropdown{
-    background-color: #ffffff;
-    border: 1px solid;
-    border-color: #e4e4e4;
-    background-color: red;
-    border-radius: 12px;
-    outline: none;
-    height: 24px;
-    width: 64px;
-    color: #767676;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .select-month{
-    border:none;
+.dropdown {
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #e4e4e4;
+  border-radius: 12px;
+  outline: none;
+  height: 24px;
+  width: 64px; 
+  color: #767676;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  align-items: center; 
+  justify-content: center; 
+}
+.dropdown:focus{
+  outline: none;
+}
+.select-month {
+  appearance: none; /* 기본 화살표 제거 */
+  -webkit-appearance: none; /* Safari, Chrome */
+  -moz-appearance: none; /* Firefox */
+  border: none;
+  background: none; 
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  width: 100%; 
+  height: 100%;
+  text-align: center; 
+  color: #767676;
+  font-size: 12px;
+  font-weight: 500;
 
-  } */
+}
+.select-btn{
+  color: #767676;
+  font-size: 12px;
+  font-weight: 500;
+}
+.select-month:hover{
+  cursor: pointer;
+}
 
-  .event-name, .calendar-month, .select-day-button {
-    margin-bottom: 20px;
-  }
-  /* .event-name {
-    border: none;
-    border-bottom: 1px solid #a7a7a7; 
-    width: 100%; 
-    padding: 5px 0;
-    outline: none; 
-    color: #a7a7a7;
-    font-size: 20px;
-    font-weight: 600;
-  }
-  
-  .event-name:focus {
-    border-bottom: 1px solid #000; 
-    color: #444444;
-    font-family: "Pretendard-SemiBold", Helvetica;
-    font-size: 20px;
-    font-weight: 600;
-  } */
-  .event-name {
-    font-size: 20px;
-    font-weight: 600;
-    border: none;
-    border-bottom: 1px solid #444444;
-    outline: none;
-    padding: 5px 0;
-    width: 100%;
-    transition: all 0.2s ease; /* 스타일 변경 시 부드럽게 전환 */
-  }
-  
-  .event-name:focus {
-    border-bottom: 1px solid #000; /* 포커스 시 밑줄 색상 변경 */
-    color: #000000; /* 포커스 시 진한 글씨색 */
-  }
-  
-  .input-blurred {
-    color: #444444; /* 포커스 해제 시 글씨 색상 변경 */
-    font-family: "Pretendard-SemiBold", Helvetica;
-    font-size: 20px;
-    font-weight: 600;
-    border-bottom: 1px solid #000; /* 포커스 해제 시 밑줄 색상 */
-  }
-  
-  
-  /* 캘린더 CSS파트 */
 
-  .main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    width: auto;
-    height: auto;
+.toggle-the-other-week {
+  width: 50px; 
+  height: 20px ;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  color: #a7a7a7;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #f5f5f5;
+}
+
+.active {
+  background-color: red;
+  background-color: #ffffff;
+  border: 2px solid;
+  border-color: #767676;
+  border-radius: 13px;
+  height: 30px;
+  width:30px !important;
+  padding: auto;
+}
+
+
+.toggle-the-other:hover, .active:hover {
+  background-color: lightgray; /* 호버 시 배경 색 */
+}
+
+
+
+
+/* .dropdown{
+  background-color: #ffffff;
+  border: 1px solid;
+  border-color: #e4e4e4;
+  background-color: red;
+  border-radius: 12px;
+  outline: none;
+  height: 24px;
+  width: 64px;
+  color: #767676;
+  font-size: 12px;
+  font-weight: 500;
+}
+.select-month{
+  border:none;
+
+} */
+
+.event-name, .calendar-month, .select-day-button {
+  margin-bottom: 20px;
+}
+/* .event-name {
+  border: none;
+  border-bottom: 1px solid #a7a7a7; 
+  width: 100%; 
+  padding: 5px 0;
+  outline: none; 
+  color: #a7a7a7;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.event-name:focus {
+  border-bottom: 1px solid #000; 
+  color: #444444;
+  font-family: "Pretendard-SemiBold", Helvetica;
+  font-size: 20px;
+  font-weight: 600;
+} */
+.event-name {
+  font-size: 20px;
+  font-weight: 600;
+  border: none;
+  border-bottom: 1px solid #444444;
+  outline: none;
+  padding: 5px 0;
+  width: 100%;
+  transition: all 0.2s ease; /* 스타일 변경 시 부드럽게 전환 */
+}
+
+.event-name:focus {
+  border-bottom: 1px solid #000; /* 포커스 시 밑줄 색상 변경 */
+  color: #000000; /* 포커스 시 진한 글씨색 */
+}
+
+.input-blurred {
+  color: #444444; /* 포커스 해제 시 글씨 색상 변경 */
+  font-family: "Pretendard-SemiBold", Helvetica;
+  font-size: 20px;
+  font-weight: 600;
+  border-bottom: 1px solid #000; /* 포커스 해제 시 밑줄 색상 */
+}
+
+
+/* 캘린더 CSS파트 */
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: auto;
+  height: auto;
 }
 
 .logo-image {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .event-name,
 .calendar-month,
 .select-day-button {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 /* 캘린더 CSS파트 */
 
 .react-calendar {
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    background: white;
-    border: none;
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.125em;
-    padding: 0;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  background: white;
+  border: none;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.125em;
+  padding: 0;
 }
 .react-calendar__month-view__days{
-  /* display: flex;
-  flex-wrap: nowrap; */
-  display: grid;
-  grid-template-columns: repeat(7, 1fr) !important; /* 7열 그리드 설정, 각 열의 너비가 동일함 */
-  gap: 0px; /* 타일 간의 간격을 설정할 수 있음 */
+/* display: flex;
+flex-wrap: nowrap; */
+display: grid;
+grid-template-columns: repeat(7, 1fr) !important; /* 7열 그리드 설정, 각 열의 너비가 동일함 */
+gap: 0px; /* 타일 간의 간격을 설정할 수 있음 */
 
-  
+
 }
 .react-calendar--doubleView {
-    width: 700px;
+  width: 700px;
 }
 .react-calendar__month-view__weekdays__weekday abbr[title]::after {
-    content: ''; /* 추가된 점 3개 제거 */
-  }
-  
-  .react-calendar__month-view__weekdays__weekday abbr {
-    text-decoration: none; /* 기본 스타일에서 점이 추가되는 경우 */
-  }
-  
+  content: ''; /* 추가된 점 3개 제거 */
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none; /* 기본 스타일에서 점이 추가되는 경우 */
+}
+
 .react-calendar--doubleView .react-calendar__viewContainer {
-    display: flex;
-    margin: -0.5em;
+  display: flex;
+  margin: -0.5em;
 }
 
 .react-calendar--doubleView .react-calendar__viewContainer > * {
-    width: 50%;
-    margin: 0.5em;
+  width: 50%;
+  margin: 0.5em;
 }
 
 .react-calendar__navigation {
-    display: none; /* display: flex;로 변경 가능 */
-    height: 44px;
-    margin-bottom: 1em;
+  display: none; /* display: flex;로 변경 가능 */
+  height: 44px;
+  margin-bottom: 1em;
 }
 
 .react-calendar__navigation button {
-    min-width: 44px;
-    background: none;
+  min-width: 44px;
+  background: none;
 }
 
 .react-calendar__navigation button:disabled {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .react-calendar__navigation button:enabled:hover,
 .react-calendar__navigation button:enabled:focus {
-    background-color: #e6e6e6;
+  background-color: #e6e6e6;
 }
 /* 요일 */
 .react-calendar__month-view__weekdays {
-    text-align: center;
-    text-transform: uppercase;
-    color: #767676;
-    font-size: 12px;
-    font-weight: 500;
-    display: flex;
-    flex-wrap: wrap;
+  text-align: center;
+  text-transform: uppercase;
+  color: #767676;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .react-calendar__month-view__weekdays__weekday {
-    padding: 0.5em 0;
-    flex: 1 0 14%; /* 타일의 기본 크기(14%는 7개의 타일이 한 줄에 들어가게끔 설정) */
-    max-width: 42px; /* 원래 설정한 크기를 유지하려면 max-width와 height를 사용 */
-    min-width: 42px;
-    margin-left:4px;
+  padding: 0.5em 0;
+  flex: 1 0 14%; /* 타일의 기본 크기(14%는 7개의 타일이 한 줄에 들어가게끔 설정) */
+  max-width: 42px; /* 원래 설정한 크기를 유지하려면 max-width와 height를 사용 */
+  min-width: 42px;
+  margin-left:4px;
 }
 
 .react-calendar__month-view__weekNumbers .react-calendar__tile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font: inherit;
-    font-size: 0.75em;
-    font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 0.75em;
+  font-weight: bold;
 
 }
 
 /* 모든 1-31 일 days이 들어가는 틀 */
 .react-calendar__tile {
-    border: 1px solid #f2f2f2;
-    border-radius: 6px;
-    height: 45px;
-    width: 42px !important; 
-    /* padding: 10px 6.6667px; */
-    background: none;
-    text-align: center;
-    line-height: 16px;
-    font: inherit;
-    color: #767676;
-    font-size: 14px;
-    font-weight: 400;
-    flex: 1 0 14%; /* 타일의 기본 크기(14%는 7개의 타일이 한 줄에 들어가게끔 설정) */
-    max-width: 42px; /* 원래 설정한 크기를 유지하려면 max-width와 height를 사용 */
-    max-height: 45px;
-    min-width: 42px;
-    min-height: 45px;
-    margin-left:4px;
-    padding: 0;
-    transition: background-color 0.3s ease;
+  border: 1px solid #f2f2f2;
+  border-radius: 6px;
+  height: 45px;
+  width: 42px !important; 
+  /* padding: 10px 6.6667px; */
+  background: none;
+  text-align: center;
+  line-height: 16px;
+  font: inherit;
+  color: #767676;
+  font-size: 14px;
+  font-weight: 400;
+  flex: 1 0 14%; /* 타일의 기본 크기(14%는 7개의 타일이 한 줄에 들어가게끔 설정) */
+  max-width: 42px; /* 원래 설정한 크기를 유지하려면 max-width와 height를 사용 */
+  max-height: 45px;
+  min-width: 42px;
+  min-height: 45px;
+  margin-left:4px;
+  padding: 0;
+  transition: background-color 0.3s ease;
 
 } 
 .react-calendar__tile:hover{
-  cursor: pointer;
-  background-color: #fff2c4;
+cursor: pointer;
+background-color: #fff2c4;
 }  
 .monthview-modal-overlay{
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+display: flex;
+justify-content: center;
+align-items: center;
 }
 .monthview-modal-content{
-  background-color: #ffffff;
-  border: 1px solid;
-  border-color: #a7a7a7;
-  border-radius: 12px;
-  height: 200px !important;
-  padding: 16px 22px;
-  width:276px;
-  border-color: #a7a7a7;
+background-color: #ffffff;
+border: 1px solid;
+border-color: #a7a7a7;
+border-radius: 12px;
+height: 200px !important;
+padding: 16px 22px;
+width:276px;
+border-color: #a7a7a7;
 
 }
 .year-display-in-modal{
-  color: #242424;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 auto;
-  margin-bottom: 12px;
-  text-align: center;
+color: #242424;
+font-size: 16px;
+font-weight: 600;
+margin: 0 auto;
+margin-bottom: 12px;
+text-align: center;
 }
 .year-display-in-modal:hover{
-  cursor: pointer;
+cursor: pointer;
 }
 .month-buttons{
-  width: auto;
-  height: auto;
-  display: grid;
-  gap: 10px 8px;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+width: auto;
+height: auto;
+display: grid;
+gap: 10px 8px;
+grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+grid-template-rows: 1fr 1fr 1fr;
 }
 .month-button{
-  border: 1px solid;
-  flex: 1 1 auto;
-  border-color: #e4e4e4;
-  background-color: #ffffff;
-  color: #242424;
-  font-size: 14px;
-  font-weight: 400;
-  height: 45px;
-  width:45px !important;
-  border-radius: 30px !important;
+border: 1px solid;
+flex: 1 1 auto;
+border-color: #e4e4e4;
+background-color: #ffffff;
+color: #242424;
+font-size: 14px;
+font-weight: 400;
+height: 45px;
+width:45px !important;
+border-radius: 30px !important;
 
 }
 .monthview-year-buttons{
 
-  display: grid;
-  gap: auto; 
-  grid-template-columns: 1fr 1fr 1fr;
+display: grid;
+gap: auto; 
+grid-template-columns: 1fr 1fr 1fr;
 
-  justify-content: center;
-  justify-items: stretch;
-  margin-top:70px;
-  margin-left:40px;
+justify-content: center;
+justify-items: stretch;
+margin-top:70px;
+margin-left:40px;
 
 }
 .monthview-year-button{
-  border: 1px solid;
-  flex: 0 0 auto;
-  border-color: #e4e4e4;
-  background-color: #ffffff;
-  color: #242424;
-  font-size: 14px;
-  font-weight: 400;
-  height: 45px;
-  width:45px !important;
-  border-radius: 30px !important;
+border: 1px solid;
+flex: 0 0 auto;
+border-color: #e4e4e4;
+background-color: #ffffff;
+color: #242424;
+font-size: 14px;
+font-weight: 400;
+height: 45px;
+width:45px !important;
+border-radius: 30px !important;
 }
 
 .month-button:hover{
-  cursor: pointer;
-  background-color: #000;
-  color: #ffffff;
+cursor: pointer;
+background-color: #000;
+color: #ffffff;
 
 }
 .monthview-year-button:hover{
-  cursor: pointer;
-  background-color: #000;
-  color: #ffffff;
+cursor: pointer;
+background-color: #000;
+color: #ffffff;
 }
 /* 연도/월 선택 네비게이션 바
 .react-calendar__year-view .react-calendar__tile,
 .react-calendar__decade-view .react-calendar__tile,
 .react-calendar__century-view .react-calendar__tile {
-     padding: 2em 0.5em; 
+   padding: 2em 0.5em; 
 } */
 /*  지난달 or 다음달 */
 .react-calendar__month-view__days__day--neighboringMonth,
 .react-calendar__decade-view__years__year--neighboringDecade,
 .react-calendar__century-view__decades__decade--neighboringCentury {
-  background-color: #fafafa;
-  border: 1px solid;
-  border-color: #f2f2f2;
-  border-radius: 6px;
-  color: #9d9d9d;
-  font-size: 14px;
-  font-weight: 400;
+background-color: #fafafa;
+border: 1px solid;
+border-color: #f2f2f2;
+border-radius: 6px;
+color: #9d9d9d;
+font-size: 14px;
+font-weight: 400;
 }
 .react-calendar__month-view__days__day--neighboringMonth:hover,
 .react-calendar__decade-view__years__year--neighboringDecade:hover,
 .react-calendar__century-view__decades__decade--neighboringCentury:hover{
-    background-color: #fafafa;
-    cursor: default;
+  background-color: #fafafa;
+  cursor: default;
 }
 .react-calendar__tile--now {
-    /* 기존 스타일 주석 처리됨 */
-    background-color: none;
-    border: none;
+  /* 기존 스타일 주석 처리됨 */
+  background-color: none;
+  border: none;
 }
 
 .react-calendar__tile:enabled:hover,
@@ -468,19 +468,19 @@
 
 /* 선택된 날짜의 배경색과 텍스트 색상을 변경 */
 .selected-date {
-    background-color: #fff2c4;
-    border: 1px solid #444444;
-    border-radius: 6px;
-    color: #47332f;
-    font-size: 14px;
-    font-weight: 500;
+  background-color: #fff2c4;
+  border: 1px solid #444444;
+  border-radius: 6px;
+  color: #47332f;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* 선택된 날짜에 마우스를 올렸을 때 */
 .selected-date:hover {
-    background-color: #fff2c4;
-    opacity: 0.8;
-    cursor: pointer;
+  background-color: #fff2c4;
+  opacity: 0.8;
+  cursor: pointer;
 }
 
 /* 박스 크기 설정을 모든 요소에 적용 */
@@ -488,7 +488,7 @@
 .react-calendar *,
 .react-calendar *:before,
 .react-calendar *:after {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }

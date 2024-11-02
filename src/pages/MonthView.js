@@ -65,8 +65,8 @@ import moment from 'moment-timezone';
       
       // 부모에게 받은 startTime과 endTime을 사용
       // 부모로부터 받은 startTime과 endTime을 사용
-      console.log("시작시간이 몇시? "+startTime);
-      console.log("마감시간이 몇시? "+endTime);
+      // console.log("시작시간이 몇시? "+startTime);
+      // console.log("마감시간이 몇시? "+endTime);
 
     //   const startDateTime = moment
     //   .tz(`${earliestDateString} ${startTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
@@ -122,7 +122,6 @@ import moment from 'moment-timezone';
         // 선택되지 않은 날짜 클릭 시 배열에 추가
         updatedMonthDates = [...currentMonthDates, dateString];
       }
-
       return {
         ...prevSavedDates,
         [monthKey]: updatedMonthDates

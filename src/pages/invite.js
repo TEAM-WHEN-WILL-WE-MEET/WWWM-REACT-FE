@@ -9,12 +9,12 @@ const Invite = () => {
   const [error, setError] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
-  const location = useLocation();
-  
-  // URL에서 appointmentId 추출
-  const queryParams = new URLSearchParams(location.search);
-  const appointmentId = queryParams.get('appointmentId') || '66c4948d11c1407794fb5c22'; // 기본값 설정
 
+  // URL에서 appointmentId 추출
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const appointmentId = queryParams.get('appointmentId') ; // 기본값 설정
+  console.log("나는야 invite.js의 appointmentID: ",appointmentId); //비정상
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password.trim() === '') {
@@ -27,7 +27,7 @@ const Invite = () => {
         password: password,
         appointmentId: appointmentId,
       };
-      console.log("데이터~~~",data);
+      console.log("로그인 데이터~~~",data);
       try {
         const response = await fetch('http://localhost:8080/api/v1/user/login', {
           method: 'POST',
@@ -43,7 +43,9 @@ const Invite = () => {
 
           // appointment 데이터 가져오기
           const appointmentResponse = await fetch(
+            // `http://localhost:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
             `http://localhost:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+
           );
 
           if (appointmentResponse.ok) {
