@@ -21,7 +21,7 @@ const ParentMonth = () => {
     }
     
     try {
-      // 캘린더 생성 요청
+      //createAppointment, 캘린더 생성 요청
       const calendarResponse = await fetch('http://localhost:8080/api/v1/appointment/createAppointment', {
         method: 'POST',
         headers: {
@@ -39,6 +39,7 @@ const ParentMonth = () => {
       console.log("나는 캘린더data: ",calendarData);
       const appointmentId = calendarData.object.id;
       console.log("왜안되는걸까?",appointmentId); //정상작동
+      
       // invite 페이지로 이동하면서 appointmentId를 쿼리 파라미터로 전달
       navigate(`/getAppointment?appointmentId=${appointmentId}`);
       

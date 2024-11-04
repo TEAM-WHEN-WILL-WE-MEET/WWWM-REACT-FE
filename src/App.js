@@ -7,7 +7,7 @@ import Invite from "./pages/invite";
 import EventCalendar from "./pages/eventCalendar";
 import ParentMonth from './pages/ParentMonth';
 import GetAppointmentRedirect from './pages/GetAppointmentRedirect';
-
+import IndividualCalendar from './pages/individualCalendar';
 
 import LandingPage from "./pages/LandingPage";
 
@@ -44,11 +44,9 @@ function App() {
          
           <Route path="/invite"   element={<> <Invite /> </>} />
 
-          <Route path="/eventCalendar" 
-            element={<> 
-            <EventCalendar /> 
-            </>} 
-          />
+          <Route path="/eventCalendar" element={<> <EventCalendar /> </>} />
+          <Route path="/individualCalendar" element={<><IndividualCalendar /></>}/>  
+          {/* ? */}
         </Routes>
       </div>
     </Router>
