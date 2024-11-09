@@ -1,3 +1,4 @@
+// individualCalendar.js
 import React, { useState, useEffect } from "react";
 import { useLocation } from 'react-router-dom';
 import moment from 'moment';
@@ -13,8 +14,6 @@ const IndividualCalendar = () => {
   const [eventName, setEventName] = useState("");
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTimes, setSelectedTimes] = useState({});
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState(null);
 
   useEffect(() => {
     if (responseData) {
@@ -23,6 +22,7 @@ const IndividualCalendar = () => {
 
       const schedules = responseData.object.schedules;
 
+      // 날짜 및 시간 데이터 설정
       const datesArray = schedules.map((schedule, index) => {
         const dateString = schedule.date;
         const date = moment.utc(dateString).format('YYYY-MM-DD');
@@ -53,11 +53,12 @@ const IndividualCalendar = () => {
         return moment(a, 'HH').diff(moment(b, 'HH'));
       });
 
-      const timesFormatted = timesArray.map(timeHM => moment(timeHM, 'HH:mm').format('HH:mm'));
+      const timesFormatted = timesArray.map(timeHM => moment(timeHM, 'HH').format('HH:mm'));
 
       setDates(datesArray);
       setTimes(timesFormatted);
 
+      // 이전에 저장된 선택된 시간 설정
       if (responseData.firstLogin === false && responseData.object.times) {
         const savedTimes = {};
         responseData.object.times.forEach(timeSlot => {
@@ -80,7 +81,7 @@ const IndividualCalendar = () => {
     }
   }, [responseData]);
 
-  const toggleTimeSelection = (timeIndex, buttonIndex) => {
+  const handleTimeClick = async (timeIndex, buttonIndex) => {
     const newSelectedTimes = { ...selectedTimes };
     if (!newSelectedTimes[selectedDate]) {
       newSelectedTimes[selectedDate] = {};
@@ -92,76 +93,52 @@ const IndividualCalendar = () => {
       [buttonIndex]: !isSelected,
     };
     setSelectedTimes(newSelectedTimes);
-  };
 
-  const handleMouseDown = (timeIndex, buttonIndex) => {
-    setIsDragging(true);
-    setDragStart({ timeIndex, buttonIndex });
-  };
+    const selectedDateInfo = dates[selectedDate];
+    const dateTime = `${selectedDateInfo.date}T${times[timeIndex].substring(0, 2)}:00`;
+    const payload = {
+      id: selectedDateInfo.id,
+      date: moment.utc(selectedDateInfo.date, "YYYY-MM-DD").format("YYYY-MM-DDTHH:mm:ss"),
+      times: [
+        {
+          time: moment.utc(dateTime, "YYYY-MM-DDTHH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),
+          users: [userName]
+        }
+      ],
+      appointmentId: appointmentId
+    };
 
-  const handleMouseEnter = (timeIndex, buttonIndex) => {
-    if (isDragging && dragStart) {
-      const start = Math.min(dragStart.timeIndex, timeIndex);
-      const end = Math.max(dragStart.timeIndex, timeIndex);
+    console.log("저장할 데이터:", payload);
 
-      for (let i = start; i <= end; i++) {
-        toggleTimeSelection(i, buttonIndex);
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/schedule/updateSchedule', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        console.log("스케줄 저장 성공");
+      } else {
+        console.log("스케줄 저장 실패");
+        alert("스케줄 저장에 실패했습니다.");
       }
+    } catch (error) {
+      console.error("저장 요청 중 오류:", error);
+      alert("서버 오류가 발생했습니다.");
     }
-  };
-
-  const handleMouseUp = (timeIndex, buttonIndex) => {
-    setIsDragging(false);
-
-    if (dragStart) {
-      const isClick =
-        dragStart.timeIndex === timeIndex && dragStart.buttonIndex === buttonIndex;
-      if (isClick) {
-        toggleTimeSelection(timeIndex, buttonIndex);
-      }
-    }
-
-    setDragStart(null);
-  };
-
-  // 터치 이벤트 핸들러 추가
-  const handleTouchStart = (e, timeIndex, buttonIndex) => {
-    e.preventDefault(); // 기본 터치 동작 방지
-    setIsDragging(true);
-    setDragStart({ timeIndex, buttonIndex });
-  };
-
-  const handleTouchMove = (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (target && target.dataset.timeIndex && target.dataset.buttonIndex) {
-      const timeIndex = parseInt(target.dataset.timeIndex, 10);
-      const buttonIndex = parseInt(target.dataset.buttonIndex, 10);
-      handleMouseEnter(timeIndex, buttonIndex);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    setDragStart(null);
   };
 
   return (
-    <div
-      className="individual-calendar"
-      onMouseLeave={() => {
-        setIsDragging(false);
-        setDragStart(null);
-      }}
-    >
+    <div className="individual-calendar">
       <div className="individual-calendar-header">
         <h2>{eventName}</h2>
       </div>
       <div className="event-date-tabs">
         {dates.map(({ date, key }) => (
-          <div
-            key={key}
+          <div key={key}
             className={`event-date-tab ${selectedDate === key ? 'active' : ''}`}
             onClick={() => setSelectedDate(key)}
           >
@@ -177,19 +154,12 @@ const IndividualCalendar = () => {
               {[...Array(6)].map((_, buttonIndex) => (
                 <button
                   key={buttonIndex}
-                  data-time-index={timeIndex}
-                  data-button-index={buttonIndex}
                   className={`eventCalendar-time-button ${
                     selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]
                       ? "selected"
                       : ""
                   }`}
-                  onMouseDown={() => handleMouseDown(timeIndex, buttonIndex)}
-                  onMouseEnter={() => handleMouseEnter(timeIndex, buttonIndex)}
-                  onMouseUp={() => handleMouseUp(timeIndex, buttonIndex)}
-                  onTouchStart={(e) => handleTouchStart(e, timeIndex, buttonIndex)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
+                  onClick={() => handleTimeClick(timeIndex, buttonIndex)}
                 />
               ))}
             </div>

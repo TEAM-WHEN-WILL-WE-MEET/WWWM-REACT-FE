@@ -179,7 +179,7 @@ const EventCalendar = () => {
           </div>
         ))}
       </div>
-
+  
       <div className="time-selection">
         {times.map((time, timeIndex) => (
           <div key={timeIndex} className="time-row">
