@@ -1,6 +1,6 @@
 // individualCalendar.js
 import React, { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate  } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/ko';
 import './individualCalendar.css';
@@ -14,7 +14,7 @@ const IndividualCalendar = () => {
   const [eventName, setEventName] = useState("");
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTimes, setSelectedTimes] = useState({});
-
+  const navigate = useNavigate(); 
   useEffect(() => {
     if (responseData) {
       setEventName(responseData.object.name);
@@ -80,6 +80,12 @@ const IndividualCalendar = () => {
       }
     }
   }, [responseData]);
+
+  // 저장 버튼 클릭 시 이동하는 함수
+  const handleSaveClick = () => {
+    // 필요한 로직 처리 후 페이지 이동
+    navigate('/eventCalendar');
+  };
 
   const handleTimeClick = async (timeIndex, buttonIndex) => {
     const newSelectedTimes = { ...selectedTimes };
@@ -166,6 +172,8 @@ const IndividualCalendar = () => {
           </div>
         ))}
       </div>
+      <button className="save-button" onClick={handleSaveClick}>내 시간대 저장</button>
+
     </div>
   );
 };

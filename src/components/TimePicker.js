@@ -1,245 +1,229 @@
 import React, { useState } from 'react';
-import './TimePicker.css'; // 스타일링을 위한 css 파일
+import './TimePicker.css';
 import { useNavigate } from 'react-router-dom';
 
-// const TimePicker = () => {
-  // const TimePicker = ({ jsonData }) => {
-    // const TimePicker = ({ jsonData, setStartTime, setEndTime }) => {
-// const TimePicker = ({ jsonData, startTime, endTime, setStartTime, setEndTime }) => {
-  const TimePicker = ({ jsonData, startTime, endTime, setStartTime, setEndTime, onCreateCalendar  }) => {
-
-  // const [startTime, setStartTime] = useState("09:00");
-  // const [endTime, setEndTime] = useState("20:00");
+const TimePicker = ({ jsonData, startTime, endTime, setStartTime, setEndTime, onCreateCalendar }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSelectingStartTime, setIsSelectingStartTime] = useState(false);
   const [isAllDay, setIsAllDay] = useState(false);
-
-  const [selectedHourIndex, setSelectedHourIndex] = useState(0);  // 선택된 시간 인덱스
-  const [selectedMinuteIndex, setSelectedMinuteIndex] = useState(0);  // 선택된 분 인덱스
   const navigate = useNavigate();
+  const [touchStart, setTouchStart] = useState(null);
+
+  // 시간을 분으로 변환하는 유틸리티 함수
+  const timeToMinutes = (time) => {
+    if (!time) return 0;
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  // 선택 가능한 시간 범위를 결정하는 함수
+  const isTimeSelectable = (hour, minute, isStart) => {
+    const currentTime = hour * 60 + minute;
+    
+    if (isStart) {
+      // startTime을 선택할 때는 endTime보다 이전이어야 함
+      return endTime ? currentTime < timeToMinutes(endTime) : true;
+    } else {
+      // endTime을 선택할 때는 startTime보다 이후여야 함
+      return startTime ? currentTime > timeToMinutes(startTime) : true;
+    }
+  };
 
   const handleTimeClick = (isStart) => {
     setIsSelectingStartTime(isStart);
-    setIsModalOpen(true); // 모달창 열기
+    setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
-    setIsModalOpen(false); // 모달창 닫기
+    setIsModalOpen(false);
+  };
+  // 터치 이벤트 핸들러 추가
+  const handleTouchStart = (e) => {
+    // 모달 컨텐츠 영역을 터치한 경우는 무시
+    if (e.target.closest('.modal-content')) return;
+    
+    // 터치 시작 위치 저장
+    setTouchStart({
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    });
   };
 
-  // const handleCreateCalendar = async () => {
-  //   try {
-  //     console.log(jsonData);
-  //     const response = await fetch('http://localhost:8080/api/v1/appointment/createAppointment', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(jsonData),
-  //     });
+  const handleTouchEnd = (e) => {
+    // 모달 컨텐츠 영역을 터치한 경우는 무시
+    if (e.target.closest('.modal-content')) return;
 
-  //     if (!response.ok) {
-  //       console.error('서버 응답 에러:', response.statusText);
-  //       // 추가적인 에러 처리를 여기에 작성하세요.
-  //       return;
-  //     }
+    // 터치 종료 위치 계산
+    const touchEnd = {
+      x: e.changedTouches[0].clientX,
+      y: e.changedTouches[0].clientY
+    };
 
-  //     const responseData = await response.json();
-
-  //     // 응답 데이터를 가지고 eventCalendar 페이지로 이동
-  //     navigate('/eventCalendar', { state: { responseData } });
-  //   } catch (error) {
-  //     console.error('데이터 전송 중 오류 발생:', error);
-  //     // 추가적인 에러 처리를 여기에 작성하세요.
-  //   }
-  // };
-//     const handleTimeSelect = (value, type) => {
-//     // value가 1자리일 경우 0을 앞에 붙여서 두 자릿수로 만듭니다.
-//     const formattedValue = value.toString().padStart(2, '0');
-
-//     if (type === 'hour') {
-//         if (isSelectingStartTime) {
-//             setStartTime((prev) => `${formattedValue}:${prev.split(':')[1]}`);
-//         } else {
-//             setEndTime((prev) => `${formattedValue}:${prev.split(':')[1]}`);
-//         }
-//     } else if (type === 'minute') {
-//         if (isSelectingStartTime) {
-//             setStartTime((prev) => `${prev.split(':')[0]}:${formattedValue}`);
-//         } else {
-//             setEndTime((prev) => `${prev.split(':')[0]}:${formattedValue}`);
-//         }
-//     }
-//     setIsModalOpen(false); // 선택 후 모달 닫기
-// };
-
-const handleTimeSelect = (value, type) => {
-  // value는 이미 패딩된 문자열이므로 그대로 사용
-  const formattedValue = value;
-
-  if (type === 'hour') {
-    if (isSelectingStartTime) {
-      setStartTime((prev) => {
-        const [prevHour, prevMinute] = (prev || "00:00").split(':');
-        return `${formattedValue}:${prevMinute}`;
-      });
-    } else {
-      setEndTime((prev) => {
-        const [prevHour, prevMinute] = (prev || "00:00").split(':');
-        return `${formattedValue}:${prevMinute}`;
-      });
+    // 터치 시작점이 있고, 이동 거리가 작은 경우(탭으로 간주)에만 모달 닫기
+    if (touchStart) {
+      const deltaX = Math.abs(touchEnd.x - touchStart.x);
+      const deltaY = Math.abs(touchEnd.y - touchStart.y);
+      
+      // 10픽셀 이내의 이동은 탭으로 간주
+      if (deltaX < 10 && deltaY < 10) {
+        handleModalClose();
+      }
     }
-  } else if (type === 'minute') {
-    if (isSelectingStartTime) {
-      setStartTime((prev) => {
-        const [prevHour, prevMinute] = (prev || "00:00").split(':');
-        return `${prevHour}:${formattedValue}`;
-      });
-    } else {
-      setEndTime((prev) => {
-        const [prevHour, prevMinute] = (prev || "00:00").split(':');
-        return `${prevHour}:${formattedValue}`;
-      });
+    
+    // 터치 시작점 초기화
+    setTouchStart(null);
+  };
+  const handleTimeSelect = (value, type) => {
+    const formattedValue = value;
+
+    if (type === 'hour') {
+      const currentMinutes = isSelectingStartTime ? 
+        (startTime ? startTime.split(':')[1] : '00') : 
+        (endTime ? endTime.split(':')[1] : '00');
+
+      // 선택하려는 시간이 유효한지 확인
+      if (!isTimeSelectable(parseInt(value), parseInt(currentMinutes), isSelectingStartTime)) {
+        return; // 유효하지 않은 선택은 무시
+      }
+
+      if (isSelectingStartTime) {
+        setStartTime((prev) => {
+          const [prevHour, prevMinute] = (prev || "00:00").split(':');
+          return `${formattedValue}:${prevMinute}`;
+        });
+      } else {
+        setEndTime((prev) => {
+          const [prevHour, prevMinute] = (prev || "00:00").split(':');
+          return `${formattedValue}:${prevMinute}`;
+        });
+      }
+    } else if (type === 'minute') {
+      const currentHour = isSelectingStartTime ?
+        (startTime ? startTime.split(':')[0] : '00') :
+        (endTime ? endTime.split(':')[0] : '00');
+
+      // 선택하려는 분이 유효한지 확인
+      if (!isTimeSelectable(parseInt(currentHour), parseInt(value), isSelectingStartTime)) {
+        return; // 유효하지 않은 선택은 무시
+      }
+
+      if (isSelectingStartTime) {
+        setStartTime((prev) => {
+          const [prevHour, prevMinute] = (prev || "00:00").split(':');
+          return `${prevHour}:${formattedValue}`;
+        });
+      } else {
+        setEndTime((prev) => {
+          const [prevHour, prevMinute] = (prev || "00:00").split(':');
+          return `${prevHour}:${formattedValue}`;
+        });
+      }
     }
-  }
-  setIsModalOpen(false); // 선택 후 모달 닫기
-};
-// const handleTimeSelect = (value, type) => {
-//     const formattedValue = value.toString().padStart(2, '0');
+    setIsModalOpen(false);
+  };
 
-//     if (type === 'hour') {
-//         if (isSelectingStartTime) {
-//             setStartTime((prev) => {
-//                 // prev가 없으면 기본값 "00:00" 사용
-//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
-//                 return `${formattedValue}:${prevMinute}`;
-//             });
-//         } else {
-//             setEndTime((prev) => {
-//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
-//                 return `${formattedValue}:${prevMinute}`;
-//             });
-//         }
-//     } else if (type === 'minute') {
-//         if (isSelectingStartTime) {
-//             setStartTime((prev) => {
-//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
-//                 return `${prevHour}:${formattedValue}`;
-//             });
-//         } else {
-//             setEndTime((prev) => {
-//                 const [prevHour, prevMinute] = (prev || "00:00").split(':');
-//                 return `${prevHour}:${formattedValue}`;
-//             });
-//         }
-//     }
-//     setIsModalOpen(false); // 선택 후 모달 닫기
-// };
-
-  
   const handleAllDayToggle = () => {
-    setIsAllDay(!isAllDay); // 하루종일 여부 토글
+    setIsAllDay(!isAllDay);
+  };
+
+  // 선택 가능한 시간 옵션을 생성하는 함수
+  const renderTimeOptions = (type) => {
+    const options = type === 'hour' 
+      ? Array.from({ length: 24 }, (_, i) => i)
+      : Array.from({ length: 6 }, (_, i) => i * 10);
+    
+    return options.map(value => {
+      const formattedValue = value < 10 ? `0${value}` : `${value}`;
+      const isSelectable = isTimeSelectable(
+        type === 'hour' ? value : parseInt(isSelectingStartTime ? startTime?.split(':')[0] : endTime?.split(':')[0]),
+        type === 'minute' ? value : parseInt(isSelectingStartTime ? startTime?.split(':')[1] : endTime?.split(':')[1]),
+        isSelectingStartTime
+      );
+
+      return (
+        <div
+          key={`${type}-${value}`}
+          className={`time-option ${!isSelectable ? 'disabled' : ''}`}
+          onClick={() => isSelectable && handleTimeSelect(formattedValue, type)}
+        >
+          {formattedValue}
+        </div>
+      );
+    });
   };
 
   return (
     <div className="time-picker-container" disabled={isAllDay}>
-      {/* 시간대 표시 텍스트 */}
       <div className="time-label">시간대 표시</div>
 
-      {/* 시간대 설정 */}
-        <div className={`time-range ${isAllDay ? 'disabled' : ''}`}>
+      <div className={`time-range ${isAllDay ? 'disabled' : ''}`}>
         <button className="time-button" onClick={() => handleTimeClick(true)} disabled={isAllDay}>
-            {startTime}
+          {startTime}
         </button>
         <div className="time-separator"></div>
         <button className="time-button" onClick={() => handleTimeClick(false)} disabled={isAllDay}>
-            {endTime}
+          {endTime}
         </button>
-        </div>
+      </div>
 
-      {/* 하루 종일 여부 토글 */}
       <div className="all-day-toggle">
-         <label className="switch">
-            <input type="checkbox" checked={isAllDay} onChange={handleAllDayToggle} />
-            <span className="slider"></span>
+        <label className="switch">
+          <input type="checkbox" checked={isAllDay} onChange={handleAllDayToggle} />
+          <span className="slider"></span>
         </label>
         <label>하루 종일</label>
-        </div>
-
-
-      {/* 이벤트 캘린더 만들기 버튼 */} 
-      {/* <button className="create-calendar-button" onClick={handleCreateCalendar}>이벤트 캘린더 만들기</button> */}
-      <button className="create-calendar-button" onClick={ onCreateCalendar }>이벤트 캘린더 만들기</button>
-
-      {/* {isModalOpen && (
-  <div className="modal-overlay" onClick={handleModalClose}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <div className="time-select-container">
-        <div className="hour-select">
-          {Array.from({ length: 24 }, (_, i) => (
-            <div
-              key={`hour-${i}`}
-              className={`time-option ${i === selectedHourIndex ? 'selected' : ''}`}
-              onClick={() => handleTimeSelect(i < 10 ? `0${i}` : `${i}`, 'hour')}
-            >
-              {i < 10 ? `0${i}` : `${i}`}
-            </div>
-          )).slice(Math.max(selectedHourIndex - 1, 0), Math.min(selectedHourIndex + 2, 24))} 
-        </div>
-        <div className="minute-select">
-          {Array.from({ length: 6 }, (_, i) => (
-            <div
-              key={`minute-${i}`}
-              className={`time-option ${i === selectedMinuteIndex ? 'selected' : ''}`}
-              onClick={() => handleTimeSelect(i * 10 < 10 ? `0${i * 10}` : `${i * 10}`, 'minute')}
-            >
-              {i * 10 < 10 ? `0${i * 10}` : `${i * 10}`}
-            </div>
-          )).slice(Math.max(selectedMinuteIndex - 1, 0), Math.min(selectedMinuteIndex + 2, 6))} 
-        </div>
       </div>
-    </div>
-  </div> */}
-{/* )} */}
 
-    {isModalOpen && (
-    <div className="modal-overlay" onClick={handleModalClose}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="time-select-container">
-            <div className="hour-select">
-            {Array.from({ length: 24 }, (v,i) => (
-                <div
-                key={`hour-${i}`}
-                className="time-option"
-                // onClick={() => handleTimeSelect(i < 10 ? `0${i}` : `${i}`, 'hour')}
-                onClick={() => handleTimeSelect(i < 10 ? `0${i}` : `${i}`, 'hour')}
-                >
-                    {i < 10 ? `0${i}` : `${i}`}
+      <button className="create-calendar-button" onClick={onCreateCalendar}>
+        이벤트 캘린더 만들기
+      </button>
 
-                </div>
-            ))}
+      {isModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={handleModalClose}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+          >
+            <div className="time-select-container">
+              <div className="hour-select">
+                {renderTimeOptions('hour')}
+              </div>
+              <div className="time-separator2">:</div>
+              <div className="minute-select">
+                {renderTimeOptions('minute')}
+              </div>
             </div>
-            <div className="time-separator2">:</div>
-            <div className="minute-select">
-            {Array.from({ length: 6 }, (_, i) => (
-                <div
-                key={`minute-${i}`}
-                className="time-option"
-                onClick={() => handleTimeSelect(i * 10 < 10 ? `0${i * 10}` : `${i * 10}`, 'minute')}
-                >
-                {/* {i * 10 < 10 ? `0${i * 10}` : `${i * 10}`} */}
-                {i * 10 < 10 ? `0${i * 10}` : `${i * 10}`}
-
-                </div>
-            ))}
-            </div>
+          </div>
         </div>
-        </div>
-    </div>
-    )}
-
+      )}
     </div>
   );
 };
+{/* 
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={handleModalClose}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="time-select-container">
+              <div className="hour-select">
+                {renderTimeOptions('hour')}
+              </div>
+              <div className="time-separator2">:</div>
+              <div className="minute-select">
+                {renderTimeOptions('minute')}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}; */}
 
 export default TimePicker;

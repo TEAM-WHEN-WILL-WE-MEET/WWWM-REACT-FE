@@ -5,7 +5,22 @@
   margin-top: 20px;
   padding: 20px;
 }
+.modal-overlay {
+  touch-action: none; /* 모바일에서 스크롤 방지 */
+  -webkit-tap-highlight-color: transparent; /* 탭 하이라이트 제거 */
+}
 
+.modal-content {
+  touch-action: pan-y; /* 모달 내부는 세로 스크롤 허용 */
+  -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
+}
+
+
+.time-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #ccc;
+}
 .time-label {
   color: #444444;
   font-family: "Pretendard-Medium", Helvetica;
@@ -197,6 +212,8 @@ input:checked + .slider:before {
   font-family: "Pretendard-Medium", Helvetica;
   font-size: 18px;
   font-weight: 500;
+  /* min-height: 44px; 일단 보류 ->모바일용 터치 타겟 크기 확보 */
+
 }
 
 .time-option.selected {

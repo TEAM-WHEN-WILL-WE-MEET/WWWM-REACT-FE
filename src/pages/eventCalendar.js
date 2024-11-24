@@ -146,7 +146,7 @@ const EventCalendar = () => {
 
   return (
     <div className="event-calendar">
-
+        <p > 여기는 eventCalendar 구역입니다~~~~</p>
       <div className="event-calendar-header">
         <div className="event-calendar-header-text">{eventName}</div>
       <div className="dropdown-container">

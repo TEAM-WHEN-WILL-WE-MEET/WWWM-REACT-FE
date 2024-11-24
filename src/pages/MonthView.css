@@ -6,6 +6,26 @@
   width:auto;
   height: auto;
 }
+/* 비활성화된 날짜 스타일 */
+.disabled-date {
+  color: #ccc !important;
+  background-color: #f5f5f5 !important;
+  cursor: not-allowed !important;
+}
+
+/* 비활성화된 날짜에 호버 효과 제거 */
+.disabled-date:hover {
+  background-color: #f5f5f5 !important;
+  cursor: not-allowed !important;
+}
+
+
+/* 선택된 날짜가 비활성화된 경우 */
+/* .selected-date.disabled-date {
+  background-color: #ccc !important;
+  color: #666 !important;
+} */
+ 
 .tab{
   width: 360px;
   height: 32px;

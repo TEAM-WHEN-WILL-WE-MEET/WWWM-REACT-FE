@@ -140,10 +140,20 @@ import moment from 'moment-timezone';
 
   const tileClassName = ({ date, view }) => {
     const dateString = moment(date).format("YYYY-MM-DD");
-    if (selectedDates.includes(dateString)) {
-      return 'selected-date';
+    const today = moment().startOf('day');
+    const classes = [];
+
+    // 오늘 이전 날짜는 'disabled-date' 클래스 추가
+    if (moment(date).isBefore(today)) {
+      classes.push('disabled-date');
     }
-    return null;
+
+    // 선택된 날짜는 'selected-date' 클래스 추가
+    if (selectedDates.includes(dateString)) {
+      classes.push('selected-date');
+    }
+
+    return classes.join(' ');
   };
 
   useEffect(() => {
@@ -188,18 +198,22 @@ import moment from 'moment-timezone';
     setModalMode('month');
   };
 
-  // 타일 비활성화 조건
+  // 타일 비활성화 조건 
   const tileDisabled = ({ date, view }) => {
     if (view === 'month') {
-      // 현재 선택된 달의 연도와 월
+      const today = moment().startOf('day');
+      
+      // 1. 오늘 이전 날짜 비활성화
+      if (moment(date).isBefore(today)) {
+        return true;
+      }
+
+      // 2. 현재 선택된 달의 날짜가 아닌 경우 비활성화
       const currentYear = calendarDate.getFullYear();
       const currentMonth = calendarDate.getMonth();
-
-      // 타일의 날짜의 연도와 월
       const tileYear = date.getFullYear();
       const tileMonth = date.getMonth();
 
-      // 현재 달과 타일의 날짜의 달이 다르면 true 반환하여 비활성화
       return currentYear !== tileYear || currentMonth !== tileMonth;
     }
     return false;
