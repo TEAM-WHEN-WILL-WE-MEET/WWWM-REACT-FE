@@ -218,6 +218,49 @@ import moment from 'moment-timezone';
     }
     return false;
   };
+  // 이전 달로 이동하는 함수
+  const goToPreviousMonth = () => {
+    const currentMonth = moment(calendarDate);
+    const previousMonth = currentMonth.subtract(1, 'month');
+    
+    // 현재 달의 선택된 날짜들을 저장
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates(prevSavedDates => ({
+        ...prevSavedDates,
+        [currentMonthKey]: selectedDates,
+      }));
+    }
+
+    // 새로운 달의 날짜로 설정
+    setCalendarDate(previousMonth.toDate());
+    
+    // 새로운 달의 저장된 날짜들을 불러옴
+    const newMonthKey = previousMonth.format("YYYY-MM");
+    setSelectedDates(savedDates[newMonthKey] || []);
+  };
+
+  // 다음 달로 이동하는 함수
+  const goToNextMonth = () => {
+    const currentMonth = moment(calendarDate);
+    const nextMonth = currentMonth.add(1, 'month');
+    
+    // 현재 달의 선택된 날짜들을 저장
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates(prevSavedDates => ({
+        ...prevSavedDates,
+        [currentMonthKey]: selectedDates,
+      }));
+    }
+
+    // 새로운 달의 날짜로 설정
+    setCalendarDate(nextMonth.toDate());
+    
+    // 새로운 달의 저장된 날짜들을 불러옴
+    const newMonthKey = nextMonth.format("YYYY-MM");
+    setSelectedDates(savedDates[newMonthKey] || []);
+  };
 
   return (
     <div className="main-container">
@@ -233,13 +276,13 @@ import moment from 'moment-timezone';
         placeholder="이벤트 이름"
       />
       <div className="calendar-header">
-        <div className="date-display">
+        {/* <div className="date-display">
           <span onClick={openMonthModal} style={{ cursor: 'pointer' }}>
             {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
           </span>
   
-        </div>
-        <div className="view-mode-toggle1">
+        </div> */}
+        {/* <div className="view-mode-toggle1">
             <button
               className="active"
               onClick={() => navigate('/MonthView')}
@@ -252,7 +295,26 @@ import moment from 'moment-timezone';
             >
               주
             </button>
+          </div> */}
+        <div className="month-navigation">
+          <button 
+            className="month-nav-button" 
+            onClick={goToPreviousMonth}
+            aria-label="이전 달"
+          >
+            &#8249;
+          </button>
+          <div className="current-month-display">
+            {moment(calendarDate).format('YYYY년 MM월')}
           </div>
+          <button 
+            className="month-nav-button" 
+            onClick={goToNextMonth}
+            aria-label="다음 달"
+          >
+            &#8250;
+          </button>
+        </div>
       </div>
       <div className="calendar">
         <Calendar
