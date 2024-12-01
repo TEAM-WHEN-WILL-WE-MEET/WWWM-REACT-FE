@@ -25,11 +25,16 @@
   background-color: #ccc !important;
   color: #666 !important;
 } */
+.navigation-buttons {
+  display: flex;
+  align-items: center;
+  margin-left: 8px; /* 월 표시와 버튼 사이 간격 */
+}
 .month-navigation {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0 auto;
   width: 100%;
   max-width: 300px;
   margin: 0 auto;

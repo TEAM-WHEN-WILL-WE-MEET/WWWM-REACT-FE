@@ -8,6 +8,8 @@ import EventCalendar from "./pages/eventCalendar";
 import ParentMonth from './pages/ParentMonth';
 import GetAppointmentRedirect from './pages/GetAppointmentRedirect';
 import IndividualCalendar from './pages/individualCalendar';
+import MyPage from './pages/MyPage';
+import AccountManagement from './pages/AccountManagement';
 
 import LandingPage from "./pages/LandingPage";
 
@@ -46,6 +48,9 @@ function App() {
 
           <Route path="/eventCalendar" element={<> <EventCalendar /> </>} />
           <Route path="/individualCalendar" element={<><IndividualCalendar /></>}/>  
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/account-management" element={<AccountManagement />} />
+
           {/* ? */}
         </Routes>
       </div>

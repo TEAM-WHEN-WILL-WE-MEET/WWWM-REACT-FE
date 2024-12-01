@@ -5,6 +5,7 @@ import './MonthView.css';
 // import moment from "moment";
 import moment from 'moment-timezone'; 
 
+import MyPage from './MyPage';
 // const MonthView = () => {
 // const MonthView = ({ setJsonData }) => {
 // const MonthView = ({ setJsonData, startTime, endTime }) => {
@@ -265,7 +266,12 @@ import moment from 'moment-timezone';
   return (
     <div className="main-container">
       <div className="tab"></div>
-      <img src="/GrayRectangle.svg" className="logo-image"/>
+      <img 
+        src="/Icon_menu.svg" 
+        className="logo-image"
+        onClick={() => navigate('/mypage')} 
+        style={{ cursor: 'pointer' }}
+        />
       <input
         className="event-name"
         type="text"
@@ -297,6 +303,10 @@ import moment from 'moment-timezone';
             </button>
           </div> */}
         <div className="month-navigation">
+        <div className="current-month-display">
+            {moment(calendarDate).format('YYYY년 MM월')}
+          </div>
+          <div className="navigation-buttons">
           <button 
             className="month-nav-button" 
             onClick={goToPreviousMonth}
@@ -304,9 +314,7 @@ import moment from 'moment-timezone';
           >
             &#8249;
           </button>
-          <div className="current-month-display">
-            {moment(calendarDate).format('YYYY년 MM월')}
-          </div>
+
           <button 
             className="month-nav-button" 
             onClick={goToNextMonth}
@@ -314,6 +322,7 @@ import moment from 'moment-timezone';
           >
             &#8250;
           </button>
+        </div>
         </div>
       </div>
       <div className="calendar">

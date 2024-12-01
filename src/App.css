@@ -1,4 +1,73 @@
 /* 기본 스타일 - 모든 디바이스에 적용될 기본 크기 */
+:root {
+  --grayscale-color: rgba(255, 204, 244, 1);
+  --grayscale-color-81: rgba(129, 161, 178, 1);
+  --grayscale-color-a2: rgba(162, 129, 178, 1);
+  --grayscale-color-d9: rgba(217, 248, 255, 1);
+  --grayscale-color-f2c5: rgba(255, 242, 197, 1);
+  --grayscale-color-ver2-BG-blue: rgba(245, 246, 255, 1);
+  --grayscale-color-ver2-BG-magen: rgba(251, 247, 255, 1);
+  --grayscale-color-ver2-blue-100: rgba(163, 213, 255, 1);
+  --grayscale-color-ver2-blue-200: rgba(118, 192, 255, 1);
+  --grayscale-color-ver2-blue-300: rgba(48, 160, 255, 1);
+  --grayscale-color-ver2-blue-400: rgba(0, 123, 227, 1);
+  --grayscale-color-ver2-blue-50: rgba(209, 234, 255, 1);
+  --grayscale-color-ver2-blue-900: rgba(0, 48, 115, 1);
+  --grayscale-color-ver2-magen-100: rgba(247, 180, 255, 1);
+  --grayscale-color-ver2-magen-50: rgba(250, 209, 255, 1);
+  --grayscale-color-ver2-magen-900: rgba(163, 46, 178, 1);
+  --grayscale-gray-100: rgba(242, 242, 242, 1);
+  --grayscale-gray-200: rgba(238, 238, 238, 1);
+  --grayscale-gray-300: rgba(224, 224, 224, 1);
+  --grayscale-gray-400: rgba(207, 207, 207, 1);
+  --grayscale-gray-50: rgba(251, 251, 251, 1);
+  --grayscale-gray-500: rgba(168, 168, 168, 1);
+  --grayscale-gray-600: rgba(118, 118, 118, 1);
+  --grayscale-gray-700: rgba(88, 88, 88, 1);
+  --grayscale-gray-800: rgba(68, 68, 68, 1);
+  --grayscale-gray-900: rgba(36, 36, 36, 1);
+}
+
+/*
+
+To enable a theme in your HTML, simply add one of the following data attributes to an HTML element, like so:
+
+<body data-grayscale-mode="light">
+    <!-- the rest of your content -->
+</body>
+
+You can apply the theme on any DOM node, not just the `body`
+
+*/
+
+[data-grayscale-mode="light"] {
+  --grayscale-color-ver2-BG-blue: rgba(245, 246, 255, 1);
+  --grayscale-color-ver2-BG-magen: rgba(251, 247, 255, 1);
+  --grayscale-color-ver2-blue-100: rgba(163, 213, 255, 1);
+  --grayscale-color-ver2-blue-200: rgba(118, 192, 255, 1);
+  --grayscale-color-ver2-blue-300: rgba(48, 160, 255, 1);
+  --grayscale-color-ver2-blue-400: rgba(0, 123, 227, 1);
+  --grayscale-color-ver2-blue-50: rgba(209, 234, 255, 1);
+  --grayscale-color-ver2-blue-900: rgba(0, 48, 115, 1);
+  --grayscale-color-ver2-magen-100: rgba(247, 180, 255, 1);
+  --grayscale-color-ver2-magen-50: rgba(250, 209, 255, 1);
+  --grayscale-color-ver2-magen-900: rgba(163, 46, 178, 1);
+}
+
+[data-grayscale-mode="dark"] {
+  --grayscale-color-ver2-BG-blue: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-BG-magen: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-blue-100: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-blue-200: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-blue-300: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-blue-400: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-blue-50: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-blue-900: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-magen-100: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-magen-50: rgba(255, 255, 255, 1);
+  --grayscale-color-ver2-magen-900: rgba(255, 255, 255, 1);
+}
+
 .App {
   width: 360px;
   height: 800px;
