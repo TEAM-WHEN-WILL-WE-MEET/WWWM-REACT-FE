@@ -22,7 +22,13 @@ const IndividualCalendar = () => {
 
       const schedules = responseData.object.schedules;
 
+      if(!schedules){
+        console.error('schedules 비어있음');
+        return;
+      }
+      
       // 날짜 및 시간 데이터 설정
+      
       const datesArray = schedules.map((schedule, index) => {
         const dateString = schedule.date;
         const date = moment.utc(dateString).format('YYYY-MM-DD');
