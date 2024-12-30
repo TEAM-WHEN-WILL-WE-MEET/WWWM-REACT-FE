@@ -19,39 +19,13 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          {/* <Route path="/MonthView" 
-            // element={<> 
-            // <MonthView /> <TimePicker /> 
-            // </>}  */}
-            <Route path="/MonthView" element={<ParentMonth />} />
-          
-          {/* <Route path="/WeekView" 
-            element={<> 
-            <WeekView /> <TimePicker /> 
-            </>} 
-          /> */}
-         
-          {/* <Route path="/invite" 
-            element={<> 
-            <Invite /> 
-            </>} 
-          /> */}
-
-          {/* <Route path="/invite" component={InvitePage} /> */}
-          {/* <Route path="/getAppointment" element={<Navigate to="/invite" replace />} /> */}
-
-          {/* <Route path="/getAppointment" element={<Navigate to={`/invite${window.location.search}`} replace />} /> */}
-          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
-
-         
+          <Route path="/MonthView" element={<ParentMonth />} />
+          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />   
           <Route path="/invite"   element={<> <Invite /> </>} />
-
           <Route path="/eventCalendar" element={<> <EventCalendar /> </>} />
           <Route path="/individualCalendar" element={<><IndividualCalendar /></>}/>  
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/account-management" element={<AccountManagement />} />
-
-          {/* ? */}
         </Routes>
       </div>
     </Router>
