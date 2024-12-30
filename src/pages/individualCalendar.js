@@ -21,12 +21,13 @@ const IndividualCalendar = () => {
       moment.locale('ko');
 
       const schedules = responseData.object.schedules;
-
+      
+      //빈 스케줄 받았을 때 에외처리
       if(!schedules){
         console.error('schedules 비어있음');
         return;
       }
-      
+
       // 날짜 및 시간 데이터 설정
       
       const datesArray = schedules.map((schedule, index) => {
@@ -41,6 +42,7 @@ const IndividualCalendar = () => {
       const endTimeHM = moment.utc(endTimeString).format('HH:mm');
 
       const scheduleTimes = schedules[0]?.times;
+
       if (!scheduleTimes) {
         console.error('스케줄에 times가 없습니다.');
         return;
@@ -105,12 +107,18 @@ const IndividualCalendar = () => {
       [buttonIndex]: !isSelected,
     };
     setSelectedTimes(newSelectedTimes);
+    console.log('buttonIndex:', buttonIndex);
 
     const selectedDateInfo = dates[selectedDate];
-    const dateTime = `${selectedDateInfo.date}T${times[timeIndex].substring(0, 2)}:00`;
+    // const dateTime = `${selectedDateInfo.date}T${times[timeIndex]}:${buttonIndex *10}`;
+    const hour = times[timeIndex].split(':')[0];  // 시간만 추출 (예: "15")
+    const minute = buttonIndex * 10;  // 분 계산 (예: 10)
+    const dateTime = `${selectedDateInfo.date}T${hour}:${String(minute).padStart(2, '0')}:00`;
+    console.log('생성된 dateTime:', dateTime);
+    console.log('UTC 변환 후:', moment.utc(dateTime, "YYYY-MM-DDTHH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"));
     const payload = {
       id: selectedDateInfo.id,
-      date: moment.utc(selectedDateInfo.date, "YYYY-MM-DD").format("YYYY-MM-DDTHH:mm:ss"),
+      date: moment.utc(dateTime, "YYYY-MM-DDTHH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),
       times: [
         {
           time: moment.utc(dateTime, "YYYY-MM-DDTHH:mm:ss").format("YYYY-MM-DDTHH:mm:ss"),

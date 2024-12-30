@@ -38,11 +38,6 @@ const Invite = () => {
 
         if (response.ok) {
           setResponseMessage('로그인 성공!');
-
-          // // 사용자 스케줄 데이터 가져오기
-          // const userScheduleResponse = await fetch(
-          //   `http://localhost:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`
-          // );
           const userScheduleResponse = await fetch(
             `http://localhost:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
             {
@@ -64,6 +59,7 @@ const Invite = () => {
               responseData = userScheduleData;
               responseData.firstLogin = false;
               console.log("재로그인이네?");
+
             } else {
               console.log("첫로그인이네?");
               const appointmentResponse = await fetch(
@@ -79,7 +75,8 @@ const Invite = () => {
                 return;
               }
             }
-
+            
+            
             navigate('/individualCalendar', { state: { responseData, appointmentId, userName: name } });
 
           } else {
