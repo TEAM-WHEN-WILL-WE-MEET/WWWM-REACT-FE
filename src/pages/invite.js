@@ -26,7 +26,7 @@ const Invite = () => {
         password: password,
         appointmentId: appointmentId,
       };
-
+ 
       try {
         const response = await fetch('http://localhost:8080/api/v1/user/login', {
           method: 'POST',
@@ -35,7 +35,7 @@ const Invite = () => {
           },
           body: JSON.stringify(data),
         });
-
+ 
         if (response.ok) {
           setResponseMessage('로그인 성공!');
           const userScheduleResponse = await fetch(
@@ -47,51 +47,60 @@ const Invite = () => {
               }
             }
           );
-          
+ 
           let responseData;
-
+ 
           if (userScheduleResponse.ok) {
             const userScheduleData = await userScheduleResponse.json();
             console.log('사용자 스케줄 데이터:', userScheduleData);
-
-            if (userScheduleData.object && userScheduleData.object.length > 0) {
-              // 사용자 스케줄이 존재할 경우
-              responseData = userScheduleData;
-              responseData.firstLogin = false;
-              console.log("재로그인이네?");
-
-            } else {
-              console.log("첫로그인이네?");
-              const appointmentResponse = await fetch(
-                `http://localhost:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
-              );
-
+            const appointmentResponse = await fetch(
+              `http://localhost:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+            ); 
               if (appointmentResponse.ok) {
                 const appointmentData = await appointmentResponse.json();
-                responseData = appointmentData;
-                responseData.firstLogin = true;
+                
+                //재로그인 case
+                if (userScheduleData.object && userScheduleData.object.length > 0) {
+                  // responseData = userScheduleData;
+                  // responseData.firstLogin = false;
+                  // console.log("재로그인이네?");
+                  // console.log("응답데이터::: ", responseData);
+                  // console.log("약속id:", appointmentId);
+                  // console.log("재로그인한 사용자 이름", name);
+                  responseData = {
+                    ...appointmentData,
+                    userSchedule: userScheduleData.object,
+                    firstLogin: false
+                  };
+                  console.log("재로그인시 responseData 구조:", {
+                    ...appointmentData,
+                    userSchedule: userScheduleData.object,
+                    firstLogin: false
+                });
+                } else { //첫로그인 case
+                  responseData = {
+                    ...appointmentData,
+                    firstLogin: true
+                  };
+                }
+
               } else {
                 setResponseMessage('약속 정보를 가져오는데 실패했습니다.');
                 return;
               }
+              navigate('/individualCalendar', { state: { responseData, appointmentId, userName: name } });
+            } else {
+              setResponseMessage('사용자 스케줄을 가져오는데 실패했습니다.');
             }
-            
-            
-            navigate('/individualCalendar', { state: { responseData, appointmentId, userName: name } });
-
           } else {
-            setResponseMessage('사용자 스케줄을 가져오는데 실패했습니다.');
+            setResponseMessage('로그인 실패: 이름이나 패스워드를 확인하세요.');
           }
-        } else {
-          setResponseMessage('로그인 실패: 이름이나 패스워드를 확인하세요.');
-        }
-      } catch (error) {
+      } catch(error) {
         console.error('Error:', error);
         setResponseMessage('서버 오류가 발생했습니다.');
       }
     }
-  };
-
+ };
   return (
     <div className="modal">
       <div className="modal-header">

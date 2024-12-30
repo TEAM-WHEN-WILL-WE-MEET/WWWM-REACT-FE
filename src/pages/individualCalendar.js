@@ -8,6 +8,14 @@ import './individualCalendar.css';
 const IndividualCalendar = () => {
   const location = useLocation();
   const { responseData, appointmentId, userName } = location.state;
+  
+    // const { responseData, appointmentId, userSchedule } = location.state;
+
+  console.log("받은 전체 responseData 구조:", responseData);
+  console.log("responseData.object 구조:", responseData.object);
+   console.log("user 스케줄정보: ", responseData.userSchedule);
+  console.log("user이름:",userName );
+
 
   const [dates, setDates] = useState([]);
   const [times, setTimes] = useState([]);
@@ -15,24 +23,44 @@ const IndividualCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTimes, setSelectedTimes] = useState({});
   const navigate = useNavigate(); 
+
+  console.log("appointmentId는 이것: ", appointmentId); //정상작동
+
   useEffect(() => {
+
+    //step1. appointment 전체의 스케줄 틀 불러옴옴
     if (responseData) {
       setEventName(responseData.object.name);
       moment.locale('ko');
 
+      // const schedules = responseData.object;
+      // const schedules = Array.isArray(responseData.object) ? 
+      // responseData.object : 
+      // [responseData.object];
       const schedules = responseData.object.schedules;
-      
+
+      console.log("schedules의 타입:", typeof schedules);
+      console.log("schedules는는 배열?:", Array.isArray(schedules));
+      console.log("schedules의 내용", schedules);
       //빈 스케줄 받았을 때 에외처리
       if(!schedules){
         console.error('schedules 비어있음');
         return;
       }
+  
+
+      console.log("이거슨 사용자의 스케줄", schedules);
+
 
       // 날짜 및 시간 데이터 설정
       
       const datesArray = schedules.map((schedule, index) => {
         const dateString = schedule.date;
         const date = moment.utc(dateString).format('YYYY-MM-DD');
+        console.log("이거슨 date:", date);
+        console.log("이거슨 key:", index);
+        console.log("이거슨 id:", schedule.id);
+
         return { date, key: index, id: schedule.id };
       });
 
@@ -66,7 +94,8 @@ const IndividualCalendar = () => {
       setDates(datesArray);
       setTimes(timesFormatted);
 
-      // 이전에 저장된 선택된 시간 설정
+
+    //step2. 사용자가 이전에 저장된 선택된 시간 불러옴옴
       if (responseData.firstLogin === false && responseData.object.times) {
         const savedTimes = {};
         responseData.object.times.forEach(timeSlot => {
@@ -107,10 +136,12 @@ const IndividualCalendar = () => {
       [buttonIndex]: !isSelected,
     };
     setSelectedTimes(newSelectedTimes);
-    console.log('buttonIndex:', buttonIndex);
+    console.log('지금 선택한 buttonIndex:', buttonIndex);
 
     const selectedDateInfo = dates[selectedDate];
-    // const dateTime = `${selectedDateInfo.date}T${times[timeIndex]}:${buttonIndex *10}`;
+
+
+    // 백엔드 서버에 업데이트된 스케줄, 양식에 맞게 가공해서 보내는 logic
     const hour = times[timeIndex].split(':')[0];  // 시간만 추출 (예: "15")
     const minute = buttonIndex * 10;  // 분 계산 (예: 10)
     const dateTime = `${selectedDateInfo.date}T${hour}:${String(minute).padStart(2, '0')}:00`;
