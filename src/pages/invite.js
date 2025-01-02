@@ -52,18 +52,20 @@ const Invite = () => {
  
           if (userScheduleResponse.ok) {
             const userScheduleData = await userScheduleResponse.json();
-            console.log('사용자 스케줄 데이터:', userScheduleData);
+            console.log('invite.js, 유저 개인 스케?줄정보:', userScheduleData);
+            
             const appointmentResponse = await fetch(
               `http://localhost:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
               if (appointmentResponse.ok) {
                 const appointmentData = await appointmentResponse.json();
-                
+                // console.log("저쪽 invite.js 신사 분이 보내주신 appointmentData입니다다: ", appointmentData);
+
                 //재로그인 case
                 if (userScheduleData.object && userScheduleData.object.length > 0) {
                   // responseData = userScheduleData;
                   // responseData.firstLogin = false;
-                  // console.log("재로그인이네?");
+                  console.log("재로그인이네?");
                   // console.log("응답데이터::: ", responseData);
                   // console.log("약속id:", appointmentId);
                   // console.log("재로그인한 사용자 이름", name);
@@ -72,11 +74,14 @@ const Invite = () => {
                     userSchedule: userScheduleData.object,
                     firstLogin: false
                   };
-                  console.log("재로그인시 responseData 구조:", {
+                  
+                  console.log("(((재로그인))))저쪽 invite.js 신사 분이 보내주신 재로그인시의 responseData 구조:", {
                     ...appointmentData,
                     userSchedule: userScheduleData.object,
                     firstLogin: false
                 });
+                // console.log("invite.js가 보낸 userSchedule: ", userScheduleData.object);
+
                 } else { //첫로그인 case
                   responseData = {
                     ...appointmentData,
