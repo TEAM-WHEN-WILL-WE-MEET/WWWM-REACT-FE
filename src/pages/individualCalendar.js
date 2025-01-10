@@ -49,6 +49,8 @@ const IndividualCalendar = () => {
                     .tz(dateString, 'Asia/Seoul')
                     .format('YYYY-MM-DD');
 
+
+        
         return { date, key: index, id: schedule.id };
       });
 

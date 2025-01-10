@@ -112,7 +112,10 @@ const Invite = () => {
         setResponseMessage('서버 오류가 발생했습니다.');
       }
     }
- };
+ };   
+
+ 
+ 
   return (
     <div className="modal">
       <div className="modal-header">
