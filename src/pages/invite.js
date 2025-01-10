@@ -28,7 +28,7 @@ const Invite = () => {
       };
  
       try {
-        const response = await fetch('http://localhost:8080/api/v1/user/login', {
+        const response = await fetch('http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/user/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -37,35 +37,42 @@ const Invite = () => {
         });
  
         if (response.ok) {
-          setResponseMessage('로그인 성공!');
-          const userScheduleResponse = await fetch(
-            `http://localhost:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
-            {
-              method: 'GET',
-              headers: {
-                'Cache-Control': 'no-cache'
-              }
-            }
-          );
- 
-          let responseData;
- 
-          if (userScheduleResponse.ok) {
-            const userScheduleData = await userScheduleResponse.json();
-            console.log('invite.js, 유저 개인 스케?줄정보:', userScheduleData);
-            
+          setResponseMessage('로그인(or 회원가입) 성공!');
+
             const appointmentResponse = await fetch(
-              `http://localhost:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+              `http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
+            // const appointmentResponse = await fetch(
+            //   `http://localhost:8080/api/v1/schedule/getSchedule?appointmentId=${appointmentId}`
+            // ); 
               if (appointmentResponse.ok) {
                 const appointmentData = await appointmentResponse.json();
-                // console.log("저쪽 invite.js 신사 분이 보내주신 appointmentData입니다다: ", appointmentData);
+                 console.log("저쪽 invite.js 신사 분이 보내주신 전체 인원의 스케줄 정보: ", appointmentData);
+
+
+                const userScheduleResponse = await fetch(
+                  `http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
+                  {
+                    method: 'GET',
+                    headers: {
+
+                      'Cache-Control': 'no-cache'
+                    }
+                  }
+                );
+       
+                let responseData;
+                // console.log("userScheduleResponse: ", userScheduleResponse);
+      
+                if (userScheduleResponse.ok) {
+                  const userScheduleData = await userScheduleResponse.json();
+                  console.log('invite.js, 서버에서 받아온 유저 개인 스케줄정보:', userScheduleData);
 
                 //재로그인 case
                 if (userScheduleData.object && userScheduleData.object.length > 0) {
                   // responseData = userScheduleData;
                   // responseData.firstLogin = false;
-                  console.log("재로그인이네?");
+                  console.log("[재로그인 사용자]");
                   // console.log("응답데이터::: ", responseData);
                   // console.log("약속id:", appointmentId);
                   // console.log("재로그인한 사용자 이름", name);

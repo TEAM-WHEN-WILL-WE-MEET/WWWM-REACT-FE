@@ -22,7 +22,7 @@ const ParentMonth = () => {
     
     try {
       //createAppointment, 캘린더 생성 요청
-      const calendarResponse = await fetch('http://localhost:8080/api/v1/appointment/createAppointment', {
+      const calendarResponse = await fetch('http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/createAppointment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
