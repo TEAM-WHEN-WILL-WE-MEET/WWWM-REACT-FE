@@ -61,6 +61,8 @@ const IndividualCalendar = () => {
         // console.log("이거슨 key:", index);
         // console.log("이거슨 id:", schedule.id);
 
+
+        
         return { date, key: index, id: schedule.id };
       });
 
