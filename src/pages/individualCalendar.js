@@ -97,7 +97,9 @@ const IndividualCalendar = () => {
       if (responseData.firstLogin === false) {
         console.log("사용자가 이전 로그인에서 저장했었던 times?: ", responseData.userSchedule[0].times);
 
-        const userSelections = responseData.userSchedule[0].times.reduce((acc, slot) => {
+        // const userSelections = responseData.userSchedule[0].times.reduce((acc, slot) => {
+          const userSelections = responseData.userSchedule.reduce((acc, daySchedule) => {
+            daySchedule.times.forEach((slot) => {
             const slotDate = moment.tz(slot.time, "Asia/Seoul").format('YYYY-MM-DD');
             const slotHour = moment.tz(slot.time, "Asia/Seoul").format('HH');
             const slotMinute = moment.tz(slot.time, "Asia/Seoul").format('mm');
@@ -105,6 +107,7 @@ const IndividualCalendar = () => {
           if (!acc[slotDate][slotHour]) acc[slotDate][slotHour] = [];
           
           acc[slotDate][slotHour].push(parseInt(slotMinute));
+            });
           return acc;
       }, {});
       
