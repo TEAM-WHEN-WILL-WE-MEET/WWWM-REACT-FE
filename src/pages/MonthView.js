@@ -27,32 +27,16 @@ import MyPage from './MyPage';
   const currentYear = new Date().getFullYear();
   const yearRange = Array.from({ length: 3 }, (_, i) => currentYear + i);
 
-  // //서버에 보낼 json 만들기
-  // const schedules = selectedDates.map(dateString => {
-  //   // 날짜 문자열을 ISO 8601 형식으로 변환하고 시간대를 지정합니다.
-  //   const dateISO = moment.tz(dateString, 'YYYY-MM-DD', 'Asia/Seoul').startOf('day').toISOString();
-  //   return { date: dateISO };
-  // });
-  // const sortedDates = [...selectedDates].sort();
-  // const earliestDateString = sortedDates[0];
-  // const latestDateString = sortedDates[sortedDates.length - 1];
-  // const startTime = moment.tz(`${earliestDateString} 09:00`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul').toISOString();
-  // const endTime = moment.tz(`${latestDateString} 17:00`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul').toISOString();
-  // const jsonData = {
-  //   name: eventName,
-  //   schedules: schedules,
-  //   startTime: startTime,
-  //   endTime: endTime,
-  //   timeZone: 'Asia/Seoul'
-  // };
 
   //서버에 보낼 json 만들기
   useEffect(() => {
     if (selectedDates.length > 0 && eventName) {
       const schedules = selectedDates.map(dateString => {
-        // const dateISO = moment.tz(dateString, 'YYYY-MM-DD', 'Asia/Seoul').startOf('day').toISOString();
-        // const dateISO = moment.tz(dateString, 'YYYY-MM-DD', 'Asia/Seoul').toISOString();
-        const dateISO = moment.utc(dateString, 'YYYY-MM-DD').format('YYYY-MM-DD[T]00:00:00[Z]');
+
+        // const dateISO = moment.utc(dateString, 'YYYY-MM-DD').format('YYYY-MM-DD[T]00:00:00[Z]');
+        const dateISO = moment
+                        .tz(dateString, 'YYYY-MM-DD', 'Asia/Seoul')  // 'KST'로 파싱
+                        .format('YYYY-MM-DDTHH:mm:ss'); 
 
         return { date: dateISO };
       });
@@ -61,25 +45,15 @@ import MyPage from './MyPage';
       const earliestDateString = sortedDates[0];
       const latestDateString = sortedDates[sortedDates.length - 1];
 
-      // const startTime = moment.tz(`${earliestDateString} 09:00`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul').toISOString();
-      // const endTime = moment.tz(`${latestDateString} 17:00`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul').toISOString();
-      
-      // 부모에게 받은 startTime과 endTime을 사용
-      // 부모로부터 받은 startTime과 endTime을 사용
-      // console.log("시작시간이 몇시? "+startTime);
-      // console.log("마감시간이 몇시? "+endTime);
+      const startDateTime = moment
+                            .tz(`${earliestDateString} ${startTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
+                            .format('YYYY-MM-DDTHH:mm:ss[Z]');
+                            // const endDateTime = moment.utc(`${latestDateString} ${endTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss[Z]');
+      const endDateTime = moment
+                  .tz(`${latestDateString} ${endTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
+                  .format('YYYY-MM-DDTHH:mm:ss[Z]');
 
-    //   const startDateTime = moment
-    //   .tz(`${earliestDateString} ${startTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
-    //   .format();
-    // const endDateTime = moment
-    //   .tz(`${latestDateString} ${endTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
-    //   .format(); 
-
-      // startTime과 endTime을 UTC로 파싱하고, 시간 변환 없이 포맷
-      const startDateTime = moment.utc(`${earliestDateString} ${startTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss[Z]');
-      const endDateTime = moment.utc(`${latestDateString} ${endTime}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DDTHH:mm:ss[Z]');
-      const data = {
+    const data = {
         name: eventName,
         schedules: schedules,
         startTime: startDateTime,
@@ -90,7 +64,6 @@ import MyPage from './MyPage';
       // 부모의 setJsonData 함수 사용
       setJsonData(data);
     }
-  // }, [selectedDates, eventName, setJsonData]);
 }, [selectedDates, eventName, startTime, endTime, setJsonData]);
 
 // 
@@ -280,7 +253,7 @@ import MyPage from './MyPage';
         onChange={handleInputChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder="이벤트 이름"
+        placeholder="캘린더 이름"
       />
       <div className="calendar-header">
         {/* <div className="date-display">

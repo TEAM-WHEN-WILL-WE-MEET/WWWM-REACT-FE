@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './TimePicker.css';
 
-const TimePicker = ({ startTime, endTime, setStartTime, setEndTime }) => {
+const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCalendar }) => {
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isEndOpen, setIsEndOpen] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
@@ -150,6 +150,9 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime }) => {
           </div>
         )}
       </div>
+      <button className="create-calendar-button" onClick={onCreateCalendar}>
+        이벤트 캘린더 만들기
+      </button>
     </div>
   );
 };
