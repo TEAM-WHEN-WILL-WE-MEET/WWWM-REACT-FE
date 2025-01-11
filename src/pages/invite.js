@@ -1,7 +1,8 @@
 // Invite.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './invite.css';
+// import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {
   const location = useLocation();
@@ -13,7 +14,21 @@ const Invite = () => {
   const [password, setPassword] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState(false);
+  const [eventname, setEventname]= useState('언제볼까?');
 
+  const handleSetName = async() => {
+    const appointmentResponse = await fetch(
+      `http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+    ); 
+    const data = await appointmentResponse.json(); 
+  const eventName = data?.object?.name;
+    setEventname(eventName);
+  };
+
+  useEffect(()=> {
+    handleSetName();
+  }, []);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password.trim() === '') {
@@ -119,7 +134,7 @@ const Invite = () => {
   return (
     <div className="modal">
       <div className="modal-header">
-        9월 동아리 정기회의
+        {eventname}
         <img src="exitBtn.svg" alt="Exit" className="inviteExit" />
       </div>
       <div className="modal-content">
