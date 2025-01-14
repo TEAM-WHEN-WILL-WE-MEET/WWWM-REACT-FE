@@ -35,7 +35,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "CI=false craco build",
     "test": "craco test"
   },
   "eslintConfig": {
@@ -57,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "firebase-tools": "^13.29.1"
   }
 }
