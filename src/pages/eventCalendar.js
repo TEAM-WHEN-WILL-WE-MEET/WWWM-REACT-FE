@@ -29,6 +29,7 @@ const EventCalendar = () => {
   const[userList, setUserList]=useState("");
   const [result, setResult] = useState('');
 
+  const [showToast, setShowToast] = useState(false);
 
   const shareData = {
     title: "언제볼까?",
@@ -36,7 +37,7 @@ const EventCalendar = () => {
     url: `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`,
   };
 
-  
+
   const isShareSupported = () => navigator.share ?? false;
 
   const handleShare = async () => {
@@ -44,10 +45,26 @@ const EventCalendar = () => {
       try {
         await navigator.share(shareData);
         setResult("공유가 완료되었습니다. ");
+        console.log("공유 완료!");
       } catch (err) {
         setResult(`Error: ${err}`);
       }
   }
+  };
+
+  const copyToClipboard = async (url) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      console.log("공유 완료!");
+      setShowToast(true);
+
+            // 3초 후 토스트 메시지 숨기기
+            setTimeout(() => {
+              setShowToast(false);
+            }, 3000);
+    } catch (err) {
+      console.error('Failed to copy!', err);
+    }
   };
   
    useEffect(() => {
@@ -242,7 +259,7 @@ useEffect(() => {
         src="/copyLink.svg" 
         className="share-image"
         alt="share-image2"
-        onClick={() =>handleShare} 
+        onClick={() =>copyToClipboard(`https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`)} 
         />
        </div>
        <div className="event-date-tabs">
@@ -310,7 +327,16 @@ useEffect(() => {
           ))}
         </div>
       </div>
-     </div>
+      {showToast && (
+        <div className="fixed bottom-4 right-4 flex items-center bg-white rounded-lg shadow-lg p-4 transition-opacity duration-300">
+          <img 
+            src="/Toast_CopyLink.svg" 
+            alt="Copy Success"
+            className="w-6 h-6 mr-2"
+          />
+      </div>
+      )}
+      </div>
    );
  };
  
