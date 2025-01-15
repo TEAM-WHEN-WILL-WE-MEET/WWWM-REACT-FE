@@ -205,7 +205,25 @@
     border-color: #81a1b2;
     border-radius: 2px;
   }
-  
+  .eventCalendar-time-button.bg-blue-50{
+    background-color: var(--blue-50);
+    border-color: var(--blue-100);
+  }
+  .eventCalendar-time-button.bg-blue-100{
+    background-color:var(--blue-100);
+    border-color: var(--blue-200);
+
+  }
+  .eventCalendar-time-button.bg-blue-200{
+    background-color:var(--blue-200);
+    border-color: var(--blue-300);
+
+  }
+  .eventCalendar-time-button.bg-magen-50{
+    background-color:var(--magen-50);
+    border-color: var(--magen-300);
+
+  }
   .save-button {
     display: block;
     margin: 20px auto;
