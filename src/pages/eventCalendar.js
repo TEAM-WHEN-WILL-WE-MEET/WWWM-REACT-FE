@@ -27,6 +27,29 @@ const EventCalendar = () => {
    const state = location.state || {};
    const appointmentId = state.id;
   const[userList, setUserList]=useState("");
+  const [result, setResult] = useState('');
+
+
+  const shareData = {
+    title: "언제볼까?",
+    text: "링크 공유로 초대하기: 공유만 하면 끝, 간편한 친구 초대",
+    url: `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`,
+  };
+
+  
+  const isShareSupported = () => navigator.share ?? false;
+
+  const handleShare = async () => {
+    if (isShareSupported()) {
+      try {
+        await navigator.share(shareData);
+        setResult("공유가 완료되었습니다. ");
+      } catch (err) {
+        setResult(`Error: ${err}`);
+      }
+  }
+  };
+  
    useEffect(() => {
     const fetchData = async () => {
         try {
@@ -208,6 +231,19 @@ useEffect(() => {
      <div className="event-calendar">
        <div className="event-calendar-header">
          {/* <h2>{eventName}</h2> */}
+         
+         <img 
+        src="/Share.svg" 
+        className="share-image"
+        alt="share-image1"
+        onClick={() =>handleShare} 
+        />
+        <img 
+        src="/copyLink.svg" 
+        className="share-image"
+        alt="share-image2"
+        onClick={() =>handleShare} 
+        />
        </div>
        <div className="event-date-tabs">
          {dates.map(({ date, key }) => (
