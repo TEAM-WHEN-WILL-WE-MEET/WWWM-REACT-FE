@@ -1,8 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate  } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes  } from 'react-router-dom';
 import './App.css';
-import MonthView from "./pages/MonthView";
-import WeekView from "./pages/WeekView";
 import Invite from "./pages/invite";
 import EventCalendar from "./pages/eventCalendar";
 import ParentMonth from './pages/ParentMonth';

@@ -1,65 +1,7 @@
+@import './styles/typography.css';
+@import './styles/color.css';
 :root {
-  --grayscale-color: rgba(255, 204, 244, 1);
-  --grayscale-color-81: rgba(129, 161, 178, 1);
-  --grayscale-color-a2: rgba(162, 129, 178, 1);
-  --grayscale-color-d9: rgba(217, 248, 255, 1);
-  --grayscale-color-f2c5: rgba(255, 242, 197, 1);
-  --grayscale-color-ver2-BG-blue: rgba(245, 246, 255, 1);
-  --grayscale-color-ver2-BG-magen: rgba(251, 247, 255, 1);
-  --grayscale-color-ver2-blue-100: rgba(163, 213, 255, 1);
-  --grayscale-color-ver2-blue-200: rgba(118, 192, 255, 1);
-  --grayscale-color-ver2-blue-300: rgba(48, 160, 255, 1);
-  --grayscale-color-ver2-blue-400: rgba(0, 123, 227, 1);
-  --grayscale-color-ver2-blue-50: rgba(209, 234, 255, 1);
-  --grayscale-color-ver2-blue-900: rgba(0, 48, 115, 1);
-  --grayscale-color-ver2-magen-100: rgba(247, 180, 255, 1);
-  --grayscale-color-ver2-magen-50: rgba(250, 209, 255, 1);
-  --grayscale-color-ver2-magen-900: rgba(163, 46, 178, 1);
-  --grayscale-gray-100: rgba(242, 242, 242, 1);
-  --grayscale-gray-200: rgba(238, 238, 238, 1);
-  --grayscale-gray-300: rgba(224, 224, 224, 1);
-  --grayscale-gray-400: rgba(207, 207, 207, 1);
-  --grayscale-gray-50: rgba(251, 251, 251, 1);
-  --grayscale-gray-500: rgba(168, 168, 168, 1);
-  --grayscale-gray-600: rgba(118, 118, 118, 1);
-  --grayscale-gray-700: rgba(88, 88, 88, 1);
-  --grayscale-gray-800: rgba(68, 68, 68, 1);
-  --grayscale-gray-900: rgba(36, 36, 36, 1);
-  
-  /* gray */
-  --gray-50: #FBFBFB;
-  --gray-100: #F2F2F2;
-  --gray-200: #EEEEEE;
-  --gray-300: #E0E0E0;
-  --gray-400: #CFCFCF;
-  --gray-500: #A8A8A8;
-  --gray-600: #767676;
-  --gray-700: #585858;
-  --gray-800: #444444;
-  --gray-900: #242424;
-
-  /* magenta */
-  --magen-50:#FAD1FF;
-  --magen-100:#F7B4FF;
-  --magen-300:#C66FD1;
-  --magen-900:#A32EB2;
-
-
-
-  
-  /* red */
-  --red-50: #FDF2F3;
-  --red-100: #F4C0C1;
-  --red-300: #D92B2B;
-
-  /* blue */
-  --blue-50: #D1E4FF;
-  --blue-100: #A3D5FF;
-  --blue-200: #76C0FF;
-  --blue-300: #30A0FF;
-  --blue-400: #007BE3;
-  --blue-500: #006AC4;
-  --blue-900: #003073;
+ 
 
 }
 
