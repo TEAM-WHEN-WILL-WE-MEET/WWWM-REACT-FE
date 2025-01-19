@@ -1,0 +1,30 @@
+/* styles/typography.css */
+:root {
+    /* Font sizes */
+    --font-size-20: 20px;
+    --font-size-16: 16px;
+    --font-size-14: 14px;
+    --font-size-12: 12px;
+
+  
+    /* Line heights */
+    --line-height-24: 24px;
+    --line-height-16: 16px;
+    --line-height-12: 12px;
+  
+    /* Font weights */
+    --font-sb: 600;
+    --font-md: 500;
+    --font-rg: 400;
+
+    /* Letter spacing */
+    --spacing: -2.5%;
+  }
+  
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap; /* 폰트 로딩 중에는 시스템 폰트를 보여주고, 로드되면 교체 */
+  }
