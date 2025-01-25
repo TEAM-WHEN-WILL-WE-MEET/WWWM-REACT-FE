@@ -181,6 +181,8 @@ export const ButtonVariants = cva(
         'bg-[var(--gray-900)]',
         'whitespace-nowrap',
         typographyVariants({ variant: 'b1-sb' }),
+        `text-[var(--white)]`,
+        'transform hover:transform-none',
 
         ]
       },

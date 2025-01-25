@@ -1,7 +1,19 @@
 @import './styles/typography.css';
 @import './styles/color.css';
 :root {
- 
+  
+  input[type="password"] {
+    font-family: password-font, sans-serif;
+    font-size: 16px;
+    font:large-caption;
+    letter-spacing: 1px;
+  }
+  
+  @font-face {
+    font-family: password-font;
+    src: local("Arial");
+    unicode-range: U+002A; /* '*' 문자만 사용 */
+  }
 
 }
 

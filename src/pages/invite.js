@@ -1,7 +1,11 @@
 // Invite.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './invite.css';
+import { typographyVariants } from '../styles/typography.ts';
+import { colorVariants, colors } from '../styles/color.ts';
+import { cn } from '../utils/cn'; 
+import { Button } from '../components/Button.tsx';
+
 // import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {
@@ -18,7 +22,7 @@ const Invite = () => {
 
   const handleSetName = async() => {
     const appointmentResponse = await fetch(
-      `http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+      `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
     ); 
     const data = await appointmentResponse.json(); 
   const eventName = data?.object?.name;
@@ -43,7 +47,7 @@ const Invite = () => {
       };
  
       try {
-        const response = await fetch('http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/user/login', {
+        const response = await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/user/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -55,7 +59,7 @@ const Invite = () => {
           setResponseMessage('로그인(or 회원가입) 성공!');
 
             const appointmentResponse = await fetch(
-              `http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+              `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
             // const appointmentResponse = await fetch(
             //   `http://localhost:8080/api/v1/schedule/getSchedule?appointmentId=${appointmentId}`
@@ -66,7 +70,7 @@ const Invite = () => {
 
 
                 const userScheduleResponse = await fetch(
-                  `http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
+                  `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
                   {
                     method: 'GET',
                     headers: {
@@ -120,7 +124,7 @@ const Invite = () => {
               setResponseMessage('사용자 스케줄을 가져오는데 실패했습니다.');
             }
           } else {
-            setResponseMessage('로그인 실패: 이름이나 패스워드를 확인하세요.');
+            setResponseMessage( '이름이나 패스워드를 확인하세요.');
           }
       } catch(error) {
         console.error('Error:', error);
@@ -131,41 +135,126 @@ const Invite = () => {
 
  
  
+ 
   return (
-    <div className="modal">
-      <div className="modal-header">
+<div className="flex justify-center items-center h-[800px] bg-[var(--gray-50,#FBFBFB)] flex-col">
+<div className={`
+          ${typographyVariants({ variant: 'h1-sb' })} 
+          ${colorVariants({ color: 'gray-800' })} 
+          flex 
+          bg-transparent
+         !mb-[16px]
+
+        `}>
         {eventname}
-        <img src="exitBtn.svg" alt="Exit" className="inviteExit" />
       </div>
-      <div className="modal-content">
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label htmlFor="name" className="invite-user-name">참여자 이름</label>
+      <div className={`
+            ${colorVariants({ bg: 'white' })} 
+            ${colorVariants({ color: 'gray-800' })} 
+            w-[312px] 
+            h-[258px] 
+            flex-shrink-0 
+            rounded-[12px] 
+            border-[1px] 
+            border-[var(--gray-800,#444)] 
+            shadow-[1px_1px_0px_0px_var(--gray-800,#444)]
+            pt-[28px] 
+            px-[32px]
+            items-center
+            justify-between
+            flex
+          `}
+        >
+        <form onSubmit={handleSubmit}   
+              className="flex flex-col items-center justify-center w-full !h-auto "
+        >
+          <div className="mb-[18px]">
+            <label htmlFor="name"
+              className={`
+                ${typographyVariants({ variant: 'd1-sb' })} 
+                ${colorVariants({ color: 'gray-800' })} 
+                tracking-[-0.3px]
+              `}>
+                참여자 이름
+                </label>
             <input
               type="text"
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className={`
+                ${colorVariants({ bg: 'gray-50' })} 
+                ${colorVariants({ color: 'gray-300' })} 
+                flex 
+                w-[248px] 
+                h-[40px] 
+                px-[12px] 
+                py-[11px] 
+                items-center 
+                flex-shrink-0 
+                rounded-[6px] 
+                border-[1px] 
+                border-[var(--gray-300,#E0E0E0)]
+                ${typographyVariants({ variant: 'b2-md' })} 
+
+              `}
               placeholder="이름을 입력해주세요"
-              required
+              
             />
           </div>
-          <div className="input-group">
-            <label htmlFor="password" className="invite-user-pw">패스워드</label>
+          <div className="">
+            <label htmlFor="password"   className={`
+              ${typographyVariants({ variant: 'd1-sb' })} 
+              ${colorVariants({ color: 'gray-800' })} 
+              tracking-[-0.3px]
+            `}>
+              패스워드
+              </label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="패스워드를 입력해주세요"
-              className={error ? 'errorPW' : ''}
-              required
+              className={`
+                ${colorVariants({ bg: 'gray-50' })} 
+                ${colorVariants({ color: 'gray-300' })} 
+                ${typographyVariants({ variant: 'b2-md' })} 
+                flex 
+                w-[248px] 
+                h-[40px] 
+                px-[12px] 
+                py-[11px] 
+                items-center 
+                gap-[10px] 
+                flex-shrink-0 
+                rounded-[6px] 
+                border-[1px] 
+                border-[var(--gray-300,#E0E0E0)] 
+                ${error ? '!outline-[1px] !outline-[#ff0000] !outline-none' : ''}
+                `}              
+              
             />
+
           </div>
-          <button type="submit" className="submit-button">참여하기</button>
-        </form>
-        {responseMessage && <p>{responseMessage}</p>}
+          <Button label='참여하기'
+                size={'participate'} 
+                additionalClass=
+                '!mt-[28px]  items-center !transform-none'        
+            />  
+         </form>
+
       </div>
+      {responseMessage && (
+              <p className={`
+                ${colorVariants({ color: 'red-300' })} 
+                ${typographyVariants({ variant: 'b2-md' })} 
+                bg-transparent
+                p-2
+                `}>
+                {responseMessage}
+              </p>
+            )}
     </div>
   );
 };
