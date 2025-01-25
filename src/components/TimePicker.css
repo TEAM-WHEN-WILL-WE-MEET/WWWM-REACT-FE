@@ -1,11 +1,4 @@
-.time-picker-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-  padding: 20px;
-  /* height: 800px; */
-}
+
 /* .modal-overlay {
   touch-action: none; 
   -webkit-tap-highlight-color: transparent; 

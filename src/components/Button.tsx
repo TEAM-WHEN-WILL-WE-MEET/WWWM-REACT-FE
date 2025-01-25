@@ -1,9 +1,9 @@
 import { cn } from '../utils/cn';
 import { cva, VariantProps } from 'class-variance-authority';
 import { ButtonHTMLAttributes, FC } from 'react';
-import { colors, colorVariants } from '../styles/color';
-import { typographyVariants } from '../styles/typography';
-
+import { colors, colorVariants } from '../styles/color.ts';
+import { typographyVariants } from '../styles/typography.ts';
+import React from 'react';
 /**
 VariantProps: class-variance-authority 라이브러리에서 제공하는 클래스 변이 관련 기능을 사용하기 위한 타입입니다.
 이 타입은 cva 함수를 사용할 때 클래스의 변이를 지정하기 위해 필요한 속성들을 정의하고 있습니다.
@@ -21,7 +21,7 @@ export const ButtonVariants = cva(
   //모든 경우에 공통으로 들어갈 CSS
   `
   flex justify-center items-center active:scale-95 rounded-xl
-  text-slate-100 transition-all shadow-md
+  text-slate-100 transition-all
   hover:scale-105 duration-200 hover:translate-x-10
   `,
   {
@@ -44,9 +44,13 @@ export const ButtonVariants = cva(
           'border',
           'border-[var(--gray-300)]',
           'bg-[var(--white)]',
+          'whitespace-nowrap',
+
+
           //선택됐을때는 
           'selected:border-[var(--blue-200)]',
           'selected:bg-[var(--blue-50)]',
+
         ],
         XS: // ex 캘린더 timeslot
         [
@@ -56,6 +60,8 @@ export const ButtonVariants = cva(
           'border',
           'border-[var(--gray-300)]',
           'bg-[var(--white)]',
+          'whitespace-nowrap',
+
           //그 이후 userCount 백분율에 따라 색상 적용되는건, js 코드 내에 있음.
         ],
         S:  //ex 삭제, 취소 버튼
@@ -72,6 +78,8 @@ export const ButtonVariants = cva(
           'border',
           'border-[var(--red-100)]',
           'bg-[var(--red-50)]',
+          'whitespace-nowrap',
+
           //취소하기 버튼은... state가 뭔지 감이 안옴, 백엔드 v2 개발 들어갈 때 고민 ㄱㄱ
           // 'border-[var(--gray-200)]',
           // 'bg-[var(--white)]',
@@ -91,14 +99,20 @@ export const ButtonVariants = cva(
           'border',
           'border-[var(--gray-400)]',
           'bg-[var(--white)]',
-          'shadow-[1px_1px_0px_0px_var(--gray-400)]',
+          'shadow-[1px_1px_0px_0px_var(--gray-400)]',    
+          'whitespace-nowrap',
+          typographyVariants({ variant: 'b2-md' }),
+          'text-[var(--gray-800)]',
+
           //비활성화시
           'pressed:border',
           'pressed:border-[var(--gray-400)]',
           'pressed:bg-[var(--gray-50)]',
+          'pressed:text-[var(--gray-800)]',
+
 
         ],
-        L: //ex 내 참여 시간 저장 
+        L: //ex 내 참여시간 저장 
         [
           'flex',
           'w-[320px]',
@@ -114,6 +128,10 @@ export const ButtonVariants = cva(
           'border-[var(--gray-900)]',
           'bg-[var(--white)]',
           'shadow-[1px_1px_0px_0px_var(--gray-900)]',
+          'whitespace-nowrap',
+          typographyVariants({ variant: 'b1-sb' }),
+          'text-[var(--gray-900)]',
+
           //press됐을 때
           'pressed:border',
           'pressed:border-[var(--gray-900)]',
@@ -122,11 +140,6 @@ export const ButtonVariants = cva(
         ],
         XL: //ex 캘린더 만들기 
         [
-          //disabled
-          'disabled:border',
-          'disabled:border-[var(--gray-500)]',
-          'disabled:bg-[var(--gray-50)]',
-
           //able
           'flex',
           'w-[320px]',
@@ -138,15 +151,22 @@ export const ButtonVariants = cva(
           'gap-[10px]',
           'flex-shrink-0',
           'rounded-[8px]',
-          'border-r-[1px]',
-          'border-r-[var(--gray-600)]',
-          'border-b-[1px]',
-          'border-b-[var(--gray-600)]',
           'bg-[var(--gray-900)]',
-          'shadow-[1px_2px_0px_0px_var(--gray-800)]',
+          'tracking-normal',
+          'font-pretendard',
+          'whitespace-nowrap',
+          'transform hover:transform-none',
+          !typographyVariants({ variant: 'b1-sb' }),
 
+          //disabled
+          'disabled:!text-[var(--gray-600)]',
+          'disabled:border',
+          'disabled:bg-[var(--gray-50)]',
+          'disabled:cursor-not-allowed',   
+          'disabled:border-[var(--gray-500)]',   
           //press
           'pressed:border',
+          'pressed:!text-[var(--gray-100)]',
           'pressed:border-[var(--gray-900)]',
           'pressed:bg-[var(--gray-800)]',
 
@@ -159,12 +179,16 @@ export const ButtonVariants = cva(
         'flex-shrink-0',
         'rounded-[6px]',
         'bg-[var(--gray-900)]',
+        'whitespace-nowrap',
+        typographyVariants({ variant: 'b1-sb' }),
+
         ]
       },
     },
     defaultVariants: {
       variant: 'default',
       size: 'default',
+      
     },
   },
 );
@@ -189,7 +213,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>,
  * @additionalClass 추가할 클래스 속성을 넣어준다
  * @props 추가할 버튼 속성을 넣어준다
  */
-const Button: FC<ButtonProps> = ({ variant, size, children, label, additionalClass, ...props }) => {
+export const Button: FC<ButtonProps> = ({ variant, size, children, label, additionalClass, ...props }) => {
+  
+  // console.log('Button props:', { variant, size, disabled: props.disabled });
+  // console.log('Applied classes:', ButtonVariants({ variant, size }));
   return (
     <button className={cn(ButtonVariants({ variant, size }), additionalClass)} {...props}>
       {children && children}

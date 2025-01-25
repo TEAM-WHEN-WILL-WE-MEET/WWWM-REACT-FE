@@ -3,13 +3,14 @@ import Calendar from 'react-calendar';
 import { useNavigate } from 'react-router-dom';
 import './MonthView.css'; 
 // import moment from "moment";
-import moment from 'moment-timezone'; 
+import moment from 'moment-timezone';
+import clsx from 'clsx'; 
+import { twMerge } from 'tailwind-merge';
 
-import MyPage from './MyPage';
-// const MonthView = () => {
-// const MonthView = ({ setJsonData }) => {
-// const MonthView = ({ setJsonData, startTime, endTime }) => {
-  const MonthView = ({ setJsonData, startTime, endTime }) => {
+import { colors, colorVariants } from '../styles/color.ts';
+import { typographyVariants } from '../styles/typography.ts';
+
+  const MonthView = ({ setJsonData, startTime, endTime, isFormReady, setIsFormReady }) => {
 
   const [eventName, setEventName] = useState("");
   const [isFocused, setIsFocused] = useState(false);
@@ -23,10 +24,50 @@ import MyPage from './MyPage';
 
   const [viewMode, setViewMode] = useState('month'); // 월/주 선택 'month' 또는 'week'
   const navigate = useNavigate();
+
+//Utility-First CSS (ft. TailwindCSS) Codes . . .
+
+// input field 
+const inputClasses = twMerge(
+  clsx(
+    //default
+    'flex',
+    'w-[320px]', 
+    'h-[40px]', 
+    'flex-col',
+    'justify-end',
+    'items-start',
+    'gap-[4px]', 
+    'flex-shrink-0',
+    'mb-[12px]',
+    'peer',
+    typographyVariants({ 
+      variant: 'h1-sb', 
+    }),
+    colorVariants({
+      color: 'gray-500', 
+    }),
+
+    'text-[20px]', //왜 얘만 적용안된지 모르겠지만 일단 하드코딩딩
+
+    //사용자가 input field 클릭했을 때
+    'focus:outline-none', 
+    'focus:border-b-2', 
+    'focus:ring-[var(--gray-800)]', 
+    'focus:text-[var(--gray-800)]',
+
+    //사용자가 input field 입력했을때
+    'valid:text-[var(--gray-800)]',
+
+    )
+);
  // 연도 범위 설정
   const currentYear = new Date().getFullYear();
   const yearRange = Array.from({ length: 3 }, (_, i) => currentYear + i);
 
+  useEffect(() => {
+    console.log('Form ready status:', isFormReady); // 상태 변경 확인용 로그
+  }, [isFormReady]);
 
   //서버에 보낼 json 만들기
   useEffect(() => {
@@ -63,6 +104,10 @@ import MyPage from './MyPage';
 
       // 부모의 setJsonData 함수 사용
       setJsonData(data);
+      setIsFormReady(true); //캘린더 만들기 버튼 활성화
+      // console.log("준비됨! ", isFormReady); 정상작동동
+    }else{
+      setIsFormReady(false);
     }
 }, [selectedDates, eventName, startTime, endTime, setJsonData]);
 
@@ -237,26 +282,48 @@ import MyPage from './MyPage';
     setSelectedDates(savedDates[newMonthKey] || []);
   };
 
+  const handleClear = () => {
+    setEventName(''); // 입력값을 빈 문자열로 설정
+  };
+
   return (
-    <div className="main-container">
-      <div className="tab"></div>
-      <img 
-        src="/Icon_menu.svg" 
-        className="logo-image"
+    <div className="flex flex-col w-auto h-auto !px-[8px]">
+      <div className="flex-row justify-start  ">
+        <img 
+        alt=""
+        src="/wwmtLogo.svg" 
+        className=" flex px-[12px] py-[12px]  cursor-pointer  "
         onClick={() => navigate('/mypage')} 
-        style={{ cursor: 'pointer' }}
         />
-      <input
-        className="event-name"
-        type="text"
-        value={eventName}
-        onChange={handleInputChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder="캘린더 이름"
-      />
-      <div className="calendar-header">
-        {/* <div className="date-display">
+      {/* <img 
+        alt=""
+        src="/hambugerMenu.svg" 
+        className="   cursor-pointer "
+        onClick={() => navigate('/mypage')} 
+        /> */}
+
+      </div>
+      <div className="relative px-4">
+        <input
+          className={inputClasses} //구 event-name
+          type="text"
+          value={eventName}
+          onChange={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          placeholder="캘린더 이름"
+        />
+        <img 
+          alt="글자 지우기 버튼"
+          src="/Icon_X.svg" 
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-[32px] h-[32px] cursor-pointer"
+          style={{ cursor: 'pointer' }}
+          onClick={handleClear}
+
+          />
+      </div>
+      <div class="flex h-[20px] mb-[8px] justify-between items-center self-stretch px-[8px] pl-[20px]">
+      {/* <div className="date-display">
           <span onClick={openMonthModal} style={{ cursor: 'pointer' }}>
             {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
           </span>
@@ -276,28 +343,34 @@ import MyPage from './MyPage';
               주
             </button>
           </div> */}
-        <div className="month-navigation">
-        <div className="current-month-display">
-            {moment(calendarDate).format('YYYY년 MM월')}
+        {/* <div className="month-navigation"> */}
+        <div class={twMerge(
+                  clsx(
+                    typographyVariants({ variant: 'b2-md' }),
+                    "text-[var(--gray-800)] "
+                )
+        )}
+        >
+        {moment(calendarDate).format('YYYY년 MM월')}
           </div>
-          <div className="navigation-buttons">
-          <button 
-            className="month-nav-button" 
+          <div className="flex items-center ml-[8px]">
+          <img 
+            className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
+         active:scale-95 "
             onClick={goToPreviousMonth}
             aria-label="이전 달"
-          >
-            &#8249;
-          </button>
-
-          <button 
-            className="month-nav-button" 
+            src="btn_Back.svg"
+          />
+          
+          <img 
+            className="bg-none cursor-pointer ml-[6px] pl-px-[4px] pt-px-[8px]  transition-colors duration-200 ease-in 
+          active:scale-95 "
             onClick={goToNextMonth}
             aria-label="다음 달"
-          >
-            &#8250;
-          </button>
+            src="btn_Forward.svg"
+          />
         </div>
-        </div>
+        {/* </div> */}
       </div>
       <div className="calendar">
         <Calendar

@@ -8,10 +8,9 @@ const ParentMonth = () => {
   const [jsonData, setJsonData] = useState(null);
   const [startTime, setStartTime] = useState('09:00'); 
   const [endTime, setEndTime] = useState('20:00');
+  const [isFormReady, setIsFormReady] = useState(false);
+
   const navigate = useNavigate();
-  const [name, setName] = useState(''); // 로그인에 필요한 이름
-  const [password, setPassword] = useState(''); // 로그인에 필요한 pw
-  const [responseMessage, setResponseMessage] = useState('');
 
    // handleCreateCalendar 함수가 필요한 곳에서 호출될 수 있도록 콜백 설정
    const handleCalendarCreation = async (data) => {
@@ -22,7 +21,7 @@ const ParentMonth = () => {
     
     try {
       //createAppointment, 캘린더 생성 요청
-      const calendarResponse = await fetch('http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/createAppointment', {
+      const calendarResponse = await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/createAppointment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,6 +60,9 @@ const ParentMonth = () => {
       // setJsonData={setJsonData}
       startTime={startTime}
       endTime={endTime}
+      isFormReady={isFormReady}
+      setIsFormReady={setIsFormReady}
+
        />
       <TimePicker
        jsonData={jsonData}
@@ -71,6 +73,9 @@ const ParentMonth = () => {
       setStartTime={setStartTime}
       setEndTime={setEndTime}
       onCreateCalendar={() => handleCalendarCreation(jsonData)}
+      isFormReady={isFormReady}
+      setIsFormReady={setIsFormReady}
+
         />
     </>
   );
