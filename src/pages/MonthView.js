@@ -10,7 +10,7 @@ import { twMerge } from 'tailwind-merge';
 import { colors, colorVariants } from '../styles/color.ts';
 import { typographyVariants } from '../styles/typography.ts';
 
-  const MonthView = ({ setJsonData, startTime, endTime }) => {
+  const MonthView = ({ setJsonData, startTime, endTime, isFormReady, setIsFormReady }) => {
 
   const [eventName, setEventName] = useState("");
   const [isFocused, setIsFocused] = useState(false);
@@ -65,6 +65,9 @@ const inputClasses = twMerge(
   const currentYear = new Date().getFullYear();
   const yearRange = Array.from({ length: 3 }, (_, i) => currentYear + i);
 
+  useEffect(() => {
+    console.log('Form ready status:', isFormReady); // 상태 변경 확인용 로그
+  }, [isFormReady]);
 
   //서버에 보낼 json 만들기
   useEffect(() => {
@@ -101,6 +104,10 @@ const inputClasses = twMerge(
 
       // 부모의 setJsonData 함수 사용
       setJsonData(data);
+      setIsFormReady(true); //캘린더 만들기 버튼 활성화
+      // console.log("준비됨! ", isFormReady); 정상작동동
+    }else{
+      setIsFormReady(false);
     }
 }, [selectedDates, eventName, startTime, endTime, setJsonData]);
 
@@ -280,23 +287,23 @@ const inputClasses = twMerge(
   };
 
   return (
-    <div className="flex flex-col items-center w-auto h-auto !px-[8px]">
-        <div className="flex items-center space-x-[250px]">
+    <div className="flex flex-col w-auto h-auto !px-[8px]">
+      <div className="flex-row justify-start  ">
         <img 
         alt=""
         src="/wwmtLogo.svg" 
-        className="  px-[12px] py-[12px]  cursor-pointer  "
+        className=" flex px-[12px] py-[12px]  cursor-pointer  "
         onClick={() => navigate('/mypage')} 
         />
-      <img 
+      {/* <img 
         alt=""
         src="/hambugerMenu.svg" 
         className="   cursor-pointer "
         onClick={() => navigate('/mypage')} 
-        />
+        /> */}
 
       </div>
-      <div className="relative">
+      <div className="relative px-4">
         <input
           className={inputClasses} //구 event-name
           type="text"
@@ -307,7 +314,7 @@ const inputClasses = twMerge(
           placeholder="캘린더 이름"
         />
         <img 
-          alt=""
+          alt="글자 지우기 버튼"
           src="/Icon_X.svg" 
           className="absolute right-2 top-1/2 -translate-y-1/2 w-[32px] h-[32px] cursor-pointer"
           style={{ cursor: 'pointer' }}
