@@ -282,13 +282,15 @@ useEffect(() => {
   };
 
   return (
-    <div className="individual-calendar">
-      <div className="flex w-[360px] pr-[20px] mt-[20px] h-[48px]  flex-row  items-start gap-[8px]">
+    <div className={`h-[800px] flex flex-col   ${colorVariants({ bg: 'gray-50' })}`}>
+      <div className={`flex ${colorVariants({ bg: 'white' })} w-[360px] pr-[20px] mt-[20px] h-[48px]  flex-row  items-start gap-[8px]`}>
         <img 
             className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
               active:scale-95 "
             aria-label="돌아가기"
             src="backward.svg"
+            onClick={() => navigate(-1)}
+
           />
           <div
           className={`
@@ -303,9 +305,11 @@ useEffect(() => {
       <div
         className={`
           flex 
+          !justify-start
           !overflow-x-auto 
           px-0 
           py-[10px] 
+          pb-0
           whitespace-nowrap 
           scrollbar-hide 
           ![&::-webkit-scrollbar]:hidden
@@ -334,7 +338,6 @@ useEffect(() => {
               `}
               tracking-[-0.35px]
               p-[9px]
-
               w-[74px]
               text-center
               flex-shrink-0
@@ -349,15 +352,8 @@ useEffect(() => {
         ))}
       </div>
 
+    <div className={`flex mb-[36px] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
 
-      <div
-        className={`
-          flex 
-          flex-col 
-          items-center 
-          ${colorVariants({ bg: 'gray-50' })}
-        `}
-      >        
       <div class="flex items-center gap-2">
         <input type="checkbox" id="all-time" 
               className="screen-reader" 
@@ -376,25 +372,49 @@ useEffect(() => {
       </div> 
       {times.map((time, timeIndex) => (
           <div key={timeIndex} className="flex items-center">
-            <div className="time">{moment(time, 'HH:mm').format('HH시')}</div>
-            <div className="eventCalendar-time-buttons">
-              {[...Array(6)].map((_, buttonIndex) => (
-                <button
+            <div
+              className={`
+                ${typographyVariants({ variant: 'd3-rg' })}
+                text-[var(--gray-800,#444)]
+                h-[28px] 
+                w-[36px] 
+                text-center 
+                mr-[6px] 
+                flex 
+                items-center 
+                justify-center 
+              `}
+            >             
+             {moment(time, 'HH:mm').format('HH시')}
+            </div>
+            <div className="grid grid-cols-6 gap-0 !h-[28px]">  
+             {[...Array(6)].map((_, buttonIndex) => (
+                <Button
                   key={buttonIndex}
-                  className={`eventCalendar-time-button ${
-                    selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]
-                      ? "selected"
-                      : ""
-                  }`}
+                  size={"XXS"}
+                  additionalClass={` 
+                    ${
+                    selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""
+                  } 
+                   items-center !transform-none`
+                  }
                   onClick={() => handleTimeClick(timeIndex, buttonIndex)}
                 />
+
               ))}
             </div>
           </div>
         ))}
       </div>
-      <button className="save-button" onClick={handleSaveClick}>내 시간대 저장</button>
-
+        <div className="flex !justify-center">
+         <Button 
+             label="내 참여시간 저장"
+             size={'L'} 
+             onClick={handleSaveClick}
+             additionalClass=
+             '  items-center !transform-none  '        
+          /> 
+        </div>
     </div>
   );
 };

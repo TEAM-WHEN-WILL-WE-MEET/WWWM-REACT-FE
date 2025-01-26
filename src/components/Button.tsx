@@ -45,7 +45,7 @@ export const ButtonVariants = cva(
           'border-[var(--gray-300)]',
           'bg-[var(--white)]',
           'whitespace-nowrap',
-
+          'rounded-none',
 
           //선택됐을때는 
           'selected:border-[var(--blue-200)]',
@@ -55,12 +55,13 @@ export const ButtonVariants = cva(
         XS: // ex 캘린더 timeslot
         [
           'w-[44px]',
-          'h-[28px]',
+          '!h-[28px]',
           'flex-shrink-0',
           'border',
           'border-[var(--gray-300)]',
           'bg-[var(--white)]',
           'whitespace-nowrap',
+          'rounded-none',
 
           //그 이후 userCount 백분율에 따라 색상 적용되는건, js 코드 내에 있음.
         ],
