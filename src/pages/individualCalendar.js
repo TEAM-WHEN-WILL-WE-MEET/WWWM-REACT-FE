@@ -7,6 +7,11 @@ import moment from 'moment-timezone';
 import 'moment/locale/ko';
 import './individualCalendar.css';
 
+import { typographyVariants } from '../styles/typography.ts';
+import { colorVariants, colors } from '../styles/color.ts';
+import { cn } from '../utils/cn'; 
+import { Button } from '../components/Button.tsx';
+
 const IndividualCalendar = () => {
   const location = useLocation();
   const { responseData, appointmentId, userName } = location.state;
@@ -25,6 +30,7 @@ const IndividualCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTimes, setSelectedTimes] = useState({});
   const navigate = useNavigate(); 
+  const [isChecked, setIsChecked] = useState(false);
 
 
   useEffect(() => {
@@ -98,6 +104,7 @@ const IndividualCalendar = () => {
         console.log("사용자가 이전 로그인에서 저장했었던 times?: ", responseData.userSchedule[0].times);
 
         // const userSelections = responseData.userSchedule[0].times.reduce((acc, slot) => {
+         //개인용 스케줄 페이지 
           const userSelections = responseData.userSchedule.reduce((acc, daySchedule) => {
             daySchedule.times.forEach((slot) => {
             const slotDate = moment.tz(slot.time, "Asia/Seoul").format('YYYY-MM-DD');
@@ -111,7 +118,7 @@ const IndividualCalendar = () => {
           return acc;
       }, {});
       
-      console.log("정리된 사용자 선택:", userSelections);
+      console.log("정리된 사용자 선택입니다~:", userSelections);
         const savedTimes = {};
         
         datesArray.forEach((dateInfo, dateIndex) => {
@@ -156,9 +163,63 @@ useEffect(() => {
   // 저장 버튼 클릭 시 이동하는 함수
   const handleSaveClick = () => {
     // 필요한 로직 처리 후 페이지 이동
-    navigate('/eventCalendar');
+    navigate('/eventCalendar', {state: {id: appointmentId}});
   };
 
+
+  const handleAllTimeChange = async (e) => {
+    const isChecked = e.target.checked;
+    const newSelectedTimes = { ...selectedTimes };
+    
+    if (!newSelectedTimes[selectedDate]) {
+      newSelectedTimes[selectedDate] = {};
+    }
+  
+    // 모든 시간대 클릭/해제
+    times.forEach((_, timeIndex) => {
+      [...Array(6)].forEach((_, buttonIndex) => {
+        if (!newSelectedTimes[selectedDate][timeIndex]) {
+          newSelectedTimes[selectedDate][timeIndex] = {};
+        }
+        newSelectedTimes[selectedDate][timeIndex][buttonIndex] = isChecked;
+      });
+    });
+  
+    setSelectedTimes(newSelectedTimes);
+  
+    // 모든 시간대에 대해 서버 업데이트
+    for (let timeIndex = 0; timeIndex < times.length; timeIndex++) {
+      for (let buttonIndex = 0; buttonIndex < 6; buttonIndex++) {
+        if (isChecked) {  // 체크된 경우만 서버에 업데이트
+          const hour = times[timeIndex].split(':')[0];
+          const minute = buttonIndex * 10;
+          const dateTime = `${dates[selectedDate].date}T${hour}:${String(minute).padStart(2, '0')}:00`;
+          const kstMoment = moment.tz(dateTime, "Asia/Seoul");
+          const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss");
+  
+          const payload = {
+            id: dates[selectedDate].id,
+            date: sendTimeString,
+            times: [{
+              time: sendTimeString,
+              users: [userName]
+            }],
+            appointmentId: appointmentId
+          };
+  
+          try {
+            await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/updateSchedule', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+          } catch (error) {
+            console.error("저장 요청 중 오류:", error);
+          }
+        }
+      }
+    }
+  };
   const handleTimeClick = async (timeIndex, buttonIndex) => {
     const newSelectedTimes = { ...selectedTimes };
     if (!newSelectedTimes[selectedDate]) {
@@ -200,7 +261,7 @@ useEffect(() => {
     console.log("timeslot 클릭시 서버에 보낼 데이터:", payload);
 
     try {
-      const response = await fetch('http://ec2-43-203-226-33.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/updateSchedule', {
+      const response = await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/updateSchedule', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -222,22 +283,99 @@ useEffect(() => {
 
   return (
     <div className="individual-calendar">
-      <div className="individual-calendar-header">
-        <h2>{eventName}</h2>
+      <div className="flex w-[360px] pr-[20px] mt-[20px] h-[48px]  flex-row  items-start gap-[8px]">
+        <img 
+            className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
+              active:scale-95 "
+            aria-label="돌아가기"
+            src="backward.svg"
+          />
+          <div
+          className={`
+            ${typographyVariants({ variant: 'h1-sb' })} 
+            overflow-hidden 
+            text-center 
+            truncate
+          `}
+>          {eventName}
+          </div>
       </div>
-      <div className="event-date-tabs">
+      <div
+        className={`
+          flex 
+          !overflow-x-auto 
+          px-0 
+          py-[10px] 
+          whitespace-nowrap 
+          scrollbar-hide 
+          ![&::-webkit-scrollbar]:hidden
+          ${colorVariants({ bg: 'white' })}
+        `}
+        style={{
+          scrollbarWidth: 'none',
+           msOverflowStyle: 'none',
+          }}
+      >
         {dates.map(({ date, key }) => (
-          <div key={key}
-            className={`event-date-tab ${selectedDate === key ? 'active' : ''}`}
+          <div
+            key={key}
+            className={`
+              ${typographyVariants({ variant: 'b1-sb' })} 
+              ${selectedDate === key ? `
+                !${colorVariants({ color: 'gray-900' })} 
+                font-[600] 
+                border-b-[2px] 
+                border-[var(--gray-900,#242424)]
+              ` : `
+                ${colorVariants({ color: 'gray-500' })} 
+                font-[500]
+                border-b-[2px] 
+                border-[var(--gray-500,#A8A8A8)]
+              `}
+              tracking-[-0.35px]
+              p-[9px]
+
+              w-[74px]
+              text-center
+              flex-shrink-0
+              flex-grow-0
+              basis-[25%] 
+            `}
+
             onClick={() => setSelectedDate(key)}
           >
             {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
           </div>
         ))}
       </div>
-      <div className="time-selection">
-        {times.map((time, timeIndex) => (
-          <div key={timeIndex} className="time-row">
+
+
+      <div
+        className={`
+          flex 
+          flex-col 
+          items-center 
+          ${colorVariants({ bg: 'gray-50' })}
+        `}
+      >        
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="all-time" 
+              className="screen-reader" 
+              onChange={(e) => {
+                setIsChecked(e.target.checked);
+                handleAllTimeChange(e);
+              }}
+              />
+        <div className="label-box">
+          <label htmlFor="all-time" 
+                className={`${typographyVariants({ variant: 'b2-md' })} ${isChecked ? colorVariants({ color: 'gray-900' })  : colorVariants({ color: 'gray-600' })}`}>  
+                 <span className="check-icon" aria-hidden="true"></span>
+                  모든 시간 가능
+          </label>
+        </div>
+      </div> 
+      {times.map((time, timeIndex) => (
+          <div key={timeIndex} className="flex items-center">
             <div className="time">{moment(time, 'HH:mm').format('HH시')}</div>
             <div className="eventCalendar-time-buttons">
               {[...Array(6)].map((_, buttonIndex) => (
