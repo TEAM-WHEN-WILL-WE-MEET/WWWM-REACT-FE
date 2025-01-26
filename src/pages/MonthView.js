@@ -72,14 +72,16 @@ const inputClasses = twMerge(
   //서버에 보낼 json 만들기
   useEffect(() => {
     if (selectedDates.length > 0 && eventName) {
-      const schedules = selectedDates.map(dateString => {
+      const schedules = selectedDates
+          .sort((a, b) => new Date(a) - new Date(b))
+          .map(dateString => {
 
-        // const dateISO = moment.utc(dateString, 'YYYY-MM-DD').format('YYYY-MM-DD[T]00:00:00[Z]');
-        const dateISO = moment
-                        .tz(dateString, 'YYYY-MM-DD', 'Asia/Seoul')  // 'KST'로 파싱
-                        .format('YYYY-MM-DDTHH:mm:ss'); 
+            // const dateISO = moment.utc(dateString, 'YYYY-MM-DD').format('YYYY-MM-DD[T]00:00:00[Z]');
+            const dateISO = moment
+                            .tz(dateString, 'YYYY-MM-DD', 'Asia/Seoul')  // 'KST'로 파싱
+                            .format('YYYY-MM-DDTHH:mm:ss'); 
 
-        return { date: dateISO };
+            return { date: dateISO };
       });
 
       const sortedDates = [...selectedDates].sort();
@@ -93,8 +95,9 @@ const inputClasses = twMerge(
       const endDateTime = moment
                   .tz(`${latestDateString} ${endTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
                   .format('YYYY-MM-DDTHH:mm:ss[Z]');
-
-    const data = {
+      console.log("startDateTime", startDateTime);
+      console.log("endDateTime", endDateTime);
+      const data = {
         name: eventName,
         schedules: schedules,
         startTime: startDateTime,
