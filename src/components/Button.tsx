@@ -156,7 +156,8 @@ export const ButtonVariants = cva(
           'tracking-normal',
           'font-pretendard',
           'whitespace-nowrap',
-          'transform hover:transform-none',
+          '!transform-none',
+          '!hover:transform hover:transform-none',
           !typographyVariants({ variant: 'b1-sb' }),
 
           //disabled
