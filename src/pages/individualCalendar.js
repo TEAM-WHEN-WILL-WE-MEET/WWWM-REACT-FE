@@ -163,7 +163,7 @@ useEffect(() => {
   // 저장 버튼 클릭 시 이동하는 함수
   const handleSaveClick = () => {
     // 필요한 로직 처리 후 페이지 이동
-    navigate('/eventCalendar', {state: {id: appointmentId}});
+    navigate('/eventCalendar', {state: {id: appointmentId , userName:userName }} );
   };
 
 
@@ -302,6 +302,7 @@ useEffect(() => {
 >          {eventName}
           </div>
       </div>
+      {/* date-tabs */}
       <div
         className={`
           flex 
@@ -313,6 +314,7 @@ useEffect(() => {
           whitespace-nowrap 
           scrollbar-hide 
           ![&::-webkit-scrollbar]:hidden
+          hover:cursor-pointer
           ${colorVariants({ bg: 'white' })}
         `}
         style={{
@@ -353,7 +355,6 @@ useEffect(() => {
       </div>
 
     <div className={`flex mb-[36px] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
-
       <div class="flex items-center gap-2">
         <input type="checkbox" id="all-time" 
               className="screen-reader" 

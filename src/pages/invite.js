@@ -23,19 +23,17 @@ const Invite = () => {
   const [buttonText, setButtonText] = useState('회원가입');
 
   useEffect(() => {
-    // localStorage에서 사용자 ID 확인
-    const loggedInUser = localStorage.getItem(`loggedInUser_${appointmentId}`);
+    // localStorage에서 로그인 여부 확인
+    const isLoggedIn = localStorage.getItem(`loggedInFlag_${appointmentId}`);
 
-    if (loggedInUser) {
-        setButtonText('로그인'); // 이전 로그인한 사용자
-        // console.log(`Logged-in user for appointmentId ${appointmentId}:`, atob(loggedInUser)); // 디코딩 후 출력
-
+    if (isLoggedIn === 'true') {
+        setButtonText('로그인'); // 이전에 로그인한 사용자
+        // console.log(`Logged-in flag for appointmentId ${appointmentId}: true`);
     } else {
         setButtonText('새로 참여하기'); // 신규 사용자
-        // console.log(`Logged-in user for appointmentId ${appointmentId}:`, atob(loggedInUser)); // 디코딩 후 출력
-
+        // console.log(`Logged-in flag for appointmentId ${appointmentId}: false`);
     }
-}, []); 
+}, [appointmentId]);
 
   const handleSetName = async() => {
     const appointmentResponse = await fetch(
@@ -83,10 +81,10 @@ const Invite = () => {
             // 사용자 ID를 localStorage에 저장,
             //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
             if (responseData.object.name) {
-              const key = `loggedInUser_${appointmentId}`;
-              localStorage.setItem(key, btoa(responseData.object.name));
-              // console.log(`User ID saved to localStorage for appointmentId ${appointmentId}:`, responseData.object.name);
-             }
+              const key = `loggedInFlag_${appointmentId}`;
+              localStorage.setItem(key, 'true'); // 로그인 플래그 설정
+              // console.log(`Login flag saved to localStorage for appointmentId ${appointmentId}: true`);
+          }
               if (appointmentResponse.ok) {
 
                 const appointmentData = await appointmentResponse.json();
@@ -126,11 +124,11 @@ const Invite = () => {
                     firstLogin: false
                   };
                   
-                //   console.log("(((재로그인))))저쪽 invite.js 신사 분이 보내주신 재로그인시의 responseData 구조:", {
-                //     ...appointmentData,
-                //     userSchedule: userScheduleData.object,
-                //     firstLogin: false
-                // });
+                  console.log("(((재로그인))))저쪽 invite.js 신사 분이 보내주신 재로그인시의 responseData 구조:", {
+                    ...appointmentData,
+                    userSchedule: userScheduleData.object,
+                    firstLogin: false
+                });
                 // console.log("invite.js가 보낸 userSchedule: ", userScheduleData.object);
 
                 } else { //첫로그인 case
