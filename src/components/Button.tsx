@@ -157,7 +157,7 @@ export const ButtonVariants = cva(
           'font-pretendard',
           'whitespace-nowrap',
           '!transform-none',
-          '!hover:transform hover:transform-none',
+          '!hover:transform-none',
           !typographyVariants({ variant: 'b1-sb' }),
 
           //disabled
@@ -184,8 +184,8 @@ export const ButtonVariants = cva(
         'whitespace-nowrap',
         typographyVariants({ variant: 'b1-sb' }),
         `text-[var(--white)]`,
-        'transform hover:transform-none',
-
+        'hover:transform-none',
+        'hover:none'
         ]
       },
     },
