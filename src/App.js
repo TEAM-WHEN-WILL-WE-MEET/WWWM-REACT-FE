@@ -9,7 +9,8 @@ import IndividualCalendar from './pages/individualCalendar';
 import MyPage from './pages/MyPage';
 import AccountManagement from './pages/AccountManagement';
 
-import LandingPage from "./pages/LandingPage";
+// import LandingPage from "./components/LandingPage";
+import LandingPage from "./components/LandingPage";
 
 function App() {
   return (

@@ -39,7 +39,7 @@ export const colors = {
 export const colorVariants = cva('', {
   variants: {
     color: {
-      'white': 'bg-[var(--white)]',
+      'white': 'text-[var(--white)]',
       'gray-50': 'text-[var(--gray-50)]',
       'gray-100': 'text-[var(--gray-100)]',
       'gray-200': 'text-[var(--gray-200)]',
