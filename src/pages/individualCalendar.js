@@ -12,7 +12,17 @@ import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
 
+// NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
+const BASE_URL = process.env.NODE_ENV === "production" 
+    ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
+    : process.env.REACT_APP_WWWM_BE_DEV_EP;
+
 const IndividualCalendar = () => {
+  // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
+  const BASE_URL = process.env.NODE_ENV === "production" 
+  ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
+  : process.env.REACT_APP_WWWM_BE_DEV_EP;
+
   const location = useLocation();
   const { responseData, appointmentId, userName } = location.state;
   
@@ -208,7 +218,7 @@ useEffect(() => {
           };
   
           try {
-            await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/updateSchedule', {
+            await fetch(`${BASE_URL}/schedule/updateSchedule`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload),
@@ -261,7 +271,7 @@ useEffect(() => {
     console.log("timeslot 클릭시 서버에 보낼 데이터:", payload);
 
     try {
-      const response = await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/updateSchedule', {
+      const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

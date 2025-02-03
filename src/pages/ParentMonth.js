@@ -4,6 +4,10 @@ import TimePicker from '../components/TimePicker';
 import { useNavigate } from 'react-router-dom'; 
 
 const ParentMonth = () => {
+  // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
+  const BASE_URL = process.env.NODE_ENV === "production" 
+  ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
+  : process.env.REACT_APP_WWWM_BE_DEV_EP;
   
   const [jsonData, setJsonData] = useState(null);
   const [startTime, setStartTime] = useState('09:00'); 
@@ -21,7 +25,7 @@ const ParentMonth = () => {
     
     try {
       //createAppointment, 캘린더 생성 요청
-      const calendarResponse = await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/createAppointment', {
+      const calendarResponse = await fetch(`${BASE_URL}/appointment/createAppointment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

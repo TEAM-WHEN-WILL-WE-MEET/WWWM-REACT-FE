@@ -17,7 +17,11 @@ const EventCalendar = () => {
    // console.log("responseData.object 구조:", responseData.object);
    //  console.log("user 스케줄정보: ", responseData.userSchedule);
    // console.log("user이름:",userName );
- 
+  
+  // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
+  const BASE_URL = process.env.NODE_ENV === "production" 
+  ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
+  : process.env.REACT_APP_WWWM_BE_DEV_EP;
  
    const [dates, setDates] = useState([]);
    const [times, setTimes] = useState([]);
@@ -80,7 +84,7 @@ const EventCalendar = () => {
             }
 
             const appointmentResponse = await fetch(
-                `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+                `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
             );
             const responseData = await appointmentResponse.json();
 

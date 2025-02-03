@@ -9,6 +9,11 @@ import { Button } from '../components/Button.tsx';
 // import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {
+  // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
+  const BASE_URL = process.env.NODE_ENV === "production" 
+  ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
+  : process.env.REACT_APP_WWWM_BE_DEV_EP;
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const appointmentId = queryParams.get('appointmentId');
@@ -37,7 +42,7 @@ const Invite = () => {
 
   const handleSetName = async() => {
     const appointmentResponse = await fetch(
-      `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+      `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
     ); 
     const data = await appointmentResponse.json(); 
   const eventName = data?.object?.name;
@@ -62,7 +67,7 @@ const Invite = () => {
       };
  
       try {
-        const response = await fetch('http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/user/login', {
+        const response = await fetch(`${BASE_URL}/user/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -75,7 +80,7 @@ const Invite = () => {
           setResponseMessage('로그인(or 회원가입) 성공!');
             // console.log("response: ", responseData);
             const appointmentResponse = await fetch(
-              `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/appointment/getAppointment?appointmentId=${appointmentId}`
+              `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
 
             // 사용자 ID를 localStorage에 저장,
@@ -93,7 +98,7 @@ const Invite = () => {
 
 
                 const userScheduleResponse = await fetch(
-                  `http://ec2-43-202-1-21.ap-northeast-2.compute.amazonaws.com:8080/api/v1/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
+                  `${BASE_URL}/schedule/getUserSchedule?appointmentId=${appointmentId}&userName=${name}`,
                   {
                     method: 'GET',
                     headers: {
