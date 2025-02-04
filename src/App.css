@@ -63,35 +63,43 @@ You can apply the theme on any DOM node, not just the `body`
   margin: 0 auto;
   padding: 0;  
 }
-
-/* Android 최소 사이즈 (360x640) */
-@media only screen and (min-device-width: 360px) and (max-device-width: 640px) and (-webkit-device-pixel-ratio: 3) {
-  .App {
-    width: 360px;
-    height: 640px;
+ /* 안드로이드 최소 사이즈 (360 x 640) 
+  w 360px 이상, h 640px 이하인 기기에서 h 640px로 적용  */
+   @media screen and (min-width: 360px) and (max-height: 640px) {
+    .App {
+      height: 640px;
+      width:auto;
+      /* background-color:#c30010; */
+    }
   }
-}
+  
+  
+  /* iOS 최소 사이즈 (375 x 667)
+     iOS 기기 중 h 667px 이하인 경우 적용 */
+  @media screen and (min-width: 375px) and (max-height: 667px) {
+    .App {
+      height: 667px;
+      /* background-color:#c30010; */
 
-/* Android 기본 작업 사이즈 (360x800) */
-/* @media only screen and (min-device-width: 360px) and (max-device-width: 800px) and (-webkit-device-pixel-ratio: 3) {
-  .App {
-    width: 360px;
-    height: 800px;
+    }
   }
-} */
+  
+  /* iOS 기본 작업 사이즈 (375 x 812)
+     iOS 기기 중 h가 668px 이상인 경우 기본 작업 사이즈로 적용 */
+  @media screen and (min-width: 375px) and (min-height: 668px) {
+    .App {
+      height: 812px;
+      /* background-color:#c30010; */
+/* 왜 여기서 pc가 적용되지..?? */
+    }
+  }
+  
+  /* PC 버전 또는 LandPage 전용 스타일: 
+     뷰포트 너비가 768px 이상인 경우, LandPage 디자인 요구에 따라 430px로 변경 */
+  @media screen and (min-width: 768px) {
+    .App {
+      width: 430px;
+      /* background-color:#c30010; */
 
-/* iOS 최소 사이즈 (375x667) */
-@media only screen and (min-device-width: 375px) and (max-device-height: 667px) and (-webkit-device-pixel-ratio: 3) {
-  .App {
-    width: 375px;
-    height: 667px;
+    }
   }
-}
-
-/* iOS 기본 작업 사이즈 (375x812) */
-@media only screen and (min-device-width: 375px) and (max-device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-  .App {
-    width: 375px;
-    height: 812px;
-  }
-}

@@ -3,12 +3,15 @@ import { useSwipeable } from "react-swipeable";
 import { useLocation, useNavigate  } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/ko'; 
-
+import copyToClipboard from '../components/copyToClipBoard.ts';
+import { share } from '../components/share.ts';
 import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
+// import { CopyToClipboard } from "react-copy-to-clipboard";
 
+import useUserAgent from "../hooks/useUserAgent";
 const EventCalendar = () => {
    
      // const { responseData, appointmentId, userSchedule } = location.state;
@@ -30,14 +33,18 @@ const EventCalendar = () => {
    const [selectedTimes, setSelectedTimes] = useState({});
    const navigate = useNavigate(); 
    const location = useLocation();
-
    const[TotalUsers, setTotalUsers] = useState("");
+
    const state = location.state || {};
    const appointmentId = state.id;
     const userName= state.userName;
-    console.log("userName:: ",userName);
+    // console.log("userName:: ",userName);
   const[userList, setUserList]=useState("");
+
   const [result, setResult] = useState('');
+  const { userAgent } = useUserAgent();
+
+  const androidWebView = useUserAgent?.isAndroidWebView;
 
   const [showToast, setShowToast] = useState(false);
 
@@ -45,21 +52,33 @@ const EventCalendar = () => {
     title: "언제볼까?",
     text: "링크 공유로 초대하기: 공유만 하면 끝, 간편한 친구 초대",
     url: `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`,
-  };
+  }; 
+  //해당 url로 접속시, 정상적으로 작동함. 
+  // 즉, url 자체는 문제없는디 공유 라이브러리 자체 문제임.
 
-  const isShareSupported = () => navigator.share ?? false;
 
+  // const handleShare = async () => {
+  //   if (isShareSupported()) {
+  //     try {
+  //       await navigator.share(shareData);
+  //       setResult("공유가 완료되었습니다. ");
+  //       console.log("shareData 성공공: ", shareData);
+  //     } catch (err) {
+  //       setResult(`Error: ${err}`);
+  //       console.log("shareData 실패: ", shareData);
+
+  //     }
+  // }
+  // };
   const handleShare = async () => {
-    if (isShareSupported()) {
-      try {
-        await navigator.share(shareData);
-        setResult("공유가 완료되었습니다. ");
-      } catch (err) {
-        setResult(`Error: ${err}`);
-      }
-  }
+    const result = await share(shareData);
+    if (result === "copiedToClipboard") {
+      alert("링크를 클립보드에 복사했습니다.");
+      console.log("링크 공유 성공공");
+    } else if (result === "failed") {
+      alert("공유하기가 지원되지 않는 환경입니다.");
+    }
   };
-
   // const copyToClipboard = async (url) => {
   //   try {
   //     await navigator.clipboard.writeText(url);
@@ -88,7 +107,7 @@ const EventCalendar = () => {
             );
             const responseData = await appointmentResponse.json();
 
-            console.log("responseData 전체: ", responseData);
+            // console.log("responseData 전체: ", responseData);
             if (!responseData || !responseData.object) {
                 console.error('응답 데이터가 올바르지 않습니다');
                 return;
@@ -104,7 +123,7 @@ const EventCalendar = () => {
                     return;
                 }
 
-                console.log("schedules 보호구역: ", schedules); //정상작동
+                // console.log("schedules 보호구역: ", schedules); //정상작동
 
                 // 날짜 및 시간 데이터 설정
                 const datesArray = schedules.map((schedule, index) => {
@@ -150,8 +169,8 @@ const EventCalendar = () => {
                 setDates(datesArray);
                 setTimes(timesFormatted);
                 
-                console.log("그냥 responseData.object: ", responseData.object);
-                console.log("responseData.object.schedules: ", responseData.object.schedules);
+                // console.log("그냥 responseData.object: ", responseData.object);
+                // console.log("responseData.object.schedules: ", responseData.object.schedules);
 
                 // 공용 스케줄 페이지 - 화면에 색 입힐 유저 몇명인지 찾는 과정
                 const userSelections = responseData.object.schedules.reduce((acc, daySchedule) => {
@@ -178,7 +197,7 @@ const EventCalendar = () => {
                     return acc;
                 }, {});
 
-                console.log("userSelections입니다 ~!!: ", userSelections);
+                // console.log("userSelections입니다 ~!!: ", userSelections);
 
 
                 // const TotalUsers = responseData.object.users.length;
@@ -188,15 +207,14 @@ const EventCalendar = () => {
                 setTotalUsers(responseData.object.users.length);
                 setUserList(responseData.object.users);
 
-
                 const savedTimes = {};
                 
                 datesArray.forEach((dateInfo, dateIndex) => {
                     const datePath = dateInfo.date;
-                    console.log("처리중인 날짜:", {
-                        datePath,
-                        existingSelections: userSelections[datePath],
-                    });
+                    // console.log("처리중인 날짜:", {
+                    //     datePath,
+                    //     existingSelections: userSelections[datePath],
+                    // });
 
                     if (userSelections[datePath]) {
                         if (!savedTimes[dateIndex]) {
@@ -209,7 +227,7 @@ const EventCalendar = () => {
                             const mm = moment(time, 'HH:mm').format('mm');
 
                             const minutesArray = userSelections[datePath][hour];
-                            console.log("minutesArray: ", minutesArray);
+                            // console.log("minutesArray: ", minutesArray);
                             if (minutesArray) {
                                 savedTimes[dateIndex][timeIndex] = {};
                                 minutesArray.forEach((minuteObj) => {
@@ -226,7 +244,7 @@ const EventCalendar = () => {
                         });
                     }
                 });
-                console.log("최종 savedTimes:", savedTimes);
+                // console.log("최종 savedTimes:", savedTimes);
                 setSelectedTimes(savedTimes);
             }
         } catch (error) {
@@ -236,11 +254,11 @@ const EventCalendar = () => {
     fetchData();
 }, [appointmentId]);
 
-useEffect(() => {
-    if (selectedTimes) {
-        console.log("selectedTimes가 업데이트됨:", selectedTimes);
-    }
-}, [selectedTimes]);
+// useEffect(() => {
+//     if (selectedTimes) {
+//         console.log("selectedTimes가 업데이트됨:", selectedTimes);
+//     }
+// }, [selectedTimes]);
 
 
  
@@ -408,7 +426,9 @@ useEffect(() => {
                 // 정상동작 --> console.log('Comparison result:', user.name === userName.toString());
                 
                 return (
-                  <div className={`
+                  <div
+                    key={user.name} 
+                    className={`
                     ${typographyVariants({ variant: 'b2-md' })}
                     min-w-[60px] text-[var(--gray-700)] justify-center text-center
                     ${user.name === userName.toString() 

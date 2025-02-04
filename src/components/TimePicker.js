@@ -8,7 +8,7 @@ import { cn } from '../utils/cn';
 
 const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCalendar,isFormReady, setIsFormReady  }) => {
 
-  console.log('[TimePicker] isFormReady:', isFormReady);
+  // console.log('[TimePicker] isFormReady:', isFormReady);
 
   const startMeridiemDialRef = useRef(null);
   const startHourDialRef = useRef(null);
