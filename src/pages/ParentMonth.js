@@ -5,10 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 const ParentMonth = () => {
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
+  // console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
+  // // development로 출력됨
   const BASE_URL = process.env.NODE_ENV === "production" 
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
-  
+
+  // 정상작동 console.log("BASE_URL: ", BASE_URL);
+
   const [jsonData, setJsonData] = useState(null);
   const [startTime, setStartTime] = useState('09:00'); 
   const [endTime, setEndTime] = useState('20:00');
@@ -41,7 +45,7 @@ const ParentMonth = () => {
       const calendarData = await calendarResponse.json();
       console.log("나는 캘린더data: ",calendarData);
       const appointmentId = calendarData.object.id;
-      console.log("왜안되는걸까?",appointmentId); //정상작동
+      // console.log("왜안되는걸까?",appointmentId); //정상작동
       
       // invite 페이지로 이동하면서 appointmentId를 쿼리 파라미터로 전달
       navigate(`/getAppointment?appointmentId=${appointmentId}`);

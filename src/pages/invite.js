@@ -83,7 +83,7 @@ const Invite = () => {
               `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
 
-            // 사용자 ID를 localStorage에 저장,
+            // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
             //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
             if (responseData.object.name) {
               const key = `loggedInFlag_${appointmentId}`;
@@ -129,11 +129,11 @@ const Invite = () => {
                     firstLogin: false
                   };
                   
-                  console.log("(((재로그인))))저쪽 invite.js 신사 분이 보내주신 재로그인시의 responseData 구조:", {
-                    ...appointmentData,
-                    userSchedule: userScheduleData.object,
-                    firstLogin: false
-                });
+                //   console.log("(((재로그인))))저쪽 invite.js 신사 분이 보내주신 재로그인시의 responseData 구조:", {
+                //     ...appointmentData,
+                //     userSchedule: userScheduleData.object,
+                //     firstLogin: false
+                // });
                 // console.log("invite.js가 보낸 userSchedule: ", userScheduleData.object);
 
                 } else { //첫로그인 case

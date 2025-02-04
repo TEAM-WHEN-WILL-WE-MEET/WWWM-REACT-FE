@@ -65,9 +65,9 @@ const inputClasses = twMerge(
   const currentYear = new Date().getFullYear();
   const yearRange = Array.from({ length: 3 }, (_, i) => currentYear + i);
 
-  useEffect(() => {
-    console.log('Form ready status:', isFormReady); // 상태 변경 확인용 로그
-  }, [isFormReady]);
+  // useEffect(() => {
+  //   console.log('Form ready status:', isFormReady); // 상태 변경 확인용 로그
+  // }, [isFormReady]);
 
   //서버에 보낼 json 만들기
   useEffect(() => {
@@ -95,8 +95,8 @@ const inputClasses = twMerge(
       const endDateTime = moment
                   .tz(`${latestDateString} ${endTime}`, 'YYYY-MM-DD HH:mm', 'Asia/Seoul')
                   .format('YYYY-MM-DDTHH:mm:ss[Z]');
-      console.log("startDateTime", startDateTime);
-      console.log("endDateTime", endDateTime);
+      // console.log("startDateTime", startDateTime);
+      // console.log("endDateTime", endDateTime);
       const data = {
         name: eventName,
         schedules: schedules,
