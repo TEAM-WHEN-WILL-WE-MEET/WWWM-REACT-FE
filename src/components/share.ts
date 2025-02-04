@@ -31,12 +31,14 @@ export const share = (data: ShareData) => {
       if (isShareSupported()) {
         await navigator.share(data);
         resolve("shared");
+        console.log("data: ", data);
         return "shared";
       }
 
       if (data.url) {
         const result = await copyToClipboard(data.url);
-
+        console.log("data url:: ", data.url);
+        console.log("result:: ", result);
         if (result) {
           resolve("copiedToClipboard");
           return "copiedToClipboard";
