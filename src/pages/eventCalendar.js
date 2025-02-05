@@ -25,9 +25,8 @@ const EventCalendar = () => {
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
  
   //공유 key
-  // const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
-  //아니 왜 env에 넣은 값은 동작안합,,,니까..???
-  const KAKAO_SHARE_KEY = '3f71531c7851261c37c07ccbb2fdc085';
+  const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
+  
 
    const [dates, setDates] = useState([]);
    const [times, setTimes] = useState([]);
