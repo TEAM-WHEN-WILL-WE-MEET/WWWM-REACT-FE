@@ -281,7 +281,7 @@ const Invite = () => {
                 bg-transparent
                 p-2
                 `}
-                aria-label="이름, 혹은 비밀번호를 확인해주세요."
+                 aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
                 >
                 {responseMessage}
               </p>
