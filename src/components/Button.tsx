@@ -22,7 +22,7 @@ export const ButtonVariants = cva(
   `
   flex justify-center items-center active:scale-95 rounded-xl
   text-slate-100 transition-all
-  hover:scale-105 duration-200 hover:translate-x-10
+  hover:scale-105 duration-200 
   `,
   {
     //variant , size에 따라 다른 디자인을 보여줄수 있다
@@ -186,7 +186,27 @@ export const ButtonVariants = cva(
         `text-[var(--white)]`,
         'hover:transform-none',
         'hover:none'
-        ]
+        ],
+        share: //카카오톡으로 공유하기, 링크 복사하기
+        [   //default는 카카오톡으로 설정했음음
+          'flex',
+          'pl-[16px]',
+          'w-[312px]',
+          'h-[44px]',
+          'py-[14px]',
+          '!justify-start',
+          'items-center',
+          '!whitespace-nowrap ',
+          '!text-center',
+          'gap-[4px]',
+          'rounded-[8px]',
+          'border',
+          'bg-[var(--gray-900)]',
+          'whitespace-normal',
+          typographyVariants({ variant: 'b2-md' }),
+          'text-[var(--white)]'
+
+        ],
       },
     },
     defaultVariants: {
