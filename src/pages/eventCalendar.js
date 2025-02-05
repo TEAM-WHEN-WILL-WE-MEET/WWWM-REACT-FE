@@ -3,15 +3,13 @@ import { useSwipeable } from "react-swipeable";
 import { useLocation, useNavigate  } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/ko'; 
-import copyToClipboard from '../components/copyToClipBoard.ts';
-import { share } from '../components/share.ts';
 import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
 // import { CopyToClipboard } from "react-copy-to-clipboard";
+import { AnimatePresence, motion } from 'framer-motion';
 
-import useUserAgent from "../hooks/useUserAgent";
 const EventCalendar = () => {
    
      // const { responseData, appointmentId, userSchedule } = location.state;
@@ -26,6 +24,11 @@ const EventCalendar = () => {
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
  
+  //공유 key
+  // const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
+  //아니 왜 env에 넣은 값은 동작안합,,,니까..???
+  const KAKAO_SHARE_KEY = '3f71531c7851261c37c07ccbb2fdc085';
+
    const [dates, setDates] = useState([]);
    const [times, setTimes] = useState([]);
    const [eventName, setEventName] = useState("");
@@ -42,57 +45,80 @@ const EventCalendar = () => {
   const[userList, setUserList]=useState("");
 
   const [result, setResult] = useState('');
-  const { userAgent } = useUserAgent();
 
-  const androidWebView = useUserAgent?.isAndroidWebView;
 
   const [showToast, setShowToast] = useState(false);
 
-  const shareData = {
-    title: "언제볼까?",
-    text: "링크 공유로 초대하기: 공유만 하면 끝, 간편한 친구 초대",
-    url: `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`,
-  }; 
-  //해당 url로 접속시, 정상적으로 작동함. 
-  // 즉, url 자체는 문제없는디 공유 라이브러리 자체 문제임.
+  const [isOpen, setIsOpen] = useState(false);
 
 
-  // const handleShare = async () => {
-  //   if (isShareSupported()) {
-  //     try {
-  //       await navigator.share(shareData);
-  //       setResult("공유가 완료되었습니다. ");
-  //       console.log("shareData 성공공: ", shareData);
-  //     } catch (err) {
-  //       setResult(`Error: ${err}`);
-  //       console.log("shareData 실패: ", shareData);
 
-  //     }
-  // }
-  // };
-  const handleShare = async () => {
-    const result = await share(shareData);
-    if (result === "copiedToClipboard") {
-      alert("링크를 클립보드에 복사했습니다.");
-      console.log("링크 공유 성공공");
-    } else if (result === "failed") {
-      alert("공유하기가 지원되지 않는 환경입니다.");
-    }
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://developers.kakao.com/sdk/js/kakao.js"; // 카카오톡 SDK
+    script.async = true;
+    document.body.appendChild(script);
+  
+    return () => {
+      document.body.removeChild(script); // return으로 제거
+    };
+  }, []);
+
+  //Share 모달창 열기
+const handleShare = () => {
+  setIsOpen(true);
+  
+}
+  // Share 모달 닫기 
+  const closeModal = () => {
+    setIsOpen(false);
   };
-  // const copyToClipboard = async (url) => {
-  //   try {
-  //     await navigator.clipboard.writeText(url);
-  //     console.log("공유 완료!");
-  //     setShowToast(true);
+  // Share 공유 ( 클립보드 복사 , 카카오톡 공유)
+const shareString = `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`;
+const clipboardShare = async() =>{
+  try{
+    await navigator.clipboard.writeText(shareString);
+    alert('초대코드 복사되었습니다~');
+  }catch(e){
+    alert('복사 실패 ㅠㅠ');
+  }
+}
 
-  //           // 3초 후 토스트 메시지 숨기기
-  //           setTimeout(() => {
-  //             setShowToast(false);
-  //           }, 3000);
-  //   } catch (err) {
-  //     console.error('Failed to copy!', err);
-  //   }
-  // };
+const KakaoShare = async() => {
+  
+  if (window.Kakao === undefined) {
+    return;
+  }
+
+  if (!window.Kakao.isInitialized()) {
+    window.Kakao.init(KAKAO_SHARE_KEY); 
+  }
+
+
+  window.Kakao.Link.sendDefault({
+    objectType: 'feed',
+    content: {
+        title: '언제볼까?',
+        description: '약속 잡기 힘든 시람들이 만든, 더 많은 만남을 위한 서비스',
+        imageUrl: 'https://ifh.cc/g/ccKapj.jpg',
+        link: {
+            mobileWebUrl: shareString,
+            webUrl: shareString,
+        },
+    },
+    buttons: [
+        {
+            title: '참여하기', 
+            link: {
+                mobileWebUrl: shareString, 
+                webUrl: shareString,
+            },
+        },
+    ],
+});
+
+}
+
   
    useEffect(() => {
     const fetchData = async () => {
@@ -277,7 +303,7 @@ const EventCalendar = () => {
             <img 
               src="/home.svg" 
               className="hover:cursor-pointer"
-              alt="share-image1"
+              alt="홈으로 돌아가기기"
               onClick={() => navigate('/MonthView')} 
               />
             <div className={`
@@ -290,7 +316,8 @@ const EventCalendar = () => {
         src="/copyLink.svg" 
         className="hover:cursor-pointer"
         alt="share-image2"
-        onClick={() =>handleShare} 
+        // onClick={() =>handleShare(shareString)} 
+        onClick={handleShare}
         />
        </div>
           <div
@@ -412,7 +439,7 @@ const EventCalendar = () => {
                <img 
               src="participant.svg" 
               className="hover:cursor-pointer"
-              alt="share-image1"
+              alt="참여인원"
               />
               참여인원  
             </div>
@@ -441,6 +468,44 @@ const EventCalendar = () => {
               })}
             </div>
       </div>
+      <AnimatePresence>
+        {isOpen && (
+          // 배경(반투명) 영역
+          <motion.div
+            className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-50"
+            onClick={closeModal}
+            // 초기 상태, 마운트 시 애니메이션, 언마운트 시 애니메이션
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* 모달 컨테이너(슬라이드 업 애니메이션) */}
+            <motion.div
+              className="bg-white w-[360px] h-[158px] justify-center rounded-t-xl flex flex-col items-center p-4 pt-0"
+              onClick={(e) => e.stopPropagation()} // 내부 클릭 시 닫힘 방지
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <img className="w-auto mb-[20px]" alt = "공유창 손잡이"src="/tabEdge.svg" />
+               <Button label='카카오톡으로 공유하기'
+                              size={'share'} 
+                              onClick={KakaoShare} 
+              >
+                  <img src="/arcticons_kakaotalk.svg" alt="카카오톡 아이콘" />
+              </Button>
+               <Button label='링크 복사하기'
+                              size={'share'} 
+                              onClick={clipboardShare} 
+                              additionalClass="mt-[10px] !border border-gray-300 bg-white text-gray-900"
+              >
+                  <img src="/tabler_link.svg" alt="링크 복사" />              
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {showToast && (
         <div className="fixed bottom-4 right-4 flex items-center bg-white rounded-lg shadow-lg p-4 transition-opacity duration-300">
           <img 
