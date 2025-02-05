@@ -302,7 +302,7 @@ const KakaoShare = async() => {
             <img 
               src="/home.svg" 
               className="hover:cursor-pointer"
-              alt="홈으로 돌아가기기"
+              alt="홈으로 돌아가기"
               onClick={() => navigate('/MonthView')} 
               />
             <div className={`
@@ -314,7 +314,7 @@ const KakaoShare = async() => {
         <img 
         src="/copyLink.svg" 
         className="hover:cursor-pointer"
-        alt="share-image2"
+        alt="링크 공유하기 버튼"
         // onClick={() =>handleShare(shareString)} 
         onClick={handleShare}
         />
@@ -492,20 +492,20 @@ const KakaoShare = async() => {
                               size={'share'} 
                               onClick={KakaoShare} 
               >
-                  <img src="/arcticons_kakaotalk.svg" alt="카카오톡 아이콘" />
+                  <img src="/arcticons_kakaotalk.svg" alt="카카오톡으로 캘린더 링크 공유하기" />
               </Button>
                <Button label='링크 복사하기'
                               size={'share'} 
                               onClick={clipboardShare} 
                               additionalClass="mt-[10px] !border border-gray-300 bg-white text-gray-900"
               >
-                  <img src="/tabler_link.svg" alt="링크 복사" />              
+                  <img src="/tabler_link.svg" alt="클립보드로 링크 복사하기" />              
               </Button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-      {showToast && (
+      {/* {showToast && (
         <div className="fixed bottom-4 right-4 flex items-center bg-white rounded-lg shadow-lg p-4 transition-opacity duration-300">
           <img 
             src="/Toast_CopyLink.svg" 
@@ -513,7 +513,7 @@ const KakaoShare = async() => {
             className="w-6 h-6 mr-2"
           />
       </div>
-      )}
+      )} */}
       </div>
       </div>
       

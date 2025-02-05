@@ -13,7 +13,9 @@ const Section1 = ({navigate }) => (
         flex flex-col  p-4
         h-[695px]
         bg-gradient-to-b from-[#CCE3FF] via-35% via-[#FFFFFF] to-[#FFFFFF]
-    `}>
+    `}
+    aria-label="빠른 약속 시간 체크할 때, 언제 볼까?"
+    >
         <div className={`  
             ${colorVariants({ color: 'gray-900' })}    
             px-[8px]
@@ -35,7 +37,7 @@ const Section1 = ({navigate }) => (
             }
              }}
             >
-                <img className="text-[14px] w-[40px] h-[40px]" src="/wwmtLogo.svg" alt="언제볼까 로고"/>
+                <img className="text-[14px] w-[40px] h-[40px]" src="/wwmtLogo.svg" alt="언제볼까? 서비스 로고"/>
             </motion.div>
             <motion.div 
                 initial={{ opacity: 0, y: 30 }}
@@ -62,6 +64,8 @@ const Section1 = ({navigate }) => (
                     size={'participate'} 
                     onClick={() => navigate('/MonthView')}                          
                     additionalClass={`hover:opacity-80 text-[16px] w-[142px] h-[48px]`}
+                    aria-role="button"
+                    aria-label="새 약속 만들기 버튼"
                 />
             </motion.div>
 
@@ -97,7 +101,12 @@ const Section2 = () => {
             p-8
             py-14
             rounded-[20px]
-        `}>
+        `}
+        aria-label="지금까지모임 날짜 잡느라고생 많으셨죠?
+                    카톡방에서언제 괜찮아요?무한 반복
+                    단체 채팅방에캘린더 스크린샷올리기 지겨우신 분?
+                    투표 만들고,결과 정리하느라시간 낭비하셨나요?"
+        >
              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{
@@ -200,7 +209,10 @@ const Section3 = () => {
             gap-8
             bg-[#FAFAFA]
             py-14
-        `}>
+        `}
+        aria-label="언제볼까?에서 이렇게 해결해드립니다!
+         원클릭 약속방 생성, 링크 공유로 초대하기, 실시간 겹치는 시간 체크, 안전하게 약속 잡고 자동 삭제"      
+        >
            <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{
@@ -262,7 +274,7 @@ const Section3Card = ({ title, description, imgURL }) => {
                 )}  
             </div>
         </div>
-        <img src={imgURL} className="ml-0" alt="언제볼까? 서비스 UI" />
+        <img src={imgURL} className="ml-0" alt="언제볼까? 서비스 화면" />
     </div>
     );
 }
@@ -306,7 +318,10 @@ const Section4 = () => {
     return(
     <section className="
         flex flex-col justify-center py-10
-         bg-[#0087FC] min-h-[657px] h-auto rounded-[20px]">
+         bg-[#0087FC] min-h-[657px] h-auto rounded-[20px]
+         "
+        aria-label="언제볼까? 팀 소개"
+         >
             <div className=" 
                 px-[8px] h-auto flex flex-col bg-transparent   gap-24  text-left
                 " >
@@ -423,7 +438,9 @@ const Section5 = ({handleScrollToTop, animationData}) => {
     ];
     return(
     <section className=" flex flex-col  py-10
-         bg-[#FFFFF] min-h-[400px] font-pretendard pt-[19em] pb-[1em] gap-20">
+         bg-[#FFFFF] min-h-[400px] font-pretendard pt-[19em] pb-[1em] gap-20"
+         aria-label="함께해요! 그래서 우리, 언제 볼까요?"
+         >
         <div className=" font-semibold text-[20px] 
             text-[#007BE3] tracking-[-0.02em] leading-[1.8em] text-center">
                 {messages.map((message, index) => (
@@ -463,7 +480,11 @@ const Section5 = ({handleScrollToTop, animationData}) => {
                 >
                 <div className="" >함께해요!</div>
                 <div className=""> 그래서 우리, 언제 볼까요?</div>
-                <div onClick={handleScrollToTop} className={`w-[106px] h-[106px] hover:cursor-pointer`}>
+                <div 
+                    aria-role="button"
+                    aria-label="페이지 맨 위로 이동" 
+                    onClick={handleScrollToTop} 
+                    className={`w-[106px] h-[106px] hover:cursor-pointer`}>
                     {animationData ? (
                         <Lottie animationData={animationData} loop={true} />
                     ):(
