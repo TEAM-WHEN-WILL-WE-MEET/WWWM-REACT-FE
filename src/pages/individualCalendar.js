@@ -360,7 +360,7 @@ useEffect(() => {
         <img 
             className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
               active:scale-95 "
-            aria-label="돌아가기"
+            alt="재로그인하러 돌아가기"
             src="backward.svg"
             onClick={() => navigate(-1)}
 
@@ -394,6 +394,7 @@ useEffect(() => {
           scrollbarWidth: 'none',
            msOverflowStyle: 'none',
           }}
+          aria-label="날짜 탭"
       >
         {dates.map(({ date, key }) => (
           <div
@@ -419,7 +420,7 @@ useEffect(() => {
               flex-grow-0
               basis-[25%] 
             `}
-
+            
             onClick={() => setSelectedDate(key)}
           >
             {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}

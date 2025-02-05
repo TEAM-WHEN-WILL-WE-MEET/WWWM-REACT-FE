@@ -227,7 +227,7 @@ const Invite = () => {
 
               `}
               placeholder="이름을 입력해주세요"
-              
+              aria-label="참여자 이름 작성란"
             />
           </div>
           <div className="">
@@ -261,14 +261,15 @@ const Invite = () => {
                 border-[var(--gray-300,#E0E0E0)] 
                 ${error ? '!outline-[1px] !outline-[#ff0000] !outline-none' : ''}
                 `}              
-              
+                aria-label="참여자 비밀번호 작성란"
             />
 
           </div>
           <Button label={buttonText}
                 size={'participate'} 
                 additionalClass=
-                '!mt-[28px]  items-center !transform-none'        
+                '!mt-[28px]  items-center !transform-none'  
+                aria-label="새로 참여하기 버튼"      
             />  
          </form>
 
@@ -279,7 +280,9 @@ const Invite = () => {
                 ${typographyVariants({ variant: 'b2-md' })} 
                 bg-transparent
                 p-2
-                `}>
+                `}
+                 aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
+                >
                 {responseMessage}
               </p>
             )}

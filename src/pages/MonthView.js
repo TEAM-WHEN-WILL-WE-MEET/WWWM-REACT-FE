@@ -293,7 +293,7 @@ const inputClasses = twMerge(
     <div className="flex flex-col w-auto h-auto !px-[8px]">
       <div className="flex-row justify-start  ">
         <img 
-        alt=""
+        alt="언제볼까? 서비스 로고"
         src="/wwmtLogo.svg" 
         className=" flex px-[12px] py-[12px]  cursor-pointer  "
         onClick={() => navigate('/mypage')} 
@@ -315,9 +315,10 @@ const inputClasses = twMerge(
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder="캘린더 이름"
+          aria-label="캘린더 이름 작성란"
         />
         <img 
-          alt="글자 지우기 버튼"
+          alt="캘린더 제목 지우기 버튼"
           src="/Icon_X.svg" 
           className="absolute right-2 top-1/2 -translate-y-1/2 w-[32px] h-[32px] cursor-pointer"
           style={{ cursor: 'pointer' }}
@@ -359,9 +360,9 @@ const inputClasses = twMerge(
           <div className="flex items-center ml-[8px]">
           <img 
             className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
-         active:scale-95 "
+            active:scale-95 "
             onClick={goToPreviousMonth}
-            aria-label="이전 달"
+            alt="이전 달로 넘어가기"
             src="btn_Back.svg"
           />
           
@@ -369,7 +370,7 @@ const inputClasses = twMerge(
             className="bg-none cursor-pointer ml-[6px] pl-px-[4px] pt-px-[8px]  transition-colors duration-200 ease-in 
           active:scale-95 "
             onClick={goToNextMonth}
-            aria-label="다음 달"
+            alt="다음 달로 넘어가기"
             src="btn_Forward.svg"
           />
         </div>
