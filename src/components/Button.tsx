@@ -207,6 +207,23 @@ export const ButtonVariants = cva(
           'text-[var(--white)]'
 
         ],
+        toast:
+        [
+          'inline-flex', 
+          'h-[40px]', 
+          'px-[20px]', 
+          'justify-center', 
+          'items-center', 
+          'gap-[10px]', 
+          'rounded-[8px]', 
+          '!bg-[var(--gray-900)]', 
+          '!text-[var(--white)]', 
+          '!font-pretendard', 
+          'text-[var(--font-size-14)]', 
+          'font-[var(--font-md)]', 
+          'leading-[var(--line-height-16)]', 
+          'tracking-[var(--spacing)]'
+        ]
       },
     },
     defaultVariants: {
