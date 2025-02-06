@@ -77,7 +77,11 @@ const shareString = `https://when-will-we-meet.site/invite?appointmentId=${appoi
 const clipboardShare = async() =>{
   try{
     await navigator.clipboard.writeText(shareString);
-    alert('초대코드 복사되었습니다~');
+    closeModal(); // 모달 닫기
+    setShowToast(true); // 토스트 표시
+    setTimeout(() => {
+      setShowToast(false); // 2초 후 자동 닫기
+    }, 2000);
   }catch(e){
     alert('복사 실패 ㅠㅠ');
   }
@@ -361,6 +365,7 @@ const KakaoShare = async() => {
                 flex-shrink-0
                 flex-grow-0
                 basis-[25%] 
+                cursor-pointer
               `}
 
               onClick={() => setSelectedDate(key)}
@@ -409,7 +414,7 @@ const KakaoShare = async() => {
               size={"XXS"}
               additionalClass={`
                 ${colorClass}
-
+                pointer-events-none
                 items-center !transform-none
               `}
             />
@@ -505,15 +510,21 @@ const KakaoShare = async() => {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* {showToast && (
-        <div className="fixed bottom-4 right-4 flex items-center bg-white rounded-lg shadow-lg p-4 transition-opacity duration-300">
-          <img 
-            src="/Toast_CopyLink.svg" 
-            alt="Copy Success"
-            className="w-6 h-6 mr-2"
-          />
-      </div>
-      )} */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div 
+          className="fixed bottom-0 left-0 right-0 flex justify-center mb-[8rem]"
+          initial={{ y: '400%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '400%' }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          <Button label="링크가 복사되었습니다!" size={'toast'}
+                   onClick={handleSaveClick} 
+                   additionalClass= 'z-50 pointer-events-none' />
+        </motion.div>
+        )}
+      </AnimatePresence>
       </div>
       </div>
       
