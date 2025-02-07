@@ -162,132 +162,166 @@ const Invite = () => {
  };   
 
  
+ const inputClasses = (isEmpty, hasError) => 
+  cn(
+    "flex w-96 h-16 px-5 py-4",
+    "items-center flex-shrink-0 rounded-lg",
+    "border border-gray-300",
+    typographyVariants({ variant: 'b2-md' }),
+    {
+      'input-empty': isEmpty,
+      'input-filled': !isEmpty,
+      'outline outline-1 outline-red-500 outline-offset-0': hasError
+    }
+  );
  
- 
-  return (
-<div className="flex justify-center items-center h-[800px] bg-[var(--gray-50,#FBFBFB)] flex-col">
-<div className={`
-          ${typographyVariants({ variant: 'h1-sb' })} 
-          ${colorVariants({ color: 'gray-800' })} 
-          flex 
-          bg-transparent
-         !mb-[16px]
-
-        `}>
-        {eventname}
-      </div>
-      <div className={`
-            ${colorVariants({ bg: 'white' })} 
-            ${colorVariants({ color: 'gray-800' })} 
-            w-[312px] 
-            h-[258px] 
-            flex-shrink-0 
-            rounded-[12px] 
-            border-[1px] 
-            border-[var(--gray-800,#444)] 
-            shadow-[1px_1px_0px_0px_var(--gray-800,#444)]
-            pt-[28px] 
-            px-[32px]
-            items-center
-            justify-between
-            flex
-          `}
-        >
-        <form onSubmit={handleSubmit}   
-              className="flex flex-col items-center justify-center w-full !h-auto "
-        >
-          <div className="mb-[18px]">
-            <label htmlFor="name"
-              className={`
-                ${typographyVariants({ variant: 'd1-sb' })} 
-                ${colorVariants({ color: 'gray-800' })} 
-                tracking-[-0.3px]
-              `}>
-                참여자 이름
-                </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={`
-                ${colorVariants({ bg: 'gray-50' })} 
-                ${colorVariants({ color: 'gray-300' })} 
-                flex 
-                w-[248px] 
-                h-[40px] 
-                px-[12px] 
-                py-[11px] 
-                items-center 
-                flex-shrink-0 
-                rounded-[6px] 
-                border-[1px] 
-                border-[var(--gray-300,#E0E0E0)]
-                ${typographyVariants({ variant: 'b2-md' })} 
-
-              `}
-              placeholder="이름을 입력해주세요"
-              aria-label="참여자 이름 작성란"
-            />
-          </div>
-          <div className="">
-            <label htmlFor="password"   className={`
+ return (
+  <div className="flex justify-center items-center h-[80rem] bg-[var(--gray-50,#FBFBFB)] flex-col">
+    <div className={`
+      ${typographyVariants({ variant: 'h1-sb' })} 
+      ${colorVariants({ color: 'gray-800' })} 
+      flex 
+      bg-transparent
+      !mb-[1.6rem]
+    `}>
+      {eventname}
+    </div>
+    <div className={`
+      ${colorVariants({ bg: 'white' })} 
+      ${colorVariants({ color: 'gray-800' })} 
+      w-[31.2rem] 
+      h-[25.8rem] 
+      flex-shrink-0 
+      rounded-[1.2rem] 
+      border-[0.1rem] 
+      border-[var(--gray-800,#444)] 
+      shadow-[0.1rem_0.1rem_0px_0px_var(--gray-800,#444)]
+      pt-[2.8rem] 
+      px-[3.2rem]
+      items-center
+      justify-between
+      flex
+    `}>
+      <form 
+        onSubmit={handleSubmit}   
+        className="flex flex-col items-center justify-center w-full !h-auto"
+      >
+        <div className="mb-[1.8rem]">
+          <label 
+            htmlFor="name"
+            className={`
               ${typographyVariants({ variant: 'd1-sb' })} 
               ${colorVariants({ color: 'gray-800' })} 
               tracking-[-0.3px]
-            `}>
-              패스워드
-              </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="패스워드를 입력해주세요"
-              className={`
-                ${colorVariants({ bg: 'gray-50' })} 
-                ${colorVariants({ color: 'gray-300' })} 
-                ${typographyVariants({ variant: 'b2-md' })} 
-                flex 
-                w-[248px] 
-                h-[40px] 
-                px-[12px] 
-                py-[11px] 
-                items-center 
-                gap-[10px] 
-                flex-shrink-0 
-                rounded-[6px] 
-                border-[1px] 
-                border-[var(--gray-300,#E0E0E0)] 
-                ${error ? '!outline-[1px] !outline-[#ff0000] !outline-none' : ''}
-                `}              
-                aria-label="참여자 비밀번호 작성란"
-            />
-
-          </div>
-          <Button label={buttonText}
-                size={'participate'} 
-                additionalClass=
-                '!mt-[28px]  items-center !transform-none'  
-                aria-label="새로 참여하기 버튼"      
-            />  
-         </form>
-
-      </div>
-      {responseMessage && (
-              <p className={`
-                ${colorVariants({ color: 'red-300' })} 
-                ${typographyVariants({ variant: 'b2-md' })} 
-                bg-transparent
-                p-2
-                `}
-                 aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
-                >
-                {responseMessage}
-              </p>
-            )}
+              p-0
+              !text-[var(--font-size-12)]
+            `}
+          >
+            참여자 이름
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={`
+                  border
+                  border-[var(--gray-300,#E0E0E0)] 
+                  ${!name
+                  ? `
+                    placeholder-[var(--gray-500,#E0E0E0)] 
+                    bg-[var(--gray-50)] 
+                    `
+                  : ` 
+                    placeholder-[var(--gray-300,#E0E0E0)] 
+                    bg-[var(--white)] 
+                    `
+                }
+              flex 
+              w-[24.8rem] 
+              h-[4rem] 
+              px-[1.2rem] 
+              py-[1.1rem] 
+              items-center 
+              flex-shrink-0 
+              rounded-[0.6rem] 
+              border-[0.1rem] 
+              ${typographyVariants({ variant: 'b2-md' })} 
+            `}
+            placeholder="이름을 입력해주세요"
+            aria-label="참여자 이름 작성란"
+          />
+        </div>
+        <div className="">
+          <label 
+            htmlFor="password"   
+            className={`
+              ${typographyVariants({ variant: 'd1-sb' })} 
+              ${colorVariants({ color: 'gray-800' })} 
+              tracking-[-0.3px]
+              p-0
+            `}
+          >
+            패스워드
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="패스워드를 입력해주세요"
+            className={`
+                  border
+                  border-[var(--gray-300,#E0E0E0)] 
+                  ${!password
+                  ? `
+                    placeholder-[var(--gray-500,#E0E0E0)] 
+                    bg-[var(--gray-50)] 
+                    `
+                  : ` 
+                    placeholder-[var(--gray-300,#E0E0E0)] 
+                    bg-[var(--white)] 
+                    `
+                }
+              ${typographyVariants({ variant: 'b2-md' })} 
+              flex 
+              w-[24.8rem] 
+              h-[4rem] 
+              px-[1.2rem] 
+              py-[1.1rem] 
+              items-center 
+              gap-[1rem] 
+              flex-shrink-0 
+              rounded-[0.6rem] 
+              border-[0.1rem] 
+              border-[var(--gray-300,#E0E0E0)] 
+              ${error ? '!outline-[0.1rem] !outline-[#ff0000] !outline-none' : ''}
+            `}              
+            aria-label="참여자 비밀번호 작성란"
+          />
+        </div>
+        <Button 
+          label={buttonText}
+          size={'participate'} 
+          additionalClass='!mt-[2.8rem] items-center !transform-none'  
+          aria-label="새로 참여하기 버튼"      
+        />  
+      </form>
     </div>
-  );
+    {responseMessage && (
+      <p className={`
+        ${colorVariants({ color: 'red-300' })} 
+        ${typographyVariants({ variant: 'b2-md' })} 
+        bg-transparent
+        p-2
+      `}
+        aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
+      >
+        {responseMessage}
+      </p>
+    )}
+  </div>
+ );
 };
 
 export default Invite;

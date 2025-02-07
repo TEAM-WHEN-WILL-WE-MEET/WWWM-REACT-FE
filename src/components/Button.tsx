@@ -25,7 +25,6 @@ export const ButtonVariants = cva(
   hover:scale-105 duration-200 
   `,
   {
-    //variant , size에 따라 다른 디자인을 보여줄수 있다
     variants: {
       variant: {
         default: [
@@ -36,122 +35,99 @@ export const ButtonVariants = cva(
       },
       size: {
         default: '',
-        XXS: //ex 내 참여 가능 시간 선택
-        [
-          'w-[46px]',
-          'h-[32px]',
+        XXS: [
+          'w-[4.6rem]',
+          'h-[3.2rem]',
           'flex-shrink-0',
           'border',
           'border-[var(--gray-300)]',
           'bg-[var(--white)]',
-          'whitespace-nowrap',
+          'whitespace-nowrap', 
           'rounded-none',
-
-          //선택됐을때는 
           'selected:border-[var(--blue-200)]',
           'selected:bg-[var(--blue-50)]',
-
         ],
-        XS: // ex 캘린더 timeslot
-        [
-          'w-[44px]',
-          '!h-[28px]',
+        XS: [
+          'w-[4.4rem]',
+          '!h-[2.8rem]',
           'flex-shrink-0',
           'border',
           'border-[var(--gray-300)]',
           'bg-[var(--white)]',
           'whitespace-nowrap',
           'rounded-none',
-
-          //그 이후 userCount 백분율에 따라 색상 적용되는건, js 코드 내에 있음.
         ],
-        S:  //ex 삭제, 취소 버튼
-        [
+        S: [
           'flex',
-          'w-[152px]',
-          'h-[40px]',
-          'px-[51px]',
-          'py-[12px]',
+          'w-[15.2rem]',
+          'h-[4rem]',
+          'px-[5.1rem]',
+          'py-[1.2rem]',
           'justify-center',
           'items-center',
           'flex-shrink-0',
-          'rounded-[8px]',
+          'rounded-[0.8rem]',
           'border',
           'border-[var(--red-100)]',
           'bg-[var(--red-50)]',
           'whitespace-nowrap',
-
-          //취소하기 버튼은... state가 뭔지 감이 안옴, 백엔드 v2 개발 들어갈 때 고민 ㄱㄱ
-          // 'border-[var(--gray-200)]',
-          // 'bg-[var(--white)]',
         ],
-        M: //ex 내 참여시간 수정 
-        [ 
+        M: [ 
           'flex',
-          'w-[312px]',
-          'h-[40px]',
-          'px-[119px]',
-          'py-[14px]',
+          'w-[31.2rem]',
+          'h-[4rem]',
+          'px-[11.9rem]',
+          'py-[1.4rem]',
           'justify-center',
           'items-center',
-          'gap-[10px]',
+          'gap-[1rem]',
           'flex-shrink-0',
-          'rounded-[8px]',
+          'rounded-[0.8rem]',
           'border',
           'border-[var(--gray-400)]',
           'bg-[var(--white)]',
-          'shadow-[1px_1px_0px_0px_var(--gray-400)]',    
+          'shadow-[0.1rem_0.1rem_0px_0px_var(--gray-400)]',    
           'whitespace-nowrap',
           typographyVariants({ variant: 'b2-md' }),
           'text-[var(--gray-800)]',
-
-          //비활성화시
           'pressed:border',
           'pressed:border-[var(--gray-400)]',
           'pressed:bg-[var(--gray-50)]',
           'pressed:text-[var(--gray-800)]',
-
-
         ],
-        L: //ex 내 참여시간 저장 
-        [
+        L: [
           'flex',
-          'w-[320px]',
-          'h-[44px]',
-          'px-[122px]',
-          'py-[16px]',
+          'w-[32rem]',
+          'h-[4.4rem]',
+          'px-[12.2rem]',
+          'py-[1.6rem]',
           'justify-center',
           'items-center',
-          'gap-[10px]',
+          'gap-[1rem]',
           'flex-shrink-0',
-          'rounded-[8px]',
+          'rounded-[0.8rem]',
           'border',
           'border-[var(--gray-900)]',
           'bg-[var(--white)]',
-          'shadow-[1px_1px_0px_0px_var(--gray-900)]',
+          'shadow-[0.1rem_0.1rem_0px_0px_var(--gray-900)]',
           'whitespace-nowrap',
           typographyVariants({ variant: 'b1-sb' }),
           'text-[var(--gray-900)]',
-
-          //press됐을 때
           'pressed:border',
           'pressed:border-[var(--gray-900)]',
           'pressed:bg-[var(--gray-50)]',
-
         ],
-        XL: //ex 캘린더 만들기 
-        [
-          //able
+        XL: [
           'flex',
-          'w-[320px]',
-          'h-[48px]',
-          'px-[122px]',
-          'py-[16px]',
+          'w-[32rem]',
+          'h-[4.8rem]',
+          'px-[12.2rem]',
+          'py-[1.6rem]',
           'justify-center',
           'items-center',
-          'gap-[10px]',
+          'gap-[1rem]',
           'flex-shrink-0',
-          'rounded-[8px]',
+          'rounded-[0.8rem]',
           'bg-[var(--gray-900)]',
           'tracking-normal',
           'font-pretendard',
@@ -159,63 +135,54 @@ export const ButtonVariants = cva(
           '!transform-none',
           '!hover:transform-none',
           !typographyVariants({ variant: 'b1-sb' }),
-
-          //disabled
           'disabled:!text-[var(--gray-600)]',
           'disabled:border',
           'disabled:bg-[var(--gray-50)]',
           'disabled:cursor-not-allowed',   
           'disabled:border-[var(--gray-500)]',   
-          //press
           'pressed:border',
           'pressed:!text-[var(--gray-100)]',
           'pressed:border-[var(--gray-900)]',
           'pressed:bg-[var(--gray-800)]',
-
-
         ],
-        participate: //참여하기 버튼
-        [
-        'w-[112px]',
-        'h-[40px]',
-        'flex-shrink-0',
-        'rounded-[6px]',
-        'bg-[var(--gray-900)]',
-        'whitespace-nowrap',
-        typographyVariants({ variant: 'b1-sb' }),
-        `text-[var(--white)]`,
-        'hover:transform-none',
-        'hover:none'
+        participate: [
+          'w-[11.2rem]',
+          'h-[4rem]',
+          'flex-shrink-0',
+          'rounded-[0.6rem]',
+          'bg-[var(--gray-900)]',
+          'whitespace-nowrap',
+          typographyVariants({ variant: 'b1-sb' }),
+          `text-[var(--white)]`,
+          'hover:transform-none',
+          'hover:none'
         ],
-        share: //카카오톡으로 공유하기, 링크 복사하기
-        [   //default는 카카오톡으로 설정했음음
+        share: [
           'flex',
-          'pl-[16px]',
-          'w-[312px]',
-          'h-[44px]',
-          'py-[14px]',
+          'pl-[1.6rem]',
+          'w-[31.2rem]',
+          'h-[4.4rem]',
+          'py-[1.4rem]',
           '!justify-start',
           'items-center',
-          '!whitespace-nowrap ',
+          '!whitespace-nowrap',
           '!text-center',
-          'gap-[4px]',
-          'rounded-[8px]',
+          'gap-[0.4rem]',
+          'rounded-[0.8rem]',
           'border',
           'bg-[var(--gray-900)]',
           'whitespace-normal',
           typographyVariants({ variant: 'b2-md' }),
           'text-[var(--white)]'
-
         ],
-        toast:
-        [
+        toast: [
           'inline-flex', 
-          'h-[40px]', 
-          'px-[20px]', 
+          'h-[4rem]', 
+          'px-[2rem]', 
           'justify-center', 
           'items-center', 
-          'gap-[10px]', 
-          'rounded-[8px]', 
+          'gap-[1rem]', 
+          'rounded-[0.8rem]', 
           '!bg-[var(--gray-900)]', 
           '!text-[var(--white)]', 
           '!font-pretendard', 
@@ -229,9 +196,8 @@ export const ButtonVariants = cva(
     defaultVariants: {
       variant: 'default',
       size: 'default',
-      
     },
-  },
+   }
 );
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>,
@@ -242,7 +208,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>,
   children?: React.ReactElement;
   //icon component 같은 리엑트 컴포넌트에 사용
   additionalClass?: string;
-  size: 'XL' | 'L' | 'M' | 'S' | 'XS' | 'XXS';
+  size: 'toast' |'share' |'participate' |'XL' | 'L' | 'M' | 'S' | 'XS' | 'XXS';
 
 }
 

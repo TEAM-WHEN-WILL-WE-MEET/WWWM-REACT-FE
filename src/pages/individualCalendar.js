@@ -355,25 +355,25 @@ useEffect(() => {
   };
 
   return (
-    <div className={`h-[800px] flex flex-col   ${colorVariants({ bg: 'gray-50' })}`}>
-      <div className={`flex ${colorVariants({ bg: 'white' })} w-[360px] pr-[20px] mt-[20px] h-[48px]  flex-row  items-start gap-[8px]`}>
+    <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
+      <div className={`flex ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}>
         <img 
-            className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
-              active:scale-95 "
-            alt="재로그인하러 돌아가기"
-            src="backward.svg"
-            onClick={() => navigate(-1)}
-
-          />
-          <div
+          className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in 
+            active:scale-95"
+          alt="재로그인하러 돌아가기"
+          src="backward.svg"
+          onClick={() => navigate(-1)}
+        />
+        <div
           className={`
             ${typographyVariants({ variant: 'h1-sb' })} 
             overflow-hidden 
             text-center 
             truncate
           `}
->          {eventName}
-          </div>
+        >
+          {eventName}
+        </div>
       </div>
       {/* date-tabs */}
       <div
@@ -382,119 +382,123 @@ useEffect(() => {
           !justify-start
           !overflow-x-auto 
           px-0 
-          py-[10px] 
+          py-[1rem] 
           pb-0
           whitespace-nowrap 
           scrollbar-hide 
           ![&::-webkit-scrollbar]:hidden
           hover:cursor-pointer
           ${colorVariants({ bg: 'white' })}
+            !min-h-[4rem]
+            border-b-[0.1rem] 
+            border-[var(--gray-500,#A8A8A8)]  
+            z-0  
         `}
         style={{
           scrollbarWidth: 'none',
-           msOverflowStyle: 'none',
-          }}
-          aria-label="날짜 탭"
+          msOverflowStyle: 'none',
+        }}
+        aria-label="날짜 탭"
       >
         {dates.map(({ date, key }) => (
           <div
             key={key}
             className={`
               ${typographyVariants({ variant: 'b1-sb' })} 
-              ${selectedDate === key ? `
-                !${colorVariants({ color: 'gray-900' })} 
-                font-[600] 
-                border-b-[2px] 
-                border-[var(--gray-900,#242424)]
-              ` : `
-                ${colorVariants({ color: 'gray-500' })} 
-                font-[500]
-                border-b-[2px] 
-                border-[var(--gray-500,#A8A8A8)]
-              `}
+                ${selectedDate === key ? 
+                  `
+                  !${colorVariants({ color: 'gray-900' })} 
+                  font-[600] 
+                  border-b-[0.2rem] 
+                  border-[var(--gray-900,#242424)]
+                  -mb-0.3
+                  z-20
+                ` :
+                 ``
+                }
               tracking-[-0.35px]
-              p-[9px]
-              w-[74px]
+              p-[0.9rem]
+              w-[7.4rem]
               text-center
               flex-shrink-0
               flex-grow-0
               basis-[25%] 
             `}
-            
             onClick={() => setSelectedDate(key)}
           >
             {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
           </div>
         ))}
       </div>
-
-    <div className={`flex mb-[36px] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="all-time" 
-              className="screen-reader" 
-              checked={isVisuallyChecked || isChecked}
-              onChange={(e) => {
-                setIsChecked(e.target.checked);
-                setIsVisuallyChecked(e.target.checked); 
-                handleAllTimeChange(e);
-              }}
-              />
-        <div className="label-box">
-          <label htmlFor="all-time" 
-                className={`${typographyVariants({ variant: 'b2-md' })} 
-                ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' })  : colorVariants({ color: 'gray-600' })}`}>  
-                 <span className="check-icon" aria-hidden="true"></span>
-                  모든 시간 가능
-          </label>
-        </div>
-      </div> 
-      {times.map((time, timeIndex) => (
+   
+      <div className={`flex pt-[2.8rem] mb-[3.6rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+        <div class="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="all-time" 
+            className="screen-reader" 
+            checked={isVisuallyChecked || isChecked}
+            onChange={(e) => {
+              setIsChecked(e.target.checked);
+              setIsVisuallyChecked(e.target.checked); 
+              handleAllTimeChange(e);
+            }}
+          />
+          <div className="label-box">
+            <label 
+              htmlFor="all-time" 
+              className={`${typographyVariants({ variant: 'b2-md' })} 
+              ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' }) : colorVariants({ color: 'gray-600' })}`}
+            >  
+              <span className="check-icon" aria-hidden="true"></span>
+              모든 시간 가능
+            </label>
+          </div>
+        </div> 
+        {times.map((time, timeIndex) => (
           <div key={timeIndex} className="flex items-center">
             <div
               className={`
                 ${typographyVariants({ variant: 'd3-rg' })}
                 text-[var(--gray-800,#444)]
-                h-[28px] 
-                w-[36px] 
+                h-[2.8rem] 
+                w-[3.6rem] 
                 text-center 
-                mr-[6px] 
+                mr-[0.6rem] 
                 flex 
                 items-center 
                 justify-center 
+                whitespace-nowrap
               `}
             >             
-             {moment(time, 'HH:mm').format('HH시')}
+              {moment(time, 'HH:mm').format('HH시')}
             </div>
-            <div className="grid grid-cols-6 gap-0 !h-[28px]">  
-             {[...Array(6)].map((_, buttonIndex) => (
+            <div className="grid grid-cols-6 gap-0 !h-[2.8rem]">  
+              {[...Array(6)].map((_, buttonIndex) => (
                 <Button
                   key={buttonIndex}
                   size={"XXS"}
                   additionalClass={` 
-                    ${
-                    selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""
-                  } 
-                   items-center !transform-none`
-                  }
+                    ${selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""} 
+                    items-center !transform-none
+                  `}
                   onClick={() => handleTimeClick(timeIndex, buttonIndex)}
                 />
-
               ))}
             </div>
           </div>
         ))}
       </div>
-        <div className="flex !justify-center">
-         <Button 
-             label="내 참여시간 저장"
-             size={'L'} 
-             onClick={handleSaveClick}
-             additionalClass=
-             '  items-center !transform-none  '        
-          /> 
-        </div>
+      <div className="flex !justify-center">
+        <Button 
+          label="내 참여시간 저장"
+          size={'L'} 
+          onClick={handleSaveClick}
+          additionalClass='items-center !transform-none mb-[1.2rem]'        
+        /> 
+      </div>
     </div>
-  );
+   );
 };
 
 export default IndividualCalendar;

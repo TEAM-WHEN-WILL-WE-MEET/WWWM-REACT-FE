@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect   } from 'react';
-import './TimePicker.css';
 import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
 import { Button } from './Button.tsx';
