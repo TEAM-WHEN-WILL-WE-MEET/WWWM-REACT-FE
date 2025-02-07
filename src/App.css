@@ -1,7 +1,6 @@
 @import './styles/typography.css';
 @import './styles/color.css';
 :root {
-  
   input[type="password"] {
     font-family: password-font, sans-serif;
     font-size: 16px;
@@ -14,20 +13,28 @@
     src: local("Arial");
     unicode-range: U+002A; /* '*' 문자만 사용 */
   }
+  color-scheme: light; 
+  /* 다크모드 무력화 */
 
 }
 
-/*
+body{
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+ scrollbar-width: none;
+ -ms-overflow-style: none;
+ scrollbar-gutter: stable
+}
+	/* 크롬, 사파리, 오페라 스크롤바 옵션 */
 
-To enable a theme in your HTML, simply add one of the following data attributes to an HTML element, like so:
 
-<body data-grayscale-mode="light">
-    <!-- the rest of your content -->
-</body>
+::-webkit-scrollbar {
+	display: none;
+  width: 0;
+  height: 0;
+}
 
-You can apply the theme on any DOM node, not just the `body`
 
-*/
 
 [data-grayscale-mode="light"] {
   --grayscale-color-ver2-BG-blue: rgba(245, 246, 255, 1);
@@ -58,48 +65,58 @@ You can apply the theme on any DOM node, not just the `body`
 }
 
 .App {
-  width: 360px;
+  width: 360px; 
   height: 800px;
-  margin: 0 auto;
+  margin: 0 auto !important;
   padding: 0;  
 }
- /* 안드로이드 최소 사이즈 (360 x 640) 
-  w 360px 이상, h 640px 이하인 기기에서 h 640px로 적용  */
-   @media screen and (min-width: 360px) and (max-height: 640px) {
-    .App {
-      height: 640px;
-      width:auto;
-      /* background-color:#c30010; */
-    }
-  }
-  
-  
-  /* iOS 최소 사이즈 (375 x 667)
-     iOS 기기 중 h 667px 이하인 경우 적용 */
-  @media screen and (min-width: 375px) and (max-height: 667px) {
-    .App {
-      height: 667px;
-      /* background-color:#c30010; */
+/* 사용자가 다크모드일 시 */
+/* Chrome, Edge에서 라이트모드로 전환되는거 확인, 삼성인터넷은 브라우저 자체가 지원X */
 
-    }
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light;
+    forced-colors: light;
   }
-  
-  /* iOS 기본 작업 사이즈 (375 x 812)
-     iOS 기기 중 h가 668px 이상인 경우 기본 작업 사이즈로 적용 */
-  @media screen and (min-width: 375px) and (min-height: 668px) {
-    .App {
-      height: 812px;
-      /* background-color:#c30010; */
-/* 왜 여기서 pc가 적용되지..?? */
-    }
-  }
-  
-  /* PC 버전 또는 LandPage 전용 스타일: 
-     뷰포트 너비가 768px 이상인 경우, LandPage 디자인 요구에 따라 430px로 변경 */
-  @media screen and (min-width: 768px) {
-    .App {
-      width: 430px;
-      /* background-color:#c30010; */
+}
 
-    }
+/* 초기값 (데스크탑 기준) */
+html {
+  font-size: 62.5%; /* 16px * 0.625 = 10px */
+}
+body{
+  font-size: 1.6rem;  /* 1.6 * 10px = 16px */
+}
+
+
+/* 모바일 퍼스트 */
+/* 가장 작은 디바이스를 우선으로 작성한 뒤 뷰포트를 확대하면서 분기점 추가가 */
+ 
+/* 소형 모바일 (가로 360 이하) */
+@media (max-width: 360px) {
+  html {
+    font-size: 62.5%;
   }
+  body {
+    font-size: 1.4rem; /* 1.4 * 10px = 14px */
+  }
+  .App {
+    width: 31.5rem; /* 10px * 31.5 = 315px */
+    margin: 0 auto;
+  }
+}
+
+/* 중/대형 모바일 (가로 361px ~ 812px 정도) */
+@media (min-width: 361px) and (max-width: 812px) {
+  html {
+    font-size: 62.5%; /* 16px * 0.625 = 10px */
+  }
+  body {
+    font-size: 1.5rem; /* 1.5 * 10px = 15px */
+  }
+  .App {
+    width: 36rem; /* 15px * 24 = 360px  */
+    margin: 0 auto;
+  }
+}
+

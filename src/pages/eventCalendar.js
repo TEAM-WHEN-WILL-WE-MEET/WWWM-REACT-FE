@@ -289,6 +289,15 @@ const KakaoShare = async() => {
 //     }
 // }, [selectedTimes]);
 
+const truncateName = (name) => {
+  const hasKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(name);
+  
+  if (hasKorean) {
+    return name.length > 4 ? name.slice(0, 4) + '...' : name;
+  } else {
+    return name.length > 6 ? name.slice(0, 6) + '...' : name;
+  }
+};
 
  
    
@@ -298,237 +307,243 @@ const KakaoShare = async() => {
      navigate(`/getAppointment?appointmentId=${appointmentId}`);
     };
 
-   return (
-    <div className={`h-[800px] flex flex-col    ${colorVariants({ bg: 'gray-50' })}`}>
-      <div className={`flex items-center flex-row justify-between  ${colorVariants({ bg: 'white' })} w-[360px] pr-[20px] mt-[20px] h-[48px]  flex-row  items-start gap-[8px]`}>
-         {/* <h2>{eventName}</h2> */}
-         <div className="flex flex-row items-center">
+    return (
+      <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
+        <div className={`flex items-center flex-row justify-between ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}>
+          {/* <h2>{eventName}</h2> */}
+          <div className="flex flex-row items-center">
             <img 
               src="/home.svg" 
               className="hover:cursor-pointer"
               alt="홈으로 돌아가기"
               onClick={() => navigate('/MonthView')} 
-              />
+            />
             <div className={`
-                ${typographyVariants({ variant: 'h1-sb' })}
+              ${typographyVariants({ variant: 'h1-sb' })}
             `}>
               {eventName}
             </div>
+          </div>
+          <img 
+            src="/Share.svg" 
+            className="hover:cursor-pointer"
+            alt="링크 공유하기 버튼"
+            // onClick={() =>handleShare(shareString)} 
+            onClick={handleShare}
+          />
         </div>
-        <img 
-        src="/copyLink.svg" 
-        className="hover:cursor-pointer"
-        alt="링크 공유하기 버튼"
-        // onClick={() =>handleShare(shareString)} 
-        onClick={handleShare}
-        />
-       </div>
-          <div
-            className={`
-              flex 
-              !justify-start
-              !overflow-x-auto 
-              px-0 
-              py-[10px] 
-              pb-0
-              whitespace-nowrap 
-              scrollbar-hide 
-              ![&::-webkit-scrollbar]:hidden
-              ${colorVariants({ bg: 'white' })}
-              !min-h-[40px]
-            `}
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              }}
-          >         
+        <div
+          className={`
+            flex 
+            !justify-start
+            !overflow-x-auto 
+            px-0 
+            py-[1rem] 
+            pb-0
+            whitespace-nowrap 
+            scrollbar-hide 
+            ![&::-webkit-scrollbar]:hidden
+            ${colorVariants({ bg: 'white' })}
+            !min-h-[4rem]
+            border-b-[0.1rem] 
+            border-[var(--gray-500,#A8A8A8)]  
+            z-0          
+          `}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >         
           {dates.map(({ date, key }) => (
             <div
               key={key}
               className={`
-                ${typographyVariants({ variant: 'b1-sb' })} 
-                ${selectedDate === key ? `
-                  !${colorVariants({ color: 'gray-900' })} 
-                  font-[600] 
-                  border-b-[2px] 
-                  border-[var(--gray-900,#242424)]
-                ` : `
-                  ${colorVariants({ color: 'gray-500' })} 
-                  font-[500]
-                  border-b-[2px] 
-                  border-[var(--gray-500,#A8A8A8)]
-                `}
                 tracking-[-0.35px]
-                p-[9px]
-                w-[74px]
+                p-[0.9rem]
+                w-[7.4rem]
                 text-center
                 flex-shrink-0
                 flex-grow-0
                 basis-[25%] 
                 cursor-pointer
-              `}
+                ${typographyVariants({ variant: 'b1-sb' })} 
+                ${selectedDate === key ? 
+                  `
+                  !${colorVariants({ color: 'gray-900' })} 
+                  font-[600] 
+                  border-b-[0.2rem] 
+                  border-[var(--gray-900,#242424)]
+                  -mb-0.3
+                  z-20
+                ` :
+                 ``
+                }
 
+              `}
               onClick={() => setSelectedDate(key)}
             >
-             {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
-           </div>
-         ))}
-       </div>
-        <div className={`flex mb-[36px] mt-[28px] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
-          {times.map((time, timeIndex) => (
-          <div key={timeIndex} className="flex items-center">
-            <div
-              className={`
-                ${typographyVariants({ variant: 'd3-rg' })}
-                text-[var(--gray-800,#444)]
-                h-[28px] 
-                w-[36px] 
-                text-center 
-                mr-[6px] 
-                flex 
-                items-center 
-                justify-center 
-              `}
-            >                 
-            {moment(time, 'HH:mm').format('HH시')}
+              {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
             </div>
-            <div className="grid grid-cols-6 gap-0 !h-[28px]">  
+          ))}
+        </div>
+        <div className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+          {times.map((time, timeIndex) => (
+            <div key={timeIndex} className="flex items-center">
+              <div
+                className={`
+                  ${typographyVariants({ variant: 'd3-rg' })}
+                  text-[var(--gray-800,#444)]
+                  h-[2.8rem] 
+                  w-[3.6rem] 
+                  text-center 
+                  mr-[0.6rem] 
+                  flex 
+                  items-center 
+                  justify-center 
+                  whitespace-nowrap                
+                `}
+              >                 
+                {moment(time, 'HH:mm').format('HH시')}
+              </div>
+              <div className="grid grid-cols-6 gap-0 !h-[2.8rem]">  
                 {[...Array(6)].map((_, buttonIndex) => {
-          const userCount = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]?.userCount || 0;
-  
-          // 색상 클래스 결정
-          let colorClass = '';
-          if (userCount/TotalUsers > 0 && userCount/TotalUsers <= 0.3) {
-            colorClass = `${colorVariants({ bg: 'blue-50' })} border-[var(--blue-100)]`;
-          } else if (userCount/TotalUsers > 0.3 && userCount/TotalUsers <= 0.6) {
-            colorClass = `${colorVariants({ bg: 'blue-100' })} border-[var(--blue-200)]`;
-          } else if (userCount/TotalUsers > 0.6 && userCount/TotalUsers < 0.99) {
-            colorClass = `${colorVariants({ bg: 'blue-200' })} border-[var(--blue-300)]`;
-          } else if (userCount/TotalUsers === 1) {
-            colorClass = `${colorVariants({ bg: 'magen-50' })} border-[var(--magen-300)]`;
-          }
-        
-          return (
-            <Button
-              key={buttonIndex}
-              size={"XXS"}
-              additionalClass={`
-                ${colorClass}
-                pointer-events-none
-                items-center !transform-none
-              `}
-            />
-          );
+                  const userCount = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]?.userCount || 0;
+      
+                  // 색상 클래스 결정
+                  let colorClass = '';
+                  if (userCount/TotalUsers > 0 && userCount/TotalUsers <= 0.3) {
+                    colorClass = `${colorVariants({ bg: 'blue-50' })} border-[var(--blue-100)]`;
+                  } else if (userCount/TotalUsers > 0.3 && userCount/TotalUsers <= 0.6) {
+                    colorClass = `${colorVariants({ bg: 'blue-100' })} border-[var(--blue-200)]`;
+                  } else if (userCount/TotalUsers > 0.6 && userCount/TotalUsers < 0.99) {
+                    colorClass = `${colorVariants({ bg: 'blue-200' })} border-[var(--blue-300)]`;
+                  } else if (userCount/TotalUsers === 1) {
+                    colorClass = `${colorVariants({ bg: 'magen-50' })} border-[var(--magen-300)]`;
+                  }
+            
+                  return (
+                    <Button
+                      key={buttonIndex}
+                      size={"XXS"}
+                      additionalClass={`
+                        ${colorClass}
+                        pointer-events-none
+                        items-center !transform-none
+                      `}
+                    />
+                  );
                 })}
               </div>
             </div>
           ))}
         </div>
         <div className="flex !justify-center">
-         <Button 
-             label="내 참여시간 수정"
-             size={'M'} 
-             onClick={handleSaveClick}
-             additionalClass=
-             '  items-center !transform-none  '        
+          <Button 
+            label="내 참여시간 수정"
+            size={'M'} 
+            onClick={handleSaveClick}
+            additionalClass='items-center !transform-none mb-[2rem]'        
           /> 
         </div>      
-        <div className="flex flex-col  h-full justify-end ">
-          <div className={`h-[190px] px-[24px] ${colorVariants({ bg: 'white' })} `} >
-          <div className="flex justify-between items-center mb-[20px]   ">
-            <div className={`flex flex-row items-center 
-            ${typographyVariants({ variant: 'b2-md' })}
-            ${colorVariants({ color: 'gray-900' })}
-            `}>            
-               <img 
-              src="participant.svg" 
-              className="hover:cursor-pointer"
-              alt="참여인원"
-              />
-              참여인원  
+        <div className="flex flex-col h-full justify-end">
+          <div className={`h-[19rem] px-[2.2rem] ${colorVariants({ bg: 'white' })} `}>
+            <div className="flex border-b pt-[1.8rem] pb-[1rem] justify-between items-center mb-[2rem]">
+              <div className={`flex flex-row items-center 
+                ${typographyVariants({ variant: 'b2-md' })}
+                ${colorVariants({ color: 'gray-900' })}
+              `}>            
+                <img 
+                  src="participant.svg" 
+                  className="hover:cursor-pointer"
+                  alt="참여인원"
+                />
+                참여인원  
+              </div>
+              <div className={`    
+                ${typographyVariants({ variant: 'b2-md' })}
+                ${colorVariants({ color: 'gray-900' })}
+              `}>{TotalUsers}명</div>
             </div>
-             <div className={`    
-              ${typographyVariants({ variant: 'b2-md' })}
-              ${colorVariants({ color: 'gray-900' })}
-              `}> {TotalUsers}명 </div>
-            </div>
-            <div className="flex flex-wrap  max-w-[316px]  items-start content-start !gap-x-[1px] gap-y-[12px] self-stretch">
-            {Object.values(userList).map((user) => {
-                // 정상동작 --> console.log('Comparison result:', user.name === userName.toString());
-                
+            <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
+              {Object.values(userList).map((user) => {
                 return (
                   <div
                     key={user.name} 
                     className={`
-                    ${typographyVariants({ variant: 'b2-md' })}
-                    min-w-[60px] text-[var(--gray-700)] justify-center text-center
-                    ${user.name === userName.toString() 
-                      ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                      : ''}
-                  `}>
-                    {user.name.length > 4 ? user.name.slice(0, 4) + '...' : user.name}
+                      ${typographyVariants({ variant: 'b2-md' })}
+                      flex min-w-[6rem] h-[2.4rem] justyfiy-center items-center text-[var(--gray-700)] justify-center text-center
+                      ${user.name === userName.toString() 
+                        ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                        : ''}
+                        max-w-[6rem]
+                        whitespace-nowrap 
+                        
+                    `}
+                  >
+                    {truncateName(user.name)}                  
                   </div>
                 );
               })}
             </div>
-      </div>
-      <AnimatePresence>
-        {isOpen && (
-          // 배경(반투명) 영역
-          <motion.div
-            className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-50"
-            onClick={closeModal}
-            // 초기 상태, 마운트 시 애니메이션, 언마운트 시 애니메이션
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {/* 모달 컨테이너(슬라이드 업 애니메이션) */}
-            <motion.div
-              className="bg-white w-[360px] h-[158px] justify-center rounded-t-xl flex flex-col items-center p-4 pt-0"
-              onClick={(e) => e.stopPropagation()} // 내부 클릭 시 닫힘 방지
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            >
-              <img className="w-auto mb-[20px]" alt = "공유창 손잡이"src="/tabEdge.svg" />
-               <Button label='카카오톡으로 공유하기'
-                              size={'share'} 
-                              onClick={KakaoShare} 
+          </div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-50"
+                onClick={closeModal}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
               >
-                  <img src="/arcticons_kakaotalk.svg" alt="카카오톡으로 캘린더 링크 공유하기" />
-              </Button>
-               <Button label='링크 복사하기'
-                              size={'share'} 
-                              onClick={clipboardShare} 
-                              additionalClass="mt-[10px] !border border-gray-300 bg-white text-gray-900"
+                <motion.div
+                  className="bg-white w-[36rem] h-[15.8rem] justify-center rounded-t-xl flex flex-col items-center p-4 pt-0"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                >
+                  <img className="w-auto mb-[2rem]" alt="공유창 손잡이" src="/tabEdge.svg" />
+                  <Button 
+                    label='카카오톡으로 공유하기'
+                    size={'share'} 
+                    onClick={KakaoShare} 
+                  >
+                    <img src="/arcticons_kakaotalk.svg" alt="카카오톡으로 캘린더 링크 공유하기" />
+                  </Button>
+                  <Button 
+                    label='링크 복사하기'
+                    size={'share'} 
+                    onClick={clipboardShare} 
+                    additionalClass="mt-[1rem] !border border-gray-300 bg-white text-gray-900"
+                  >
+                    <img src="/tabler_link.svg" alt="클립보드로 링크 복사하기" />              
+                  </Button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {showToast && (
+              <motion.div 
+                className="fixed bottom-0 left-0 right-0 flex justify-center mb-[8rem]"
+                initial={{ y: '400%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '400%' }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
               >
-                  <img src="/tabler_link.svg" alt="클립보드로 링크 복사하기" />              
-              </Button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showToast && (
-          <motion.div 
-          className="fixed bottom-0 left-0 right-0 flex justify-center mb-[8rem]"
-          initial={{ y: '400%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '400%' }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          <Button label="링크가 복사되었습니다!" size={'toast'}
-                   onClick={handleSaveClick} 
-                   additionalClass= 'z-50 pointer-events-none' />
-        </motion.div>
-        )}
-      </AnimatePresence>
+                <Button 
+                  label="링크가 복사되었습니다!" 
+                  size={'toast'}
+                  onClick={handleSaveClick} 
+                  additionalClass='z-50 pointer-events-none' 
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-      </div>
-      
-   );
+     );
  };
  
 export default EventCalendar;

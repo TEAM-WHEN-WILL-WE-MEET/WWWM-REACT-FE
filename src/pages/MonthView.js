@@ -290,21 +290,21 @@ const inputClasses = twMerge(
   };
 
   return (
-    <div className="flex flex-col w-auto h-auto !px-[8px]">
-      <div className="flex-row justify-start  ">
+    <div className="flex flex-col w-auto h-auto !px-[0.8rem]">
+      <div className="flex-row justify-start">
         <img 
-        alt="언제볼까? 서비스 로고"
-        src="/wwmtLogo.svg" 
-        className=" flex px-[12px] py-[12px]  cursor-pointer  "
-        onClick={() => navigate('/mypage')} 
+          alt="언제볼까? 서비스 로고"
+          src="/wwmtLogo.svg" 
+          className="flex px-[1.2rem] py-[1.2rem] cursor-pointer"
+          // onClick={() => navigate('/mypage')} 
+          onClick={() => navigate('/')}  
         />
-      {/* <img 
-        alt=""
-        src="/hambugerMenu.svg" 
-        className="   cursor-pointer "
-        onClick={() => navigate('/mypage')} 
+        {/* <img 
+          alt=""
+          src="/hambugerMenu.svg" 
+          className="   cursor-pointer "
+          onClick={() => navigate('/mypage')} 
         /> */}
-
       </div>
       <div className="relative px-4">
         <input
@@ -320,55 +320,51 @@ const inputClasses = twMerge(
         <img 
           alt="캘린더 제목 지우기 버튼"
           src="/Icon_X.svg" 
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-[32px] h-[32px] cursor-pointer"
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-[3.2rem] h-[3.2rem] cursor-pointer"
           style={{ cursor: 'pointer' }}
           onClick={handleClear}
-
-          />
+        />
       </div>
-      <div class="flex h-[20px] mb-[8px] justify-between items-center self-stretch px-[8px] pl-[20px]">
-      {/* <div className="date-display">
+      <div class="flex h-[2rem] mb-[0.8rem] justify-between items-center self-stretch px-[0.8rem] pl-[2rem]">
+        {/* <div className="date-display">
           <span onClick={openMonthModal} style={{ cursor: 'pointer' }}>
             {calendarDate.getFullYear()}년 {calendarDate.getMonth() + 1}월
           </span>
-  
         </div> */}
         {/* <div className="view-mode-toggle1">
-            <button
-              className="active"
-              onClick={() => navigate('/MonthView')}
-            >
-              월
-            </button>
-            <button
-              className="toggle-the-other-week"
-              onClick={() => navigate('/WeekView')}
-            >
-              주
-            </button>
-          </div> */}
+          <button
+            className="active"
+            onClick={() => navigate('/MonthView')}
+          >
+            월
+          </button>
+          <button
+            className="toggle-the-other-week"
+            onClick={() => navigate('/WeekView')}
+          >
+            주
+          </button>
+        </div> */}
         {/* <div className="month-navigation"> */}
         <div class={twMerge(
-                  clsx(
-                    typographyVariants({ variant: 'b2-md' }),
-                    "text-[var(--gray-800)] "
-                )
-        )}
-        >
-        {moment(calendarDate).format('YYYY년 MM월')}
-          </div>
-          <div className="flex items-center ml-[8px]">
+          clsx(
+            typographyVariants({ variant: 'b2-md' }),
+            "text-[var(--gray-800)] "
+          )
+        )}>
+          {moment(calendarDate).format('YYYY년 MM월')}
+        </div>
+        <div className="flex items-center ml-[0.8rem]">
           <img 
-            className="bg-none cursor-pointer pl-px-[10px] pt-px-[8px]  transition-colors duration-200 ease-in 
-            active:scale-95 "
+            className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in 
+            active:scale-95"
             onClick={goToPreviousMonth}
             alt="이전 달로 넘어가기"
             src="btn_Back.svg"
           />
-          
           <img 
-            className="bg-none cursor-pointer ml-[6px] pl-px-[4px] pt-px-[8px]  transition-colors duration-200 ease-in 
-          active:scale-95 "
+            className="bg-none cursor-pointer ml-[0.6rem] pl-px-[0.4rem] pt-px-[0.8rem] transition-colors duration-200 ease-in 
+            active:scale-95"
             onClick={goToNextMonth}
             alt="다음 달로 넘어가기"
             src="btn_Forward.svg"
