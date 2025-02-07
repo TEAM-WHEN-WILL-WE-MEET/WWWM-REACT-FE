@@ -1,10 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   corePlugins: {
-    preflight: false,
+    preflight: true,
   },
 content: ["./src/**/*.{js,jsx,ts,tsx}"],
-important: "#__next",
   theme: {
     extend: {
       fontFamily: {
