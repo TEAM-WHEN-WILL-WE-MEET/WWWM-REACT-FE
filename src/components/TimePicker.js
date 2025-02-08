@@ -100,30 +100,11 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
   // 오전/오후 상태
   // 시간 상태 (1 ~ 12)
 
-  const meridiemList = ['오전', '오후'];
-  const hourList = Array.from({ length: 12 }, (_, i) => i + 1); // [1..12]
   const morningHours = Array.from({ length: 12 }, (_, i) => i);     // 0..11
   const afternoonHours = Array.from({ length: 12 }, (_, i) => i+12); // 12..23
 
 
-  
-    const scrollToTop = (isStart) => {
-      if (isStart) {
-        if (startHourDialRef.current) {
-          startHourDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-        if (startMeridiemDialRef.current) {
-          startMeridiemDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-      } else {
-        if (endHourDialRef.current) {
-          endHourDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-        if (endMeridiemDialRef.current) {
-          endMeridiemDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-      }
-    };
+ 
   // 24시간 => '오전'/'오후'
   function getMeridiem(hour24) {
     return hour24 < 12 ? '오전' : '오후';
@@ -389,7 +370,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                             ? ` ${colorVariants({ bg: 'gray-100' })} !text-[var(--gray-400)] cursor-not-allowed`
                             : isActive
                             ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400',  bg: 'white' })} !text-[var(--blue-400)]`
-                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' , bg:'gray-50'})} !text-[var(--gray-600)]`
                         }
                       `}
                     >
@@ -418,7 +399,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                             ? `${colorVariants({ bg: 'gray-100' })}  !text-[var(--gray-400)] cursor-not-allowed`
                             : isActive
                             ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400',  bg: 'white' })} !text-[var(--blue-400)]`
-                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600', bg:'gray-50' })} !text-[var(--gray-600)]`
                         }
                       `}
                     >
@@ -477,7 +458,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                       ${
                         isActive
                         ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400' , bg: 'white'})} !text-[var(--blue-400)]`
-                          : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                          : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600', bg:'gray-50' })} !text-[var(--gray-600)]`
                       }
                       `}
                   >
@@ -543,7 +524,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                             ? `${colorVariants({ bg: 'gray-100' })}  !text-[var(--gray-400)] cursor-not-allowed`
                             : isActive
                             ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400',  bg: 'white' })} !text-[var(--blue-400)]`
-                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600', bg:'gray-50' })} !text-[var(--gray-600)]`
                         }
                       `}
                     >
