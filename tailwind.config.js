@@ -14,6 +14,7 @@ safelist: [
     pattern: /^(?:!font-pretendard|text-\[var\(--font-size-(?:20|16|14|12)\)\]|font-\[var\(--font-(?:sb|md|rg)\)\]|leading-\[var\(--line-height-(?:24|16|12)\)\]|tracking-\[var\(--spacing)\)\]$/,
   },
 ],
+
   theme: {
     extend: {
       fontFamily: {
