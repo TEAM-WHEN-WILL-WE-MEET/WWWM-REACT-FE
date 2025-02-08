@@ -100,30 +100,11 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
   // 오전/오후 상태
   // 시간 상태 (1 ~ 12)
 
-  const meridiemList = ['오전', '오후'];
-  const hourList = Array.from({ length: 12 }, (_, i) => i + 1); // [1..12]
   const morningHours = Array.from({ length: 12 }, (_, i) => i);     // 0..11
   const afternoonHours = Array.from({ length: 12 }, (_, i) => i+12); // 12..23
 
 
-  
-    const scrollToTop = (isStart) => {
-      if (isStart) {
-        if (startHourDialRef.current) {
-          startHourDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-        if (startMeridiemDialRef.current) {
-          startMeridiemDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-      } else {
-        if (endHourDialRef.current) {
-          endHourDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-        if (endMeridiemDialRef.current) {
-          endMeridiemDialRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        }
-      }
-    };
+ 
   // 24시간 => '오전'/'오후'
   function getMeridiem(hour24) {
     return hour24 < 12 ? '오전' : '오후';
@@ -164,7 +145,80 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
       }
     }
   };
-
+  //스크롤 시 중앙에 위치한 항목을 감지하는 핸들러
+  // 오전/오후 다이얼
+  const handleMeridiemScroll = (e) => {
+    const container = e.currentTarget;
+    const center = container.scrollTop + container.clientHeight / 2;
+    let closestDistance = Infinity;
+    let selectedMeridiem = null;
+    Array.from(container.children).forEach((child) => {
+      const childCenter = child.offsetTop + child.offsetHeight / 2;
+      const distance = Math.abs(center - childCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        selectedMeridiem = child.getAttribute('data-meridiem');
+      }
+    });
+    if (selectedMeridiem && selectedMeridiem !== startMeridiem) {
+      handleMeridiemChange(selectedMeridiem, true);
+    }
+  };
+  //시간 다이얼
+  const handleHourScroll = (e) => {
+    const container = e.currentTarget;
+    // 스크롤 위치를 기준으로 보이는 영역의 중앙 위치 계산
+    const containerCenter = container.scrollTop + container.clientHeight / 2;
+    
+    let closestDistance = Infinity;
+    let selectedHour = null;
+    
+    // container.children는 각 시간 행(<div data-hour="...">)을 의미합니다.
+    Array.from(container.children).forEach((child) => {
+      // 각 자식의 컨테이너 내 상대적 위치(행의 중앙)
+      const childCenter = child.offsetTop + child.offsetHeight / 2;
+      const distance = Math.abs(childCenter - containerCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        selectedHour = child.getAttribute('data-hour');
+      }
+    });
+    
+    if (selectedHour !== null) {
+      const newHour24 = parseInt(selectedHour, 10);
+      // 현재 선택된 시간과 다르면 상태 업데이트 호출
+      if (newHour24 !== startHour24) {
+        handleHourChange(newHour24, true);
+      }
+    }
+  };
+  const handleEndHourScroll = (e) => {
+    const container = e.currentTarget;
+    // 컨테이너 내에서 보이는 영역의 중앙 좌표 계산
+    const containerCenter = container.scrollTop + container.clientHeight / 2;
+    let closestDistance = Infinity;
+    let selectedHour = null;
+  
+    // 각 자식(시간 행)의 중앙 좌표를 계산하여 컨테이너 중앙과의 거리를 비교
+    Array.from(container.children).forEach((child) => {
+      const childCenter = child.offsetTop + child.offsetHeight / 2;
+      const distance = Math.abs(childCenter - containerCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        selectedHour = child.getAttribute('data-hour');
+      }
+    });
+  
+    if (selectedHour !== null) {
+      const newHour24 = parseInt(selectedHour, 10);
+      // 중앙에 위치한 시간이 현재 선택된 종료 시간과 다르면 상태 업데이트
+      if (newHour24 !== endHour24) {
+        handleHourChange(newHour24, false);
+      }
+    }
+  };
+  
+  
   const onWheelHour = (e, isStart) => {
     e.preventDefault();
     if (e.deltaY > 0) {
@@ -188,7 +242,8 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
     }
   };
 
-
+ 
+  
   return (
     <div className="flex flex-col items-center mt-5 p-5">
       <div className="flex flex-col items-start space-y-4 p-0 w-[32rem] h-[22.4rem]">
@@ -225,6 +280,8 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
               className="relative w-1/2 h-[11.2rem] overflow-y-auto border border-none
                         rounded-md scroll-snap-y scroll-snap-mandatory h-auto"
               onWheel={(e) => onWheelMeridiem(e, true)}
+              onScroll={handleMeridiemScroll}
+
               ref={meridiemDialRef}  
             >
               {['오전', '오후'].map((m) => {
@@ -233,7 +290,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                   <div
                     key={m}
                     className={` h-[3.73rem] flex items-center justify-center 
-                              cursor-pointer scroll-snap-align-start
+                              cursor-pointer scroll-snap-align-center
                       ${
                         m === startMeridiem
                           ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400' , bg: 'white'})} !text-[var(--blue-400)]`
@@ -241,7 +298,22 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                       }
                       
                       `}
-                    onClick={() => handleMeridiemChange(m, true)}
+                    // onClick={() => handleMeridiemChange(m, true)}
+                    onClick={() => {
+                      handleMeridiemChange(m, true)
+                      // 클릭 시 해당 항목이 중앙으로 스크롤되도록 함 (부드러운 전환)
+                      if (meridiemDialRef.current) {
+                        // 예를 들어, '오전'은 맨 위, '오후'는 두번째 항목의 offsetTop 사용
+                        const targetTop =
+                          m === '오전'
+                            ? 0
+                            : meridiemDialRef.current.children[1].offsetTop;
+                        meridiemDialRef.current.scrollTo({
+                          top: targetTop,
+                          behavior: 'smooth',
+                        });
+                      }
+                    }}
                   >
                     {m}
                   </div>
@@ -253,26 +325,43 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
             <div
               className="relative w-1/2 h-[11.2rem]overflow-y-auto border 
                         border-none overflow-scroll [&::-webkit-scrollbar]:hidden
-                         scroll-snap-y scroll-snap-mandatory h-[112px]"
+                         scroll-snap-y scroll-snap-mandatory h-[112px]
+                         "
               onWheel={(e) => onWheelHour(e, true)}
+              onScroll={handleHourScroll}
+
               ref={hourDialRef}
               style={{
                 scrollbarWidth: 'none',
                  msOverflowStyle: 'none',
                 }}
             >
-              {(startHour24 < 12 ? morningHours : afternoonHours).map((h24) => {
+              {(startHour24 < 12 ? morningHours : afternoonHours).map((h24, index) => {
                 const displayH = to12Hour(h24);
                 const isActive = (startHour24 === h24);
                 const isDisabled = (endHour24 != null) && (h24 >= endHour24);
 
                 return (
-                  <div  key={h24} className="flex  justify-between items-center h-[3.73rem]">
+                  <div data-hour={h24}  key={h24} className="flex  justify-between items-center h-[3.73rem] croll-snap-align-center">
                     {/* hour  */}
                     <div
+                      // onClick={() => {
+                      //   if (!isDisabled) {
+                      //     handleHourChange(h24, true);
+                      //   }
+                      // }}
                       onClick={() => {
-                        if (!isDisabled) {
+                        if (!isDisabled && hourDialRef.current) {
                           handleHourChange(h24, true);
+
+                          // 클릭 시 해당 항목이 중앙으로 스크롤되도록 함
+                      
+                          const targetTop =
+                            hourDialRef.current.children[index].offsetTop;
+                          hourDialRef.current.scrollTo({
+                            top: targetTop,
+                            behavior: 'smooth',
+                          });
                         }
                       }}
                       className={` h-[3.73rem] w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
@@ -281,7 +370,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                             ? ` ${colorVariants({ bg: 'gray-100' })} !text-[var(--gray-400)] cursor-not-allowed`
                             : isActive
                             ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400',  bg: 'white' })} !text-[var(--blue-400)]`
-                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' , bg:'gray-50'})} !text-[var(--gray-600)]`
                         }
                       `}
                     >
@@ -289,9 +378,19 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                   </div>
                   {/* 00 min */}
                   <div
+                      // onClick={() => {
+                      //   if (!isDisabled) {
+                      //     handleHourChange(h24, true);
+                      //   }
+                      // }}
                       onClick={() => {
-                        if (!isDisabled) {
-                          handleHourChange(h24, true);
+                        if (!isDisabled && hourDialRef.current) {
+                          const targetTop =
+                            hourDialRef.current.children[index].offsetTop;
+                          hourDialRef.current.scrollTo({
+                            top: targetTop,
+                            behavior: 'smooth',
+                          });
                         }
                       }}
                       className={` h-[3.73rem] w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
@@ -300,7 +399,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                             ? `${colorVariants({ bg: 'gray-100' })}  !text-[var(--gray-400)] cursor-not-allowed`
                             : isActive
                             ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400',  bg: 'white' })} !text-[var(--blue-400)]`
-                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600', bg:'gray-50' })} !text-[var(--gray-600)]`
                         }
                       `}
                     >
@@ -345,6 +444,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                         rounded-md scroll-snap-y scroll-snap-mandatory  "
               onWheel={(e) => onWheelMeridiem(e, false)} // 종료시간 휠
               ref={endMeridiemDialRef}
+              style={{ scrollBehavior: 'smooth' }}
             >
               {['오전', '오후'].map((m) => {
                 // 현재 종료시간의 meridiem이 m과 같으면 하이라이트
@@ -354,11 +454,11 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                     key={m}
                     onClick={() => handleMeridiemChange(m, false)} // 종료시간 meridiem 변경
                     className={` h-[3.73rem] flex items-center justify-center 
-                              cursor-pointer scroll-snap-align-start 
+                              cursor-pointer scroll-snap-align-center 
                       ${
                         isActive
                         ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400' , bg: 'white'})} !text-[var(--blue-400)]`
-                          : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                          : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600', bg:'gray-50' })} !text-[var(--gray-600)]`
                       }
                       `}
                   >
@@ -373,10 +473,12 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
               className="relative w-1/2 h-40 overflow-y-auto  border-none 
                         scroll-snap-y overflow-scroll [&::-webkit-scrollbar]:hidden h-[11.2rem]"
               onWheel={(e) => onWheelHour(e, false)} // 종료시간 휠
+              onScroll={handleEndHourScroll}
               ref={endHourDialRef}
               style={{
                 scrollbarWidth: 'none',
                  msOverflowStyle: 'none',
+                 scrollBehavior: 'smooth',
                 }}
             >
               {/** 
@@ -389,7 +491,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                 const isDisabled = (startHour24 != null) && (h24 <= startHour24);
 
                 return (
-                  <div key={h24} className=" flex  items-center justify-between  h-[3.73rem]">
+                  <div data-hour={h24}   key={h24} className=" flex  items-center scroll-snap-align-center justify-between  h-[3.73rem]">
                   {/* hour  */}
                     <div
                       onClick={() => {
@@ -422,7 +524,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                             ? `${colorVariants({ bg: 'gray-100' })}  !text-[var(--gray-400)] cursor-not-allowed`
                             : isActive
                             ? ` ${typographyVariants({ variant: 'h3-md' })} ${colorVariants({ color: 'blue-400',  bg: 'white' })} !text-[var(--blue-400)]`
-                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600' })} !text-[var(--gray-600)]`
+                            : ` ${typographyVariants({ variant: 'h4-md' })} ${colorVariants({ color: 'gray-600', bg:'gray-50' })} !text-[var(--gray-600)]`
                         }
                       `}
                     >
