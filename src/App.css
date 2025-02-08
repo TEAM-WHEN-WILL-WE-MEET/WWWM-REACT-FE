@@ -82,7 +82,7 @@ body{
 
 /* 초기값 (데스크탑 기준) */
 html {
-  font-size: 62.5%; /* 16px * 0.625 = 10px */
+  font-size: 62.5% !important; /* 16px * 0.625 = 10px */
 }
 body{
   font-size: 1.6rem;  /* 1.6 * 10px = 16px */
@@ -108,15 +108,13 @@ body{
 
 /* 중/대형 모바일 (가로 361px ~ 812px 정도) */
 @media (min-width: 361px) and (max-width: 812px) {
-  html {
-    font-size: 62.5%; /* 16px * 0.625 = 10px */
+  /* html {
+    font-size: 62.5%; 
   }
   body {
-    font-size: 1.5rem; /* 1.5 * 10px = 15px */
-  }
-  .App {
-    width: 36rem; /* 15px * 24 = 360px  */
-    margin: 0 auto;
-  }
+    font-size: 1.5rem; 
+  } */
+  /* 15px * 24 = 360px  */
+
 }
 
