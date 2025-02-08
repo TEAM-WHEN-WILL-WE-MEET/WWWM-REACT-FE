@@ -191,12 +191,12 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
 
   return (
     <div className="flex flex-col items-center mt-5 p-5">
-      <div className="flex flex-col items-start space-y-4 p-0 w-[320px] h-[224px]">
+      <div className="flex flex-col items-start space-y-4 p-0 w-[32rem] h-[22.4rem]">
         {/* "시작 시간" 표시부 */}
         <div className={cn(
-          "flex justify-between w-full cursor-pointer",
-          "border-b-[2px]",
-          "pb-[12px]",          
+          "flex justify-between w-full cursor-pointer ",
+          "border-b-[0.2rem]",
+          "pb-[1.2rem]",          
           `border-b-[${colors.gray[300]}]`
             )}       
          onClick={handleStartClick}
@@ -219,10 +219,10 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
 
         {/* 다이얼 영역 */}
         {isStartOpen && (      
-          <div ref={startDialRef} className={`${colorVariants({ bg: 'gray-50' })} flex w-full space-x-2 !h-[112px]`}>
+          <div ref={startDialRef} className={`${colorVariants({ bg: 'gray-50' })} flex w-full space-x-2 !h-[11.2rem]`}>
             {/* 오전/오후 Dial */}
             <div
-              className="relative w-1/2 h-40 overflow-y-auto border border-none
+              className="relative w-1/2 h-[11.2rem] overflow-y-auto border border-none
                         rounded-md scroll-snap-y scroll-snap-mandatory h-auto"
               onWheel={(e) => onWheelMeridiem(e, true)}
               ref={meridiemDialRef}  
@@ -232,7 +232,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                 return (
                   <div
                     key={m}
-                    className={`h-10 flex items-center justify-center 
+                    className={` h-[3.73rem] flex items-center justify-center 
                               cursor-pointer scroll-snap-align-start
                       ${
                         m === startMeridiem
@@ -251,7 +251,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
 
             {/* 시간 Dial (1~12) */}
             <div
-              className="relative w-1/2 h-40 overflow-y-auto border 
+              className="relative w-1/2 h-[11.2rem]overflow-y-auto border 
                         border-none overflow-scroll [&::-webkit-scrollbar]:hidden
                          scroll-snap-y scroll-snap-mandatory h-[112px]"
               onWheel={(e) => onWheelHour(e, true)}
@@ -267,7 +267,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                 const isDisabled = (endHour24 != null) && (h24 >= endHour24);
 
                 return (
-                  <div  key={h24} className="flex justify-between">
+                  <div  key={h24} className="flex  justify-between items-center h-[3.73rem]">
                     {/* hour  */}
                     <div
                       onClick={() => {
@@ -275,7 +275,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                           handleHourChange(h24, true);
                         }
                       }}
-                      className={`h-10 w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
+                      className={` h-[3.73rem] w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
                         ${
                           isDisabled
                             ? ` ${colorVariants({ bg: 'gray-100' })} !text-[var(--gray-400)] cursor-not-allowed`
@@ -294,7 +294,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                           handleHourChange(h24, true);
                         }
                       }}
-                      className={`h-10 w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
+                      className={` h-[3.73rem] w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
                         ${
                           isDisabled
                             ? `${colorVariants({ bg: 'gray-100' })}  !text-[var(--gray-400)] cursor-not-allowed`
@@ -317,8 +317,8 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
         {/* "종료 시간" 표시부 */}
         <div className={cn(
           "flex justify-between w-full cursor-pointer",
-          "border-b-[2px]",
-          "pb-[12px]",
+          "border-b-[0.2rem]",
+          "pb-[1.2rem]",
           `border-b-[${colors.gray[300]}]`,
           
             )}       
@@ -338,10 +338,10 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
 
         {/* 다이얼 영역 */}
         {isEndOpen && (
-          <div ref={endDialRef} className={`${colorVariants({ bg: 'gray-50' })} flex w-full space-x-2 !h-[112px]  `}>
+          <div ref={endDialRef} className={`${colorVariants({ bg: 'gray-50' })} flex w-full space-x-2 !h-[11.2rem]  `}>
             {/* 오전/오후 Dial */}
             <div
-              className="relative w-1/2 h-40 overflow-y-auto border border-none 
+              className="relative w-1/2 overflow-y-auto border border-none 
                         rounded-md scroll-snap-y scroll-snap-mandatory  "
               onWheel={(e) => onWheelMeridiem(e, false)} // 종료시간 휠
               ref={endMeridiemDialRef}
@@ -353,7 +353,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                   <div
                     key={m}
                     onClick={() => handleMeridiemChange(m, false)} // 종료시간 meridiem 변경
-                    className={`h-10 flex items-center justify-center 
+                    className={` h-[3.73rem] flex items-center justify-center 
                               cursor-pointer scroll-snap-align-start 
                       ${
                         isActive
@@ -371,7 +371,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
             {/* 시간 Dial */}
             <div
               className="relative w-1/2 h-40 overflow-y-auto  border-none 
-                        scroll-snap-y overflow-scroll [&::-webkit-scrollbar]:hidden h-[112px]"
+                        scroll-snap-y overflow-scroll [&::-webkit-scrollbar]:hidden h-[11.2rem]"
               onWheel={(e) => onWheelHour(e, false)} // 종료시간 휠
               ref={endHourDialRef}
               style={{
@@ -389,7 +389,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                 const isDisabled = (startHour24 != null) && (h24 <= startHour24);
 
                 return (
-                  <div key={h24} className=" flex justify-between ">
+                  <div key={h24} className=" flex  items-center justify-between  h-[3.73rem]">
                   {/* hour  */}
                     <div
                       onClick={() => {
@@ -397,7 +397,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                           handleHourChange(h24, false);
                         }
                       }}
-                      className={`h-10 w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start  
+                      className={` h-[3.73rem] w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start  
                         ${
                           isDisabled
                             ? ` ${colorVariants({ bg: 'gray-100' })} !text-[var(--gray-400)] cursor-not-allowed`
@@ -416,7 +416,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                           handleHourChange(h24, true);
                         }
                       }}
-                      className={`h-10 w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
+                      className={` h-[3.73rem] w-1/2 flex items-center justify-center cursor-pointer scroll-snap-align-start 
                         ${
                           isDisabled
                             ? `${colorVariants({ bg: 'gray-100' })}  !text-[var(--gray-400)] cursor-not-allowed`
