@@ -1,5 +1,5 @@
 // individualCalendar.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate  } from 'react-router-dom';
 // import moment from 'moment';
 import moment from 'moment-timezone';
@@ -18,11 +18,15 @@ const BASE_URL = process.env.NODE_ENV === "production"
     : process.env.REACT_APP_WWWM_BE_DEV_EP;
 
 const IndividualCalendar = () => {
-  // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
-  const BASE_URL = process.env.NODE_ENV === "production" 
-  ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
-  : process.env.REACT_APP_WWWM_BE_DEV_EP;
 
+  const dragStartRef = useRef(null); // 초기 마우스 좌표
+  const isDraggingRef = useRef(false); // 드래그 여부 플래그
+  const updatedSlotsRef = useRef(new Set()); // 업데이트한 셀 기록
+  const initialCellRef = useRef(null); // { timeIndex, buttonIndex, intendedValue } : 처음 눌린 셀
+  const draggedSlotsRef = useRef(new Set());
+  const dragSelectModeRef = useRef(null);
+  const hasDraggedRef = useRef(false); // 단순 클릭과 드래그 구분
+  
   const location = useLocation();
   const { responseData, appointmentId, userName } = location.state;
   
@@ -45,8 +49,135 @@ const IndividualCalendar = () => {
 
 
 
+  //timeslot drag 관련
   useEffect(() => {
+    const handleWindowMouseUp = () => {
+      isDraggingRef.current = false;
+      draggedSlotsRef.current.clear();
+      dragSelectModeRef.current = null;
+      hasDraggedRef.current = false;
+    };
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    return () => {
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+    };
+  }, []);
+    // 드래그 시작 시 해당 timeslot의 현재 상태를 반전한 값을 기준으로 드래그 모드를 설정
+    const handleMouseDown = (timeIndex, buttonIndex) => {
+      isDraggingRef.current = true;
+      hasDraggedRef.current = false; // 클릭과 드래그를 구분하기 위한 플래그 초기화
+      // 현재 timeslot의 상태를 확인한 후, 반전값을 drag 모드 값으로 지정
+      const currentValue = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
+      const newValue = !currentValue;
+      dragSelectModeRef.current = newValue;
+      // 해당 timeslot을 드래그 내에서 업데이트했음을 기록
+      draggedSlotsRef.current.add(`${timeIndex}-${buttonIndex}`);
+      updateTimeSlot(timeIndex, buttonIndex, newValue, selectedTimes, setSelectedTimes, selectedDate);
+    };
+  
+    // 드래그 중 다른 timeslot에 진입 시, 아직 업데이트하지 않은 경우 dragSelectMode의 값으로 업데이트
+    const handleMouseEnter = (timeIndex, buttonIndex) => {
+      if (isDraggingRef.current) {
+        hasDraggedRef.current = true;
+        const key = `${timeIndex}-${buttonIndex}`;
+        if (!draggedSlotsRef.current.has(key)) {
+          draggedSlotsRef.current.add(key);
+          updateTimeSlot(timeIndex, buttonIndex, dragSelectModeRef.current, selectedTimes, setSelectedTimes, selectedDate);
+        }
+      }
+    };
+  
+    // 마우스 버튼을 떼면 드래그 상태 초기화
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+      draggedSlotsRef.current.clear();
+      dragSelectModeRef.current = null;
+      hasDraggedRef.current = false;
+    };
 
+
+  // window의 mouseup 이벤트를 통해 드래그 종료 및 단일 클릭 처리
+  useEffect(() => {
+    const handleWindowMouseUp = () => {
+      if (initialCellRef.current && !isDraggingRef.current) {
+        // 드래그가 감지되지 않았으면 단일 클릭으로 처리
+        const { timeIndex, buttonIndex } = initialCellRef.current;
+        handleTimeClick(
+          timeIndex,
+          buttonIndex,
+          selectedTimes,
+          setSelectedTimes,
+          selectedDate,
+        );
+      }
+      // 드래그 상태 초기화
+      dragStartRef.current = null;
+      isDraggingRef.current = false;
+      updatedSlotsRef.current.clear();
+      initialCellRef.current = null;
+    };
+
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    return () => {
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+    };
+  }, [selectedTimes, setSelectedTimes, selectedDate]);
+
+  // 버튼의 mousedown: 단일 클릭/드래그 판단을 위한 초기 좌표와 셀 정보를 기록 (즉, 실제 업데이트는 여기서 진행하지 않음)
+  const handleButtonMouseDown = (timeIndex, buttonIndex, event) => {
+    dragStartRef.current = { x: event.clientX, y: event.clientY };
+    isDraggingRef.current = false;
+    updatedSlotsRef.current.clear();
+    initialCellRef.current = {
+      timeIndex,
+      buttonIndex,
+      intendedValue: !selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex],
+    };
+  };
+
+  // 버튼의 mouseenter: 마우스 이동 거리를 체크해 드래그 여부를 판단하고, 드래그가 시작되면 해당 셀을 업데이트
+  const handleButtonMouseEnter = (timeIndex, buttonIndex, event) => {
+    if (!dragStartRef.current) return;
+    const dx = event.clientX - dragStartRef.current.x;
+    const dy = event.clientY - dragStartRef.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const remThreshold = 0.5 * parseFloat(getComputedStyle(document.documentElement).fontSize); // ==0.5rem
+
+    // 이동 거리가 5px을 초과하면 드래그로 판단
+    if (!isDraggingRef.current && distance > remThreshold) {
+      isDraggingRef.current = true;
+      // 드래그가 시작되면, 최초 눌렸던 셀(초기 셀)을 업데이트
+      const keyInitial = `${initialCellRef.current.timeIndex}-${initialCellRef.current.buttonIndex}`;
+      if (!updatedSlotsRef.current.has(keyInitial)) {
+        updateTimeSlot(
+          initialCellRef.current.timeIndex,
+          initialCellRef.current.buttonIndex,
+          initialCellRef.current.intendedValue,
+          selectedTimes,
+          setSelectedTimes,
+          selectedDate,
+          dates,
+          times,
+        );
+        updatedSlotsRef.current.add(keyInitial);
+      }
+    }
+    if (isDraggingRef.current) {
+      const key = `${timeIndex}-${buttonIndex}`;
+      if (!updatedSlotsRef.current.has(key)) {
+        updateTimeSlot(
+          timeIndex,
+          buttonIndex,
+          initialCellRef.current.intendedValue,
+          selectedTimes,
+          setSelectedTimes,
+          selectedDate,
+        );
+        updatedSlotsRef.current.add(key);
+      }
+    }
+  };
+  useEffect(() => {
     //step1. appointment 전체의 스케줄 틀 불러옴
     if (responseData) {
       setEventName(responseData.object.name);
@@ -353,6 +484,65 @@ useEffect(() => {
       alert("서버 오류가 발생했습니다.");
     }
   };
+// timeslot의 상태를 강제로 newValue(선택/해제)로 업데이트하는 함수 (드래그 전용)
+const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, setSelectedTimes, selectedDate) => {
+  // 이미 원하는 상태이면 업데이트하지 않음
+  const currentValue = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
+  if (currentValue === newValue) return;
+
+  const newSelectedTimes = { ...selectedTimes };
+  if (!newSelectedTimes[selectedDate]) {
+    newSelectedTimes[selectedDate] = {};
+  }
+  newSelectedTimes[selectedDate][timeIndex] = {
+    ...newSelectedTimes[selectedDate][timeIndex],
+    [buttonIndex]: newValue,
+  };
+  setSelectedTimes(newSelectedTimes);
+
+  const selectedDateInfo = dates[selectedDate];
+  const hour = times[timeIndex].split(':')[0];
+  const minute = buttonIndex * 10;
+  const dateTime = `${selectedDateInfo.date}T${hour}:${String(minute).padStart(2, '0')}:00`;
+  const kstMoment = moment.tz(dateTime, 'Asia/Seoul');
+  const sendTimeString = kstMoment.format('YYYY-MM-DDTHH:mm:ss');
+
+  console.log('dateTime', dateTime);
+  const payload = {
+    id: selectedDateInfo.id,
+    date: sendTimeString,
+    times: [
+      {
+        time: sendTimeString,
+        users: [userName],
+      },
+    ],
+    appointmentId: appointmentId,
+  };
+
+  console.log('timeslot 업데이트 (드래그) 시 서버에 보낼 데이터:', payload);
+
+  try {
+    const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      console.log('스케줄 저장 성공');
+    } else {
+      console.log('스케줄 저장 실패');
+      alert('스케줄 저장에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('저장 요청 중 오류:', error);
+    alert('서버 오류가 발생했습니다.');
+  }
+};
+
 
   return (
     <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
@@ -430,9 +620,8 @@ useEffect(() => {
           </div>
         ))}
       </div>
-   
       <div className={`flex pt-[2.8rem] mb-[3.6rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
-        <div class="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <input 
             type="checkbox" 
             id="all-time" 
@@ -482,7 +671,16 @@ useEffect(() => {
                     ${selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""} 
                     items-center !transform-none
                   `}
-                  onClick={() => handleTimeClick(timeIndex, buttonIndex)}
+                  // onMouseUp={handleMouseUp}
+                  // onClick={(e) => {
+                  //   if (hasDraggedRef.current) {
+                  //     e.preventDefault();
+                  //     return;
+                  //   }
+                  //   handleTimeClick(timeIndex, buttonIndex, selectedTimes, setSelectedTimes, selectedDate, dates, times, appointmentId, userName, BASE_URL);
+                  // }}
+                  onMouseDown={(e) => handleButtonMouseDown(timeIndex, buttonIndex, e)}
+                  onMouseEnter={(e) => handleButtonMouseEnter(timeIndex, buttonIndex, e)}
                 />
               ))}
             </div>
@@ -498,7 +696,8 @@ useEffect(() => {
         /> 
       </div>
     </div>
-   );
+  );
 };
-
+  
 export default IndividualCalendar;
+  
