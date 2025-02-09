@@ -57,8 +57,6 @@ const EventCalendar = () => {
     script.src = "https://developers.kakao.com/sdk/js/kakao.js"; // 카카오톡 SDK
     script.async = true;
     document.body.appendChild(script);
-    window.Kakao.init(KAKAO_SHARE_KEY); 
-
     return () => {
       document.body.removeChild(script); // return으로 제거
     };
@@ -94,10 +92,11 @@ const KakaoShare = async() => {
   if (window.Kakao === undefined) {
     return;
   }
+  window.Kakao.init(KAKAO_SHARE_KEY); 
 
-  if (!window.Kakao.isInitialized()) {
-    window.Kakao.init(KAKAO_SHARE_KEY); 
-  }
+  // if (!window.Kakao.isInitialized()) {
+  //   window.Kakao.init(KAKAO_SHARE_KEY); 
+  // }
 
 
   window.Kakao.Link.sendDefault({
