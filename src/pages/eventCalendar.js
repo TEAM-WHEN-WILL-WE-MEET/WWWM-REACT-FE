@@ -92,13 +92,17 @@ const KakaoShare = async() => {
   if (window.Kakao === undefined) {
     return;
   }
-  window.Kakao.init(KAKAO_SHARE_KEY); 
+  // console.log("카카오 앱키: ", KAKAO_SHARE_KEY);
+  // console.log(typeof KAKAO_SHARE_KEY);
 
-  // if (!window.Kakao.isInitialized()) {
-  //   window.Kakao.init(KAKAO_SHARE_KEY); 
-  // }
+  // window.Kakao.init(KAKAO_SHARE_KEY); 
 
+  if (!window.Kakao.isInitialized()) {
+    window.Kakao.init(KAKAO_SHARE_KEY); 
+  }
 
+  console.log("isInitialized? ",window.Kakao.isInitialized());
+  
   window.Kakao.Link.sendDefault({
     objectType: 'feed',
     content: {
