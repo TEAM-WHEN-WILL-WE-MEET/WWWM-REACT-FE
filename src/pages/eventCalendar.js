@@ -27,7 +27,7 @@ const EventCalendar = () => {
   //공유 key
   const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
   
-
+//정상작동 console.log(" KAKAO_SHARE_KEY: ",  process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE);
    const [dates, setDates] = useState([]);
    const [times, setTimes] = useState([]);
    const [eventName, setEventName] = useState("");
@@ -57,7 +57,8 @@ const EventCalendar = () => {
     script.src = "https://developers.kakao.com/sdk/js/kakao.js"; // 카카오톡 SDK
     script.async = true;
     document.body.appendChild(script);
-  
+    window.Kakao.init(KAKAO_SHARE_KEY); 
+
     return () => {
       document.body.removeChild(script); // return으로 제거
     };
@@ -72,7 +73,7 @@ const handleShare = () => {
   const closeModal = () => {
     setIsOpen(false);
   };
-  // Share 공유 ( 클립보드 복사 , 카카오톡 공유)
+  // Share 공유 ( 클립보드 복사)
 const shareString = `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`;
 const clipboardShare = async() =>{
   try{
@@ -87,6 +88,7 @@ const clipboardShare = async() =>{
   }
 }
 
+//카카오톡 공유
 const KakaoShare = async() => {
   
   if (window.Kakao === undefined) {
