@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
 import { useLocation, useNavigate  } from 'react-router-dom';
 import moment from 'moment';
+
 import 'moment/locale/ko'; 
 import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
-import { cn } from '../utils/cn'; 
+import { cn } from '../utils/cn.js'; 
 import { Button } from '../components/Button.tsx';
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from 'framer-motion';
@@ -88,23 +89,25 @@ const clipboardShare = async() =>{
 
 //카카오톡 공유
 const KakaoShare = async() => {
-  
+
   if (window.Kakao === undefined) {
     return;
   }
-  // console.log("카카오 앱키: ", KAKAO_SHARE_KEY);
-  // console.log(typeof KAKAO_SHARE_KEY);
+  console.log("init 하기 전 카카오 앱키: \n", KAKAO_SHARE_KEY);
+  console.log(typeof KAKAO_SHARE_KEY);
 
   // window.Kakao.init(KAKAO_SHARE_KEY); 
 
-  // if (!window.Kakao.isInitialized()) {
-  //   window.Kakao.init(KAKAO_SHARE_KEY); 
-  // }
-  if (window.Kakao) {
-    window.Kakao.init(KAKAO_SHARE_KEY); 
+
+  if (!window.Kakao.isInitialized()) {
+    window.Kakao.init(KAKAO_SHARE_KEY);
   }
+
+
   console.log("isInitialized? ",window.Kakao.isInitialized());
-  
+  console.log("init 이후 카카오 앱키: \n", KAKAO_SHARE_KEY);
+  console.log(typeof KAKAO_SHARE_KEY);
+
   window.Kakao.Link.sendDefault({
     objectType: 'feed',
     content: {
