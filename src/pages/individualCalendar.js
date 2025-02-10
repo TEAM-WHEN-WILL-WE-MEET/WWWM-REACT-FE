@@ -1,5 +1,5 @@
 // individualCalendar.js
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect,  useCallback  } from "react";
 import { useLocation, useNavigate  } from 'react-router-dom';
 // import moment from 'moment';
 import moment from 'moment-timezone';
@@ -26,7 +26,16 @@ const IndividualCalendar = () => {
   const draggedSlotsRef = useRef(new Set());
   const dragSelectModeRef = useRef(null);
   const hasDraggedRef = useRef(false); // 단순 클릭과 드래그 구분
-  
+
+  const touchStartTimeRef = useRef(null);
+  const lastTouchedCellRef = useRef(null);
+  const currentTouchRef = useRef(null);
+
+  const processedCellsRef = useRef(new Set());
+  const scheduledUpdateRef = useRef(null);
+  const isTouchDeviceRef = useRef(false);
+  const dragStartPointRef = useRef(null);
+  const dragModeRef = useRef(null);
   const location = useLocation();
   const { responseData, appointmentId, userName } = location.state;
   
@@ -48,6 +57,39 @@ const IndividualCalendar = () => {
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
 
 
+// 연속된 업데이트 처리를 위한 디바운스 함수
+const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
+  if (scheduledUpdateRef.current) {
+    clearTimeout(scheduledUpdateRef.current);
+  }
+
+  scheduledUpdateRef.current = setTimeout(() => {
+    updateTimeSlot(
+      timeIndex,
+      buttonIndex,
+      newValue,
+      selectedTimes,
+      setSelectedTimes,
+      selectedDate,
+      dates,
+      times,
+      userName,
+      appointmentId,
+      BASE_URL
+    );
+  }, 16); // 약 1프레임 (60fps) 딜레이
+}, [selectedTimes, setSelectedTimes, selectedDate, dates, times]);
+ // 드래그 상태 초기화
+ const resetDragState = useCallback(() => {
+  isDraggingRef.current = false;
+  dragStartPointRef.current = null;
+  dragModeRef.current = null;
+  processedCellsRef.current.clear();
+  if (scheduledUpdateRef.current) {
+    clearTimeout(scheduledUpdateRef.current);
+    scheduledUpdateRef.current = null;
+  }
+}, []);
 
   //timeslot drag 관련
   useEffect(() => {
@@ -98,10 +140,12 @@ const IndividualCalendar = () => {
 
   // window의 mouseup 이벤트를 통해 드래그 종료 및 단일 클릭 처리
   useEffect(() => {
-    const handleWindowMouseUp = () => {
+    // const handleWindowMouseUp = () => {
+      const handleGlobalEnd = (event) => {
       if (initialCellRef.current && !isDraggingRef.current) {
         // 드래그가 감지되지 않았으면 단일 클릭으로 처리
         const { timeIndex, buttonIndex } = initialCellRef.current;
+        
         handleTimeClick(
           timeIndex,
           buttonIndex,
@@ -115,13 +159,114 @@ const IndividualCalendar = () => {
       isDraggingRef.current = false;
       updatedSlotsRef.current.clear();
       initialCellRef.current = null;
-    };
 
-    window.addEventListener('mouseup', handleWindowMouseUp);
+      lastTouchedCellRef.current = null;
+      draggedSlotsRef.current.clear();
+      dragSelectModeRef.current = null;
+      hasDraggedRef.current = false;
+      currentTouchRef.current = null;
+
+    };
+    //PC 이벤트
+    window.addEventListener('mouseup', handleGlobalEnd);
+     // 모바일 이벤트
+     window.addEventListener('touchend', handleGlobalEnd);
+     window.addEventListener('touchcancel', handleGlobalEnd);
+
     return () => {
-      window.removeEventListener('mouseup', handleWindowMouseUp);
+      window.removeEventListener('mouseup', handleGlobalEnd);
+      window.removeEventListener('touchend', handleGlobalEnd, );
+      window.removeEventListener('touchcancel', handleGlobalEnd);
     };
   }, [selectedTimes, setSelectedTimes, selectedDate]);
+
+  const findCellFromPoint = (x, y) => {
+    // document.elementFromPoint를 사용하여 현재 터치/마우스 포인트 아래의 요소 찾기
+    const element = document.elementFromPoint(x, y);
+    if (!element) return null;
+
+    // 타임슬롯 버튼 찾기
+    const button = element.closest('[data-time-index]');
+    if (!button) return null;
+
+    const timeIndex = parseInt(button.getAttribute('data-time-index'));
+    const buttonIndex = parseInt(button.getAttribute('data-button-index'));
+
+    return { timeIndex, buttonIndex };
+  };
+  const handleDragStart = (timeIndex, buttonIndex) => {
+    const currentValue = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
+    dragSelectModeRef.current = !currentValue; // 현재 값의 반대값으로 설정
+    
+    // 초기 셀 정보 저장
+    initialCellRef.current = {
+      timeIndex,
+      buttonIndex,
+      intendedValue: !currentValue
+    };
+
+    // 첫 번째 셀 업데이트
+    updateTimeSlot(
+      timeIndex,
+      buttonIndex,
+      dragSelectModeRef.current,
+      selectedTimes,
+      setSelectedTimes,
+      selectedDate
+    );
+    updatedSlotsRef.current.add(`${timeIndex}-${buttonIndex}`);
+  };
+
+  const handleDragMove = (timeIndex, buttonIndex) => {
+    if (!initialCellRef.current) return;
+    
+    const key = `${timeIndex}-${buttonIndex}`;
+    if (!updatedSlotsRef.current.has(key)) {
+      updateTimeSlot(
+        timeIndex,
+        buttonIndex,
+        dragSelectModeRef.current,
+        selectedTimes,
+        setSelectedTimes,
+        selectedDate
+      );
+      updatedSlotsRef.current.add(key);
+      hasDraggedRef.current = true;
+    }
+  };
+  const findTimeSlotFromPoint = (x, y) => {
+    const element = document.elementFromPoint(x, y);
+    if (!element) return null;
+
+    const timeSlot = element.closest('[data-timeslot]');
+    if (!timeSlot) return null;
+
+    return {
+      timeIndex: parseInt(timeSlot.getAttribute('data-time-index')),
+      buttonIndex: parseInt(timeSlot.getAttribute('data-button-index'))
+    };
+  };
+    // 모바일 이벤트 핸들러
+    const handleTouchStart = (timeIndex, buttonIndex, event) => {
+      event.preventDefault();
+      const touch = event.touches[0];
+      currentTouchRef.current = { x: touch.clientX, y: touch.clientY };
+      handleDragStart(timeIndex, buttonIndex);
+    };
+  
+    const handleTouchMove = (event) => {
+      event.preventDefault();
+      if (!isDraggingRef.current) return;
+  
+      const touch = event.touches[0];
+      const timeSlot = findTimeSlotFromPoint(touch.clientX, touch.clientY);
+      
+      if (timeSlot) {
+        handleDragMove(timeSlot.timeIndex, timeSlot.buttonIndex);
+      }
+    };
+
+
 
   // 버튼의 mousedown: 단일 클릭/드래그 판단을 위한 초기 좌표와 셀 정보를 기록 (즉, 실제 업데이트는 여기서 진행하지 않음)
   const handleButtonMouseDown = (timeIndex, buttonIndex, event) => {
@@ -681,7 +826,12 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
                   // }}
                   onMouseDown={(e) => handleButtonMouseDown(timeIndex, buttonIndex, e)}
                   onMouseEnter={(e) => handleButtonMouseEnter(timeIndex, buttonIndex, e)}
-                />
+                  onTouchStart={(e) => handleTouchStart(timeIndex, buttonIndex, e)}
+                  onTouchMove={handleTouchMove}
+
+                  style={{ touchAction: 'none' }}
+               
+                  />
               ))}
             </div>
           </div>
