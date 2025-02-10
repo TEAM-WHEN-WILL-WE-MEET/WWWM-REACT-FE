@@ -20,6 +20,7 @@ jobs:
         run: |
           echo "REACT_APP_WWWM_BE_ENDPOINT=${{ secrets.REACT_APP_WWWM_BE_ENDPOINT }}" >> .env
           echo "REACT_APP_WWWM_BE_DEV_EP=${{ secrets.REACT_APP_WWWM_BE_DEV_EP }}" >> .env
+          echo "REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE=${{ secrets.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE }}" >> .env
 
       # Node.js 설치 및 프로젝트 의존성 설치
       - name: Install dependencies
