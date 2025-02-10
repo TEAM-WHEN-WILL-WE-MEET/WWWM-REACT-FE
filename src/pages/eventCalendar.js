@@ -97,10 +97,12 @@ const KakaoShare = async() => {
 
   // window.Kakao.init(KAKAO_SHARE_KEY); 
 
-  if (!window.Kakao.isInitialized()) {
+  // if (!window.Kakao.isInitialized()) {
+  //   window.Kakao.init(KAKAO_SHARE_KEY); 
+  // }
+  if (window.Kakao) {
     window.Kakao.init(KAKAO_SHARE_KEY); 
   }
-
   console.log("isInitialized? ",window.Kakao.isInitialized());
   
   window.Kakao.Link.sendDefault({
