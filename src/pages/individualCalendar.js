@@ -64,6 +64,7 @@ const IndividualCalendar = () => {
 
   // 모바일 터치 시작: 시작 셀의 인덱스를 기록
   const handleTouchStart = (timeIndex, buttonIndex, e) => {
+    const touch = e.touches[0];
 
       // 시작 셀이 이미 선택되어 있으면 이번 드래그는 unselect, 아니면 select
       const startingCellSelected = !!(
@@ -72,8 +73,14 @@ const IndividualCalendar = () => {
         selectedTimes[selectedDate][timeIndex][buttonIndex]
       );
       const desiredValue = !startingCellSelected; // toggle: 이미 선택되어 있다면 false, 아니면 true
-
-    mobileDragStartRef.current = { timeIndex, buttonIndex, desiredValue  };
+      mobileDragStartRef.current = {
+        timeIndex,
+        buttonIndex,
+        desiredValue,
+        startX: touch.clientX,
+        startY: touch.clientY,
+      };
+    // mobileDragStartRef.current = { timeIndex, buttonIndex, desiredValue  };
     mobileDragEndRef.current = { timeIndex, buttonIndex, desiredValue  };
     backupSelectedDayRef.current = selectedTimes[selectedDate]
     ? JSON.parse(JSON.stringify(selectedTimes[selectedDate]))
@@ -140,37 +147,40 @@ const IndividualCalendar = () => {
 
   // 모바일 터치 종료: 미리보기 영역을 최종 선택으로 확정하고, 각 셀에 대해 서버 업데이트 호출
   const handleTouchEnd = (e) => {
-    if (!mobileDragStartRef.current || !mobileDragEndRef.current) return;
-    const start = mobileDragStartRef.current;
-    const end = mobileDragEndRef.current;
-      
-  // 터치 시작과 종료의 좌표 차이가 매우 작으면 단일 클릭으로 간주
-  const deltaTimeIndex = Math.abs(start.timeIndex - end.timeIndex);
-  const deltaButtonIndex = Math.abs(start.buttonIndex - end.buttonIndex);
-  const isClick = deltaTimeIndex === 0 && deltaButtonIndex === 0;
+    // if (!mobileDragStartRef.current || !mobileDragEndRef.current) return;
+    if (!mobileDragStartRef.current) return;
+    const touch = e.changedTouches[0];
 
-  if (isClick) {
-    // 단일 클릭 처리: 기존 단일 클릭 로직 호출
-    handleTimeClick(start.timeIndex, start.buttonIndex);
-  } else {
-    // 드래그 영역에 대해 toggle 업데이트 진행 (forceUpdate: true)
-    const minTime = Math.min(start.timeIndex, end.timeIndex);
-    const maxTime = Math.max(start.timeIndex, end.timeIndex);
-    const minButton = Math.min(start.buttonIndex, end.buttonIndex);
-    const maxButton = Math.max(start.buttonIndex, end.buttonIndex);
-    const desiredValue = start.desiredValue;
+    const start = mobileDragStartRef.current;
+    const dx = touch.clientX - start.startX;
+    const dy = touch.clientY - start.startY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    console.log("이거슨 distance", distance);
+    const CLICK_THRESHOLD = 5; 
+    // const end = mobileDragEndRef.current;
+    if (distance < CLICK_THRESHOLD) {
+      // 단일 클릭으로 간주 , 기존 단일 클릭 로직 호출
+      handleTimeClick(start.timeIndex, start.buttonIndex);
+    } else {
+      // 드래그로 간주주 , 미리보기 영역 확정 및 서버 업데이트
+      const end = mobileDragEndRef.current;
+      const minTime = Math.min(start.timeIndex, end.timeIndex);
+      const maxTime = Math.max(start.timeIndex, end.timeIndex);
+      const minButton = Math.min(start.buttonIndex, end.buttonIndex);
+      const maxButton = Math.max(start.buttonIndex, end.buttonIndex);
+      const desiredValue = start.desiredValue;
   
-    for (let t = minTime; t <= maxTime; t++) {
-      for (let b = minButton; b <= maxButton; b++) {
-        updateTimeSlot(t, b, desiredValue, selectedTimes, setSelectedTimes, selectedDate, true);
+      for (let t = minTime; t <= maxTime; t++) {
+        for (let b = minButton; b <= maxButton; b++) {
+          updateTimeSlot(t, b, desiredValue, selectedTimes, setSelectedTimes, selectedDate, true);
+        }
       }
     }
-  }
-  // refs 초기화
-  mobileDragStartRef.current = null;
-  mobileDragEndRef.current = null;
-  backupSelectedDayRef.current = null;
-};
+    // refs 초기화
+    mobileDragStartRef.current = null;
+    mobileDragEndRef.current = null;
+    backupSelectedDayRef.current = null;
+  };
 
 
 // 연속된 업데이트 처리를 위한 디바운스 함수
@@ -294,7 +304,7 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
       window.removeEventListener('touchend', handleGlobalEnd, );
       window.removeEventListener('touchcancel', handleGlobalEnd);
     };
-  }, [selectedTimes, setSelectedTimes, selectedDate]);
+  }, [selectedTimes, setSelectedTimes, selectedDate, times, dates]);
 
   const findCellFromPoint = (x, y) => {
     // document.elementFromPoint를 사용하여 현재 터치/마우스 포인트 아래의 요소 찾기
