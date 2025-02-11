@@ -64,6 +64,7 @@ const IndividualCalendar = () => {
 
   // 모바일 터치 시작: 시작 셀의 인덱스를 기록
   const handleTouchStart = (timeIndex, buttonIndex, e) => {
+
       // 시작 셀이 이미 선택되어 있으면 이번 드래그는 unselect, 아니면 select
       const startingCellSelected = !!(
         selectedTimes[selectedDate] &&
@@ -142,24 +143,34 @@ const IndividualCalendar = () => {
     if (!mobileDragStartRef.current || !mobileDragEndRef.current) return;
     const start = mobileDragStartRef.current;
     const end = mobileDragEndRef.current;
+      
+  // 터치 시작과 종료의 좌표 차이가 매우 작으면 단일 클릭으로 간주
+  const deltaTimeIndex = Math.abs(start.timeIndex - end.timeIndex);
+  const deltaButtonIndex = Math.abs(start.buttonIndex - end.buttonIndex);
+  const isClick = deltaTimeIndex === 0 && deltaButtonIndex === 0;
+
+  if (isClick) {
+    // 단일 클릭 처리: 기존 단일 클릭 로직 호출
+    handleTimeClick(start.timeIndex, start.buttonIndex);
+  } else {
+    // 드래그 영역에 대해 toggle 업데이트 진행 (forceUpdate: true)
     const minTime = Math.min(start.timeIndex, end.timeIndex);
     const maxTime = Math.max(start.timeIndex, end.timeIndex);
     const minButton = Math.min(start.buttonIndex, end.buttonIndex);
     const maxButton = Math.max(start.buttonIndex, end.buttonIndex);
     const desiredValue = start.desiredValue;
-
-    //드래그 영역 내 각 timeslot에 대해 updateTimeSlot 호출 (forceUpdate: true)
+  
     for (let t = minTime; t <= maxTime; t++) {
       for (let b = minButton; b <= maxButton; b++) {
         updateTimeSlot(t, b, desiredValue, selectedTimes, setSelectedTimes, selectedDate, true);
       }
     }
-    // ref 초기화
-    mobileDragStartRef.current = null;
-    mobileDragEndRef.current = null;
-    backupSelectedDayRef.current = null;
-
-  };
+  }
+  // refs 초기화
+  mobileDragStartRef.current = null;
+  mobileDragEndRef.current = null;
+  backupSelectedDayRef.current = null;
+};
 
 
 // 연속된 업데이트 처리를 위한 디바운스 함수
@@ -718,7 +729,7 @@ useEffect(() => {
 const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, setSelectedTimes, selectedDate, forceUpdate = false ) => {
   // 이미 원하는 상태이면 업데이트하지 않음
   const currentValue = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
-  if (currentValue === newValue) return;
+  if (!forceUpdate && currentValue === newValue) return;
 
   const newSelectedTimes = { ...selectedTimes };
   if (!newSelectedTimes[selectedDate]) {
