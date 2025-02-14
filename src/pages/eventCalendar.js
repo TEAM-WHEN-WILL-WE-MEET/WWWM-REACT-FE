@@ -10,7 +10,6 @@ import { cn } from '../utils/cn.js';
 import { Button } from '../components/Button.tsx';
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
 
 
 const EventCalendar = () => {
@@ -314,206 +313,184 @@ const truncateName = (name) => {
     };
 
     return (
-      <>
-        <Helmet>
-        <title>{eventName ? `언제볼까? - ${eventName} ` : '언제볼까?'}</title>
-        <meta
-            name="description"
-            content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요. 최적의 시간을 척척 찾아드려요! "
-          />
-        </Helmet>
-        <main className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
-          <header>
-            <div
-              className={`flex items-center flex-row justify-between ${colorVariants({
-                bg: 'white',
-              })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}
-            >
-              <div className="flex flex-row items-center">
-                <img
-                  src="/home.svg"
-                  className="hover:cursor-pointer"
-                  alt="홈으로 돌아가기"
-                  onClick={() => navigate('/MonthView')}
-                />
-                <div className={`${typographyVariants({ variant: 'h1-sb' })}`}>
-                  {eventName}
-                </div>
-              </div>
-              <img
-                src="/Share.svg"
-                className="hover:cursor-pointer"
-                alt="링크 공유하기 버튼"
-                onClick={handleShare}
-              />
-            </div>
-          </header>
-          <nav aria-label="날짜 탭">
-            <div
-              className={`
-                flex
-                !justify-start
-                !overflow-x-auto
-                px-0
-                py-[1rem]
-                pb-0
-                whitespace-nowrap
-                scrollbar-hide
-                ![&::-webkit-scrollbar]:hidden
-                ${colorVariants({ bg: 'white' })}
-                !min-h-[4rem]
-                border-b-[0.1rem]
-                border-[var(--gray-500,#A8A8A8)]
-                z-0
-              `}
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
-            >
-              {dates.map(({ date, key }) => (
-                <div
-                  key={key}
-                  className={`
-                    tracking-[-0.35px]
-                    p-[0.9rem]
-                    w-[7.4rem]
-                    text-center
-                    flex-shrink-0
-                    flex-grow-0
-                    basis-[25%]
-                    cursor-pointer
-                    ${typographyVariants({ variant: 'b1-sb' })}
-                    ${
-                      selectedDate === key
-                        ? `
-                          !${colorVariants({ color: 'gray-900' })}
-                          font-[600]
-                          border-b-[0.2rem]
-                          border-[var(--gray-900,#242424)]
-                          -mb-0.3
-                          z-20
-                        `
-                        : ``
-                    }
-                  `}
-                  onClick={() => setSelectedDate(key)}
-                >
-                  {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
-                </div>
-              ))}
-            </div>
-          </nav>
-          <section aria-label="시간 선택">
-            <div
-              className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}
-            >
-              {times.map((time, timeIndex) => (
-                <div key={timeIndex} className="flex items-center">
-                  <div
-                    className={`
-                      ${typographyVariants({ variant: 'd3-rg' })}
-                      text-[var(--gray-800,#444)]
-                      h-[2.8rem]
-                      w-[3.6rem]
-                      text-center
-                      mr-[0.6rem]
-                      flex
-                      items-center
-                      justify-center
-                      whitespace-nowrap
-                    `}
-                  >
-                    {moment(time, 'HH:mm').format('HH시')}
-                  </div>
-                  <div className="grid grid-cols-6 gap-0 !h-[2.8rem]">
-                    {[...Array(6)].map((_, buttonIndex) => {
-                      const userCount =
-                        selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]?.userCount || 0;
-                      let colorClass = '';
-                      if (userCount / TotalUsers > 0 && userCount / TotalUsers <= 0.3) {
-                        colorClass = `${colorVariants({ bg: 'blue-50' })} border-[var(--blue-100)]`;
-                      } else if (userCount / TotalUsers > 0.3 && userCount / TotalUsers <= 0.6) {
-                        colorClass = `${colorVariants({ bg: 'blue-100' })} border-[var(--blue-200)]`;
-                      } else if (userCount / TotalUsers > 0.6 && userCount / TotalUsers < 0.99) {
-                        colorClass = `${colorVariants({ bg: 'blue-200' })} border-[var(--blue-300)]`;
-                      } else if (userCount / TotalUsers === 1) {
-                        colorClass = `${colorVariants({ bg: 'magen-50' })} border-[var(--magen-300)]`;
-                      }
-                      return (
-                        <Button
-                          key={buttonIndex}
-                          size={'XXS'}
-                          additionalClass={`
-                            ${colorClass}
-                            pointer-events-none
-                            items-center
-                            !transform-none
-                          `}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-          <div className="flex !justify-center">
-            <Button
-              label="내 참여시간 수정"
-              size={'M'}
-              onClick={handleSaveClick}
-              additionalClass="items-center !transform-none mb-[2rem]"
+      <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
+        <div className={`flex items-center flex-row justify-between ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}>
+          {/* <h2>{eventName}</h2> */}
+          <div className="flex flex-row items-center">
+            <img 
+              src="/home.svg" 
+              className="hover:cursor-pointer"
+              alt="홈으로 돌아가기"
+              onClick={() => navigate('/MonthView')} 
             />
+            <div className={`
+              ${typographyVariants({ variant: 'h1-sb' })}
+            `}>
+              {eventName}
+            </div>
           </div>
-          <section aria-label="참여 인원">
-            <div className={`h-[19rem] px-[2.2rem] ${colorVariants({ bg: 'white' })}`}>
-              <div className="flex border-b pt-[1.8rem] pb-[1rem] justify-between items-center mb-[2rem]">
-                <div
-                  className={`
-                    flex flex-row items-center
-                    ${typographyVariants({ variant: 'b2-md' })}
-                    ${colorVariants({ color: 'gray-900' })}
-                  `}
-                >
-                  <img
-                    src="participant.svg"
-                    className="hover:cursor-pointer"
-                    alt="참여인원"
-                  />
-                  참여인원
-                </div>
-                <div
-                  className={`
-                    ${typographyVariants({ variant: 'b2-md' })}
-                    ${colorVariants({ color: 'gray-900' })}
-                  `}
-                >
-                  {TotalUsers}명
-                </div>
+          <img 
+            src="/Share.svg" 
+            className="hover:cursor-pointer"
+            alt="링크 공유하기 버튼"
+            // onClick={() =>handleShare(shareString)} 
+            onClick={handleShare}
+          />
+        </div>
+        <div
+          className={`
+            flex 
+            !justify-start
+            !overflow-x-auto 
+            px-0 
+            py-[1rem] 
+            pb-0
+            whitespace-nowrap 
+            scrollbar-hide 
+            ![&::-webkit-scrollbar]:hidden
+            ${colorVariants({ bg: 'white' })}
+            !min-h-[4rem]
+            border-b-[0.1rem] 
+            border-[var(--gray-500,#A8A8A8)]  
+            z-0          
+          `}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >         
+          {dates.map(({ date, key }) => (
+            <div
+              key={key}
+              className={`
+                tracking-[-0.35px]
+                p-[0.9rem]
+                w-[7.4rem]
+                text-center
+                flex-shrink-0
+                flex-grow-0
+                basis-[25%] 
+                cursor-pointer
+                ${typographyVariants({ variant: 'b1-sb' })} 
+                ${selectedDate === key ? 
+                  `
+                  !${colorVariants({ color: 'gray-900' })} 
+                  font-[600] 
+                  border-b-[0.2rem] 
+                  border-[var(--gray-900,#242424)]
+                  -mb-0.3
+                  z-20
+                ` :
+                 ``
+                }
+
+              `}
+              onClick={() => setSelectedDate(key)}
+            >
+              {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
+            </div>
+          ))}
+        </div>
+        <div className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+          {times.map((time, timeIndex) => (
+            <div key={timeIndex} className="flex items-center">
+              <div
+                className={`
+                  ${typographyVariants({ variant: 'd3-rg' })}
+                  text-[var(--gray-800,#444)]
+                  h-[2.8rem] 
+                  w-[3.6rem] 
+                  text-center 
+                  mr-[0.6rem] 
+                  flex 
+                  items-center 
+                  justify-center 
+                  whitespace-nowrap                
+                `}
+              >                 
+                {moment(time, 'HH:mm').format('HH시')}
               </div>
-              <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
-                {Object.values(userList).map((user) => {
+              <div className="grid grid-cols-6 gap-0 !h-[2.8rem]">  
+                {[...Array(6)].map((_, buttonIndex) => {
+                  const userCount = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]?.userCount || 0;
+      
+                  // 색상 클래스 결정
+                  let colorClass = '';
+                  if (userCount/TotalUsers > 0 && userCount/TotalUsers <= 0.3) {
+                    colorClass = `${colorVariants({ bg: 'blue-50' })} border-[var(--blue-100)]`;
+                  } else if (userCount/TotalUsers > 0.3 && userCount/TotalUsers <= 0.6) {
+                    colorClass = `${colorVariants({ bg: 'blue-100' })} border-[var(--blue-200)]`;
+                  } else if (userCount/TotalUsers > 0.6 && userCount/TotalUsers < 0.99) {
+                    colorClass = `${colorVariants({ bg: 'blue-200' })} border-[var(--blue-300)]`;
+                  } else if (userCount/TotalUsers === 1) {
+                    colorClass = `${colorVariants({ bg: 'magen-50' })} border-[var(--magen-300)]`;
+                  }
+            
                   return (
-                    <div
-                      key={user.name}
-                      className={`
-                        ${typographyVariants({ variant: 'b2-md' })}
-                        flex min-w-[6rem] h-[2.4rem] justyfiy-center items-center text-[var(--gray-700)] justify-center text-center
-                        ${user.name === userName.toString()
-                          ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                          : ''}
-                        max-w-[6rem]
-                        whitespace-nowrap
+                    <Button
+                      key={buttonIndex}
+                      size={"XXS"}
+                      additionalClass={`
+                        ${colorClass}
+                        pointer-events-none
+                        items-center !transform-none
                       `}
-                    >
-                      {truncateName(user.name)}
-                    </div>
+                    />
                   );
                 })}
               </div>
             </div>
-          </section>
+          ))}
+        </div>
+        <div className="flex !justify-center">
+          <Button 
+            label="내 참여시간 수정"
+            size={'M'} 
+            onClick={handleSaveClick}
+            additionalClass='items-center !transform-none mb-[2rem]'        
+          /> 
+        </div>      
+        <div className="flex flex-col h-full justify-end">
+          <div className={`h-[19rem] px-[2.2rem] ${colorVariants({ bg: 'white' })} `}>
+            <div className="flex border-b pt-[1.8rem] pb-[1rem] justify-between items-center mb-[2rem]">
+              <div className={`flex flex-row items-center 
+                ${typographyVariants({ variant: 'b2-md' })}
+                ${colorVariants({ color: 'gray-900' })}
+              `}>            
+                <img 
+                  src="participant.svg" 
+                  className="hover:cursor-pointer"
+                  alt="참여인원"
+                />
+                참여인원  
+              </div>
+              <div className={`    
+                ${typographyVariants({ variant: 'b2-md' })}
+                ${colorVariants({ color: 'gray-900' })}
+              `}>{TotalUsers}명</div>
+            </div>
+            <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
+              {Object.values(userList).map((user) => {
+                return (
+                  <div
+                    key={user.name} 
+                    className={`
+                      ${typographyVariants({ variant: 'b2-md' })}
+                      flex min-w-[6rem] h-[2.4rem] justyfiy-center items-center text-[var(--gray-700)] justify-center text-center
+                      ${user.name === userName.toString() 
+                        ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                        : ''}
+                        max-w-[6rem]
+                        whitespace-nowrap 
+                        
+                    `}
+                  >
+                    {truncateName(user.name)}                  
+                  </div>
+                );
+              })}
+            </div>
+          </div>
           <AnimatePresence>
             {isOpen && (
               <motion.div
@@ -531,24 +508,21 @@ const truncateName = (name) => {
                   exit={{ y: '100%' }}
                   transition={{ duration: 0.3, ease: 'easeOut' }}
                 >
-                  <img
-                    className="w-auto mb-[2rem]"
-                    alt="공유창 손잡이"
-                    src="/tabEdge.svg"
-                  />
-                  <Button label="카카오톡으로 공유하기" size={'share'} onClick={KakaoShare}>
-                    <img
-                      src="/arcticons_kakaotalk.svg"
-                      alt="카카오톡으로 캘린더 링크 공유하기"
-                    />
+                  <img className="w-auto mb-[2rem]" alt="공유창 손잡이" src="/tabEdge.svg" />
+                  <Button 
+                    label='카카오톡으로 공유하기'
+                    size={'share'} 
+                    onClick={KakaoShare} 
+                  >
+                    <img src="/arcticons_kakaotalk.svg" alt="카카오톡으로 캘린더 링크 공유하기" />
                   </Button>
-                  <Button
-                    label="링크 복사하기"
-                    size={'share'}
-                    onClick={clipboardShare}
+                  <Button 
+                    label='링크 복사하기'
+                    size={'share'} 
+                    onClick={clipboardShare} 
                     additionalClass="mt-[1rem] !border border-gray-300 bg-white text-gray-900"
                   >
-                    <img src="/tabler_link.svg" alt="클립보드로 링크 복사하기" />
+                    <img src="/tabler_link.svg" alt="클립보드로 링크 복사하기" />              
                   </Button>
                 </motion.div>
               </motion.div>
@@ -556,25 +530,25 @@ const truncateName = (name) => {
           </AnimatePresence>
           <AnimatePresence>
             {showToast && (
-              <motion.div
+              <motion.div 
                 className="fixed bottom-0 left-0 right-0 flex justify-center mb-[8rem]"
                 initial={{ y: '400%' }}
                 animate={{ y: 0 }}
                 exit={{ y: '400%' }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
               >
-                <Button
-                  label="링크가 복사되었습니다!"
+                <Button 
+                  label="링크가 복사되었습니다!" 
                   size={'toast'}
-                  onClick={handleSaveClick}
-                  additionalClass="z-50 pointer-events-none"
+                  onClick={handleSaveClick} 
+                  additionalClass='z-50 pointer-events-none' 
                 />
               </motion.div>
             )}
           </AnimatePresence>
-        </main>
-      </>
-    );
+        </div>
+      </div>
+     );
  };
  
 export default EventCalendar;

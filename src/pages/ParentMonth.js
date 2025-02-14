@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import MonthView from './MonthView';
 import TimePicker from '../components/TimePicker';
 import { useNavigate } from 'react-router-dom'; 
-import { Helmet } from 'react-helmet-async';
 
 const ParentMonth = () => {
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
@@ -24,7 +23,7 @@ const ParentMonth = () => {
    // handleCreateCalendar 함수가 필요한 곳에서 호출될 수 있도록 콜백 설정
    const handleCalendarCreation = async (data) => {
     if (!data) {
-      //console.error('jsonData가 아직 준비되지 않았습니다.');
+      console.error('jsonData가 아직 준비되지 않았습니다.');
       return;
     }
     
@@ -44,7 +43,7 @@ const ParentMonth = () => {
       }
 
       const calendarData = await calendarResponse.json();
-      //console.log("나는 캘린더data: ",calendarData);
+      console.log("나는 캘린더data: ",calendarData);
       const appointmentId = calendarData.object.id;
       // console.log("왜안되는걸까?",appointmentId); //정상작동
       
@@ -61,13 +60,6 @@ const ParentMonth = () => {
  
   return (
     <>
-      <Helmet>
-         <title>{'언제볼까?'}</title>
-          <meta
-            name="description"
-            content="언제볼까? 서비스와 함께 원클릭 약속방 생성, 클릭 한 번으로 약속 잡기 시작! "
-          />
-      </Helmet>
       <MonthView 
         setJsonData={(data) => {
         setJsonData(data);

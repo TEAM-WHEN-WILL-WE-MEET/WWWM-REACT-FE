@@ -11,7 +11,6 @@ import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
-import { Helmet } from 'react-helmet-async';
 
 // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
 const BASE_URL = process.env.NODE_ENV === "production" 
@@ -741,67 +740,83 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
 };
 
 
-return (
-  <>
-    <Helmet>
-      <title>{eventName ? `언제볼까? - ${eventName} ` : '언제볼까?'}</title>
-      <meta
-        name="description"
-        content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요"
-      />
-    </Helmet>
-    <main className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
-      <header>
-        <div className={`flex ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}>
-          <img 
-            className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in active:scale-95"
-            alt="재로그인하러 돌아가기"
-            src="backward.svg"
-            onClick={() => navigate(-1)}
-          />
-          {/* h1 태그를 사용해 주요 제목임을 명시 */}
-          <h1 className={`${typographyVariants({ variant: 'h1-sb' })} overflow-hidden text-center truncate`}>
-            {eventName}
-          </h1>
-        </div>
-      </header>
-      <nav aria-label="날짜 탭">
+  return (
+    <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
+      <div className={`flex ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}>
+        <img 
+          className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in 
+            active:scale-95"
+          alt="재로그인하러 돌아가기"
+          src="backward.svg"
+          onClick={() => navigate(-1)}
+        />
         <div
-          className={`flex !justify-start !overflow-x-auto px-0 py-[1rem] pb-0 whitespace-nowrap scrollbar-hide ![&::-webkit-scrollbar]:hidden hover:cursor-pointer ${colorVariants({ bg: 'white' })} !min-h-[4rem] border-b-[0.1rem] border-[var(--gray-500,#A8A8A8)] z-0`}
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
+          className={`
+            ${typographyVariants({ variant: 'h1-sb' })} 
+            overflow-hidden 
+            text-center 
+            truncate
+          `}
         >
-          {dates.map(({ date, key }) => (
-            <div
-              key={key}
-              className={`
-                ${typographyVariants({ variant: 'b1-sb' })}
-                ${selectedDate === key ? `
-                  !${colorVariants({ color: 'gray-900' })}
-                  font-[600]
-                  border-b-[0.2rem]
+          {eventName}
+        </div>
+      </div>
+      {/* date-tabs */}
+      <div
+        className={`
+          flex 
+          !justify-start
+          !overflow-x-auto 
+          px-0 
+          py-[1rem] 
+          pb-0
+          whitespace-nowrap 
+          scrollbar-hide 
+          ![&::-webkit-scrollbar]:hidden
+          hover:cursor-pointer
+          ${colorVariants({ bg: 'white' })}
+            !min-h-[4rem]
+            border-b-[0.1rem] 
+            border-[var(--gray-500,#A8A8A8)]  
+            z-0  
+        `}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}
+        aria-label="날짜 탭"
+      >
+        {dates.map(({ date, key }) => (
+          <div
+            key={key}
+            className={`
+              ${typographyVariants({ variant: 'b1-sb' })} 
+                ${selectedDate === key ? 
+                  `
+                  !${colorVariants({ color: 'gray-900' })} 
+                  font-[600] 
+                  border-b-[0.2rem] 
                   border-[var(--gray-900,#242424)]
                   -mb-0.3
                   z-20
-                ` : ``}
-                tracking-[-0.35px]
-                p-[0.9rem]
-                w-[7.4rem]
-                text-center
-                flex-shrink-0
-                flex-grow-0
-                basis-[25%]
-              `}
-              onClick={() => setSelectedDate(key)}
-            >
-              {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
-            </div>
-          ))}
-        </div>
-      </nav>
-      <section className={`flex pt-[2.8rem] mb-[3.6rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>
+                ` :
+                 ``
+                }
+              tracking-[-0.35px]
+              p-[0.9rem]
+              w-[7.4rem]
+              text-center
+              flex-shrink-0
+              flex-grow-0
+              basis-[25%] 
+            `}
+            onClick={() => setSelectedDate(key)}
+          >
+            {moment(date, 'YYYY-MM-DD').format('M/D(ddd)')}
+          </div>
+        ))}
+      </div>
+      <div className={`flex pt-[2.8rem] mb-[3.6rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
         <div className="flex items-center gap-2">
           <input 
             type="checkbox" 
@@ -817,10 +832,8 @@ return (
           <div className="label-box">
             <label 
               htmlFor="all-time" 
-              className={`
-                ${typographyVariants({ variant: 'b2-md' })}
-                ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' }) : colorVariants({ color: 'gray-600' })}
-              `}
+              className={`${typographyVariants({ variant: 'b2-md' })} 
+              ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' }) : colorVariants({ color: 'gray-600' })}`}
             >  
               <span className="check-icon" aria-hidden="true"></span>
               모든 시간 가능
@@ -833,13 +846,13 @@ return (
               className={`
                 ${typographyVariants({ variant: 'd3-rg' })}
                 text-[var(--gray-800,#444)]
-                h-[2.8rem]
-                w-[3.6rem]
-                text-center
-                mr-[0.6rem]
-                flex
-                items-center
-                justify-center
+                h-[2.8rem] 
+                w-[3.6rem] 
+                text-center 
+                mr-[0.6rem] 
+                flex 
+                items-center 
+                justify-center 
                 whitespace-nowrap
               `}
             >             
@@ -850,36 +863,38 @@ return (
                 <Button
                   key={buttonIndex}
                   size={"XXS"}
-                  // 아래 data attribute는 터치 이벤트에서 각 셀의 위치를 식별
-                  data-time-index={timeIndex}
+                 // 아래 data attribute는 터치 이벤트에서 각 셀의 위치를 식별
+                  data-time-index={timeIndex}  
                   data-button-index={buttonIndex}
-                  additionalClass={`
-                    ${selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""}
+                  additionalClass={` 
+                    ${selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""} 
                     items-center !transform-none
                   `}
                   onMouseDown={(e) => handleButtonMouseDown(timeIndex, buttonIndex, e)}
                   onMouseEnter={(e) => handleButtonMouseEnter(timeIndex, buttonIndex, e)}
+
                   onTouchStart={(e) => handleTouchStart(timeIndex, buttonIndex, e)}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
                   style={{ touchAction: "none" }}
-                />
+
+               
+                  />
               ))}
             </div>
           </div>
         ))}
-      </section>
-      <footer className="flex !justify-center">
+      </div>
+      <div className="flex !justify-center">
         <Button 
           label="내 참여시간 저장"
           size={'L'} 
           onClick={handleSaveClick}
           additionalClass='items-center !transform-none mb-[1.2rem]'        
         /> 
-      </footer>
-    </main>
-  </>
-);
+      </div>
+    </div>
+  );
 };
   
 export default IndividualCalendar;
