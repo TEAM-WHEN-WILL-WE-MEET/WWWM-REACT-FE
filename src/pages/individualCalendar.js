@@ -158,7 +158,7 @@ const IndividualCalendar = () => {
     const dx = touch.clientX - start.startX;
     const dy = touch.clientY - start.startY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    console.log("이거슨 distance", distance);
+    // console.log("이거슨 distance", distance);
     const CLICK_THRESHOLD = 5; 
     // const end = mobileDragEndRef.current;
     if (distance < CLICK_THRESHOLD) {
@@ -498,7 +498,7 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
 
       //재로그인 case
       if (responseData.firstLogin === false) {
-        console.log("사용자가 이전 로그인에서 저장했었던 times?: ", responseData.userSchedule[0].times);
+        // console.log("사용자가 이전 로그인에서 저장했었던 times?: ", responseData.userSchedule[0].times);
 
         // const userSelections = responseData.userSchedule[0].times.reduce((acc, slot) => {
          //개인용 스케줄 페이지 
@@ -577,27 +577,8 @@ useEffect(() => {
 const handleSaveClick = async () => {
   const selectedDateInfo = dates[selectedDate];
   const timesArray = bulkTimesArray;
-  console.log("저장버튼 클릭시: bulkTimesArray", bulkTimesArray) ;
-  // // selectedTimes에 저장된 해당 날짜의 모든 timeslot을 순회하여 선택된 항목만 timesArray에 추가
-  // if (selectedTimes[selectedDate]) {
-  //   for (let timeIndex = 0; timeIndex < times.length; timeIndex++) {
-  //     for (let buttonIndex = 0; buttonIndex < 6; buttonIndex++) {
-  //       if (selectedTimes[selectedDate][timeIndex]?.[buttonIndex]) {
-  //         const hour = times[timeIndex].split(':')[0];
-  //         const minute = buttonIndex * 10;
-  //         const dateTime = `${selectedDateInfo.date}T${hour}:${String(minute).padStart(2, '0')}:00`;
-  //         const kstMoment = moment.tz(dateTime, "Asia/Seoul");
-  //         const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
-
-  //         timesArray.push({
-  //           time: sendTimeString,
-  //           users: [userName],
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-
+  // console.log("저장버튼 클릭시: bulkTimesArray", bulkTimesArray) ;
+  
   // timeslot이 하나도 선택되지 않은 경우에도 selectedDateInfo.date를 올바른 포맷으로 변환
   const formattedDate = timesArray.length > 0 
     ? timesArray[0].time 
@@ -610,7 +591,7 @@ const handleSaveClick = async () => {
     appointmentId: appointmentId,
   };
 
-  console.log("저장 버튼 클릭 시 서버에 보낼 payload:", payload);
+  // console.log("저장 버튼 클릭 시 서버에 보낼 payload:", payload);
 
   try {
     const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
@@ -620,11 +601,16 @@ const handleSaveClick = async () => {
     });
 
     if (response.ok) {
-      console.log("스케줄 저장 성공");
+      // console.log("스케줄 저장 성공");
       navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
-    } else {
-      console.log("스케줄 저장 실패");
-      alert("스케줄 저장에 실패했습니다.");
+      // console.log(response);
+
+    } else { //times에 아무런 시간도 저장되지 않았을 때
+
+      // console.log("스케줄 저장 실패");
+      // console.log(response);
+      // alert("스케줄 저장에 실패했습니다.");
+      navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
     }
   } catch (error) {
     console.error("저장 요청 중 오류:", error);
@@ -645,8 +631,8 @@ const handleAllTimeChange = async (e) => {
 
   // 이전 상태를 깊은 복사로 저장
   const prevState = JSON.parse(JSON.stringify(selectedTimes[selectedDate] || {}));
-  console.log("이전 상태:", prevState);
-  console.log("업데이트 전 현재 상태:", selectedTimes[selectedDate]);
+  // console.log("이전 상태:", prevState);
+  // console.log("업데이트 전 현재 상태:", selectedTimes[selectedDate]);
 
   times.forEach((_, timeIndex) => {
     if (!newSelectedTimes[selectedDate][timeIndex]) {
@@ -657,11 +643,10 @@ const handleAllTimeChange = async (e) => {
     });
   });
 
-  console.log("업데이트할 새로운 상태:", newSelectedTimes[selectedDate]);
+  // console.log("업데이트할 새로운 상태:", newSelectedTimes[selectedDate]);
   setSelectedTimes(newSelectedTimes);
 
   // 변경된 시간 슬롯만을 bulkTimesArray에 모으기
-  const bulkTimesArray = [];
   for (let timeIndex = 0; timeIndex < times.length; timeIndex++) {
     if (!prevState[timeIndex]) {
       prevState[timeIndex] = {};
@@ -673,7 +658,7 @@ const handleAllTimeChange = async (e) => {
       // 상태가 변경된 경우에만 처리
       if (prevSelected !== newSelected) {
         // isChecked가 true이면 기존에 선택되지 않았던 시간( false -> true )만,
-        // isChecked가 false이면 기존에 선택되어 있던 시간( true -> false )만 처리합니다.
+        // isChecked가 false이면 기존에 선택되어 있던 시간( true -> false )만 처리
         // (두 경우 모두 prevSelected !== newSelected 조건에 부합합니다.)
         const hour = times[timeIndex].split(':')[0];
         const minute = buttonIndex * 10;
@@ -681,15 +666,18 @@ const handleAllTimeChange = async (e) => {
         const kstMoment = moment.tz(dateTime, "Asia/Seoul");
         const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
 
-        bulkTimesArray.push({
+        const newItem = {
           time: sendTimeString,
           users: [userName],
-        });
+        };
+  
+        setBulkTimesArray((prev) => [...prev, newItem]);
+
       }
     }
   }
 
-  console.log("모든 시간 가능 체크 후 bulkTimesArray:", bulkTimesArray);
+  // console.log("모든 시간 가능 체크 후 bulkTimesArray:", bulkTimesArray);
   // 여기서 bulkTimesArray를 이용해 추후 handleSaveClick 등에서 서버에 일괄 업데이트 요청을 보내도록 처리하면 됩니다.
 };
 
@@ -716,52 +704,10 @@ const handleAllTimeChange = async (e) => {
     };
   
     setBulkTimesArray((prev) => [...prev, newItem]);
-    // const selectedDateInfo = dates[selectedDate];
-
-
-    // // 백엔드 서버에 업데이트된 스케줄, 양식에 맞게 가공해서 보내는 logic
-    // const hour = times[timeIndex].split(':')[0];  // 시간만 추출 (예: "15")
-    // const minute = buttonIndex * 10;  // 분 계산 (예: 10)
-    // const dateTime = `${selectedDateInfo.date}T${hour}:${String(minute).padStart(2, '0')}:00`;
-    // const kstMoment = moment.tz(dateTime, "Asia/Seoul");
-    // const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss"); 
-    // // const sendTimeString = dateTime.format("YYYY-MM-DDTHH:mm:ss"); 
-
-    // console.log("dateTime", dateTime);
-    // const payload = {
-    //   id: selectedDateInfo.id,
-    //   date: sendTimeString,
-    //   times: [
-    //     {
-    //       time: sendTimeString,
-    //       users: [userName]
-    //     }
-    //   ],
-    //   appointmentId: appointmentId
-    // };
-
-    // console.log("timeslot 클릭시 서버에 보낼 데이터:", payload);
-
-    // try {
-    //   const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(payload),
-    //   });
-
-    //   if (response.ok) {
-    //     console.log("스케줄 저장 성공");
-    //   } else {
-    //     console.log("스케줄 저장 실패");
-    //     alert("스케줄 저장에 실패했습니다.");
-    //   }
-    // } catch (error) {
-    //   console.error("저장 요청 중 오류:", error);
-    //   alert("서버 오류가 발생했습니다.");
-    // }
+  
   };
+
+
 // timeslot의 상태를 강제로 newValue(선택/해제)로 업데이트하는 함수 (드래그 전용)
 const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, setSelectedTimes, selectedDate, forceUpdate = false ) => {
   // 이미 원하는 상태이면 업데이트하지 않음
@@ -790,47 +736,7 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
   };
 
   setBulkTimesArray((prev) => [...prev, newItem]);
-  // const selectedDateInfo = dates[selectedDate];
-  // const hour = times[timeIndex].split(':')[0];
-  // const minute = buttonIndex * 10;
-  // const dateTime = `${selectedDateInfo.date}T${hour}:${String(minute).padStart(2, '0')}:00`;
-  // const kstMoment = moment.tz(dateTime, 'Asia/Seoul');
-  // const sendTimeString = kstMoment.format('YYYY-MM-DDTHH:mm:ss');
-
-  // console.log('dateTime', dateTime);
-  // const payload = {
-  //   id: selectedDateInfo.id,
-  //   date: sendTimeString,
-  //   times: [
-  //     {
-  //       time: sendTimeString,
-  //       users: [userName],
-  //     },
-  //   ],
-  //   appointmentId: appointmentId,
-  // };
-
-  // console.log('timeslot 업데이트 (드래그) 시 서버에 보낼 데이터:', payload);
-
-  // try {
-  //   const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
-  //     method: 'PUT',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(payload),
-  //   });
-
-  //   if (response.ok) {
-  //     console.log('스케줄 저장 성공');
-  //   } else {
-  //     console.log('스케줄 저장 실패');
-  //     alert('스케줄 저장에 실패했습니다.');
-  //   }
-  // } catch (error) {
-  //   console.error('저장 요청 중 오류:', error);
-  //   alert('서버 오류가 발생했습니다.');
-  // }
+ 
 };
 
 
@@ -964,14 +870,6 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
                     ${selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex] ? '!border-[var(--blue-200)] bg-[var(--blue-50)]' : ""} 
                     items-center !transform-none
                   `}
-                  // onMouseUp={handleMouseUp}
-                  // onClick={(e) => {
-                  //   if (hasDraggedRef.current) {
-                  //     e.preventDefault();
-                  //     return;
-                  //   }
-                  //   handleTimeClick(timeIndex, buttonIndex, selectedTimes, setSelectedTimes, selectedDate, dates, times, appointmentId, userName, BASE_URL);
-                  // }}
                   onMouseDown={(e) => handleButtonMouseDown(timeIndex, buttonIndex, e)}
                   onMouseEnter={(e) => handleButtonMouseEnter(timeIndex, buttonIndex, e)}
 
