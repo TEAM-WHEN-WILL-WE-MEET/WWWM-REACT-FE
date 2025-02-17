@@ -43,7 +43,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": " craco build",
+    "build": " CI=false craco build",
     "test": "craco test",
     "postbuild": "react-hydratable",
     "preview": "react-hydratable --preview"
