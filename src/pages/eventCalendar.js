@@ -10,6 +10,7 @@ import { cn } from '../utils/cn.js';
 import { Button } from '../components/Button.tsx';
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 
 const EventCalendar = () => {
@@ -312,7 +313,17 @@ const truncateName = (name) => {
      navigate(`/getAppointment?appointmentId=${appointmentId}`);
     };
 
+    
     return (
+      <>
+        <Helmet>
+        <title>{eventName ? `언제볼까? - ${eventName} ` : '언제볼까?'}</title>
+        <meta
+            name="description"
+            content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요. 최적의 시간을 척척 찾아드려요! "
+          />
+        </Helmet>
+
       <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
         <div className={`flex items-center flex-row justify-between ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}>
           {/* <h2>{eventName}</h2> */}
@@ -548,6 +559,7 @@ const truncateName = (name) => {
           </AnimatePresence>
         </div>
       </div>
+      </>
      );
  };
  

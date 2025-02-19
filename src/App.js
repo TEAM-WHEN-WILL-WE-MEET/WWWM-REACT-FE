@@ -10,6 +10,7 @@ import MyPage from './pages/MyPage';
 import AccountManagement from './pages/AccountManagement';
 import LandingPage from "./components/LandingPage";
 
+
 function App() {
   return (
     <Router>

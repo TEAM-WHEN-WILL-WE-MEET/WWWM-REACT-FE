@@ -7,3 +7,4 @@ const GetAppointmentRedirect = () => {
 };
 
 export default GetAppointmentRedirect;
+

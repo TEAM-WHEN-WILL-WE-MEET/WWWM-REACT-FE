@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MonthView from './MonthView';
 import TimePicker from '../components/TimePicker';
 import { useNavigate } from 'react-router-dom'; 
-
+import { Helmet } from 'react-helmet-async';
 const ParentMonth = () => {
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   // console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
@@ -58,8 +58,17 @@ const ParentMonth = () => {
 
     
  
+
+  
   return (
     <>
+      <Helmet>
+         <title>{'언제볼까?'}</title>
+          <meta
+            name="description"
+            content="언제볼까? 서비스와 함께 원클릭 약속방 생성, 클릭 한 번으로 약속 잡기 시작! "
+          />
+      </Helmet>
       <MonthView 
         setJsonData={(data) => {
         setJsonData(data);

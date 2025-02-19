@@ -5,6 +5,7 @@ import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
+import { Helmet } from 'react-helmet-async';
 
 // import { tryParse } from 'firebase-tools/lib/utils';
 
@@ -176,6 +177,14 @@ const Invite = () => {
   );
  
  return (
+  <>
+  <Helmet>
+    <title>{eventname ? `언제볼까? - ${eventname} ` : '언제볼까?'}</title>
+    <meta
+      name="description"
+      content="언제볼까?와 함께 약속방을 링크 공유로 초대하세요. 공유만 하면 끝, 간편한 친구 초대!"
+    />
+  </Helmet>
   <div className="flex justify-center items-center h-[80rem] bg-[var(--gray-50,#FBFBFB)] flex-col">
     <div className={`
       ${typographyVariants({ variant: 'h1-sb' })} 
@@ -321,6 +330,7 @@ const Invite = () => {
       </p>
     )}
   </div>
+  </>
  );
 };
 

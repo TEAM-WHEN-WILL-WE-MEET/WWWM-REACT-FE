@@ -11,7 +11,7 @@ import { typographyVariants } from '../styles/typography.ts';
 import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
-
+import { Helmet } from 'react-helmet-async';
 // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
 const BASE_URL = process.env.NODE_ENV === "production" 
     ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
@@ -740,7 +740,16 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
 };
 
 
+
   return (
+    <>
+    <Helmet>
+      <title>{eventName ? `언제볼까? - ${eventName} ` : '언제볼까?'}</title>
+      <meta
+        name="description"
+        content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요"
+      />
+    </Helmet>
     <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
       <div className={`flex ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}>
         <img 
@@ -894,6 +903,7 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
         /> 
       </div>
     </div>
+    </>
   );
 };
   
