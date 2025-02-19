@@ -8,6 +8,7 @@ import { Button } from './Button.tsx';
 import { motion } from "framer-motion";
 import { Helmet } from 'react-helmet-async';
 
+
 //빠른 약속 시간 체크할 때, 언제 볼까?
 const Section1 = ({navigate }) => (
     <section className={`

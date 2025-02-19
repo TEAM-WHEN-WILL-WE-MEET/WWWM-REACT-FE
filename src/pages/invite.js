@@ -7,6 +7,7 @@ import { cn } from '../utils/cn';
 import { Button } from '../components/Button.tsx';
 import { Helmet } from 'react-helmet-async';
 
+
 // import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {

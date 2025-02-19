@@ -313,6 +313,7 @@ const truncateName = (name) => {
      navigate(`/getAppointment?appointmentId=${appointmentId}`);
     };
 
+    
     return (
       <>
         <Helmet>
