@@ -6,7 +6,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { colorVariants, colors } from '../styles/color.ts';
 import { Button } from './Button.tsx';
 import { motion } from "framer-motion";
-import { Helmet } from 'react-helmet-async';
 
 
 //빠른 약속 시간 체크할 때, 언제 볼까?
@@ -554,13 +553,6 @@ const LandingPage = () => {
       }, []);
     return (
     <div className=" overflow-x-hidden  mx-0 !bg-[var(--white)]">
-            <Helmet>
-               <title>{'언제볼까?'}</title>
-                <meta
-                  name="description"
-                  content="언제볼까? 약속 잡기 힘든 시람들이 만든, 더 많은 만남을 위한 서비스! "
-                />
-            </Helmet>
                 <Section1 navigate={navigate}/>
                 <Section2 />
                 <Section3 />

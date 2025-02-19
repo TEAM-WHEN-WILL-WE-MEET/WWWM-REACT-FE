@@ -90,7 +90,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
       setEndHour24(nextH);
       const hh = String(nextH).padStart(2, '0');
       setEndTime(`${hh}:00`);
-      //console.log("endtimeL ",endTime);
+      console.log("endtimeL ",endTime);
     }
   };
 
