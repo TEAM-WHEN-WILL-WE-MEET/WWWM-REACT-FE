@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /mypage/
+Disallow: /account-management/
+
+Sitemap: https://when-will-we-meet.site/sitemap.xml
