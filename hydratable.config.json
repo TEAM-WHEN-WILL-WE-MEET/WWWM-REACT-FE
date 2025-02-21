@@ -1,5 +1,5 @@
 {
-  "crawlingUrls": ["/", "/MonthView", "/individualCalendar","/invite", "/eventCalendar"],
+  "crawlingUrls": ["/", "/MonthView", "/individualCalendar", "/eventCalendar"],
   "delay": 1500,
   "pageCount": 1,
   "retryCount": 1

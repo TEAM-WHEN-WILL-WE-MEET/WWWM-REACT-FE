@@ -16,10 +16,6 @@
         "destination": "/MonthView/index.html"
       },
       {
-        "source": "/invite",
-        "destination": "/invite/index.html"
-      },
-      {
         "source": "/individualCalendar",
         "destination": "/individualCalendar/index.html"
       },
