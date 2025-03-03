@@ -287,6 +287,9 @@ const Section3 = () => {
   }
 //팀 소개
 
+
+
+
 const Section4 = () => {
     const positions = [
         { x: 40, y: -48, name: "민상연", role: "Developer", profileURL: "@judemin", flag: "dev" },
