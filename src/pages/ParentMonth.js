@@ -10,7 +10,6 @@ const ParentMonth = () => {
   const BASE_URL = process.env.NODE_ENV === "production" 
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
-
   // 정상작동 console.log("BASE_URL: ", BASE_URL);
 
   const [jsonData, setJsonData] = useState(null);
