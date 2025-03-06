@@ -292,11 +292,11 @@ const Section3 = () => {
 
 const Section4 = () => {
     const positions = [
-        { x: 40, y: -48, name: "민상연", role: "Developer", profileURL: "@judemin", flag: "dev" },
-        { x: 130, y: 50, name: "강찬욱", role: "Developer", profileURL: "@chanwookK", flag: "dev" },
+        { x: 40, y: -48, name: "민상연", role: "Team Lead", profileURL: "@judemin", flag: "dev" },
+        { x: 130, y: 50, name: "강찬욱", role: "BE Developer", profileURL: "@chanwookK", flag: "dev" },
         { x: 65, y: 135, name: "장연우", role: "Designer", profileURL: "@", flag: "design" },
         { x: -70, y: 90, name: "이시은", role: "Designer", profileURL: "@", flag: "design" },
-        { x: -75, y: 10, name: "이현주", role: "Developer", profileURL: "@hyun1211", flag: "dev" },
+        { x: -75, y: 10, name: "이현주", role: "FE Developer", profileURL: "@hyun1211", flag: "dev" },
       ];
     // 중심점 계산 (원의 중심을 (0,0)으로 가정)
     const centerX = 40;
@@ -507,16 +507,14 @@ const Section4 = () => {
 //연락처 탭
 const Footer = () => (
     <footer className={`
-      h-[9rem] bg-[#171717] place-items-center
-      grid grid-cols-3 grid-rows-2 gap-4 w-full p-4
-       text-center text-[#BDBDBD] text-center
+      h-[9rem] bg-[#171717] place-items-left
+      grid grid-cols-1 grid-rows-3 gap-2 w-full p-4
+       text-left text-[#BDBDBD] text-left
       font-pretendard font-medium text-[1.4rem] leading-[1.6em]
     `}>
-      <div className="">연락처정보</div>
-      <div className="">연락처정보</div>
-      <div className="">연락처정보</div>
-      <div className="">연락처정보</div>
-      <div className="">연락처정보</div>
+      <div>대표자: 민상연</div>
+      <div>대표 메일: whenwillwemeet.dev@gmail.com</div>
+      <div> © 2025 언제볼까. All rights reserved.</div>
     </footer>
   );
 
