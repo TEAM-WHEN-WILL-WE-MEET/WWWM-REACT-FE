@@ -8,7 +8,7 @@
   <loc>https://when-will-we-meet.site/</loc>
   <lastmod>2025-02-19T06:23:39+00:00</lastmod>
   <changefreq>weekly</changefreq>
-  <priority>0.8</priority>
+  <priority>1</priority>
 </url>
 <url>
   <loc>https://when-will-we-meet.site/MonthView</loc>
@@ -32,7 +32,7 @@
   <loc>https://when-will-we-meet.site/eventCalendar</loc>
   <lastmod>2025-02-19T06:23:39+00:00</lastmod>
   <changefreq>weekly</changefreq>
-  <priority>1.0</priority>
+  <priority>0.8</priority>
 </url>
 <url>
   <loc>https://when-will-we-meet.site/individualCalendar</loc>
