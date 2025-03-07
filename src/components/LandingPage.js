@@ -10,72 +10,76 @@ import { Helmet } from 'react-helmet-async';
 
 //빠른 약속 시간 체크할 때, 언제 볼까?
 const Section1 = ({navigate }) => (
-    <section className={`
+    <section
+    className={`
       flex flex-col p-4
       h-[69.5rem]
       bg-gradient-to-b from-[#CCE3FF] via-35% via-[#FFFFFF] to-[#FFFFFF]
     `}
-      aria-label="빠른 약속 시간 체크할 때, 언제 볼까?"
-    >
-      <div className={`  
-        ${colorVariants({ color: 'gray-900' })}    
+    aria-label="빠른 약속 시간 체크할 때, 언제 볼까?"
+  >
+    <div
+      className={`
+        ${colorVariants({ color: 'gray-900' })}
         px-[0.8rem]
-        flex
-        flex-col
+        flex flex-col
         bg-transparent
         justify-center items-center
         gap-9
         pt-[5em]
-        text-[3rem] text-[#020202] tracking-[-0.03em] leading-[4rem] text-center     
-      `}>
-        <motion.div 
-          initial={{ opacity: 0, scale: 0 }}
-          whileInView={{
-            opacity: 1, scale: 1,
-            transition:{
-              duration: 1.6,
-              ease: [0.000, 1.180, 0.000, 0.960],
-            }
-          }}
-        >
+        text-[3rem] text-[#020202] tracking-[-0.03em] leading-[4rem] text-center
+      `}
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{
+          opacity: 1, scale: 1,
+          transition:{
+            duration: 1.6,
+            ease: [0.000, 1.180, 0.000, 0.960],
+          }
+        }}
+      >
+        <figure>
           <img 
             className="text-[1.4rem] w-[4rem] h-[4rem]" 
             src="/wwmtLogo.svg" 
             alt="언제볼까? 서비스 로고"
           />
-        </motion.div>
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-            transition: { delay: 0.5, duration: 1.2, ease: [0.25, 1, 0.5, 1], },
-          }}         
-        >
-          <div className="flex flex-col font-pretendard">
-            <div className={`!font-semibold`}>빠른 약속 시간 체크할 때,</div>
-            <div className={`!font-bold`}>언제 볼까?</div>
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-            transition: { delay: 0.8, duration: 1.2, ease: [0.25, 1, 0.5, 1],},
-          }}          
-        >
-          <Button 
-            label='새 약속 만들기'
-            size={'participate'} 
-            onClick={() => navigate('/MonthView')}                          
-            additionalClass={`hover:opacity-80 text-[1.6rem] w-[14.2rem] h-[4.8rem]`}
-            aria-role="button"
-            aria-label="새 약속 만들기 버튼"
-          />
-        </motion.div>
-      </div>
-    </section>
+        </figure>
+      </motion.div>
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{
+          opacity: 1,
+          y: 0,
+          transition: { delay: 0.5, duration: 1.2, ease: [0.25, 1, 0.5, 1] },
+        }}
+      >
+        <header className="flex flex-col font-pretendard">
+          <h2 className="!font-semibold">빠른 약속 시간 체크할 때,</h2>
+          <h2 className="!font-bold">언제 볼까?</h2>
+        </header>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{
+          opacity: 1,
+          y: 0,
+          transition: { delay: 0.8, duration: 1.2, ease: [0.25, 1, 0.5, 1] },
+        }}
+      >
+        <Button 
+          label="새 약속 만들기"
+          size="participate" 
+          onClick={() => navigate('/MonthView')}
+          additionalClass="hover:opacity-80 text-[1.6rem] w-[14.2rem] h-[4.8rem]"
+          aria-role="button"
+          aria-label="새 약속 만들기 버튼"
+        />
+      </motion.div>
+    </div>
+  </section>
   );
 
 
@@ -100,7 +104,8 @@ const Section2 = () => {
     ];
   
     return (
-      <section className={`
+      <section
+      className={`
         flex flex-col space-y-4 p-4
         h-[69.5rem]
         gap-4
@@ -109,79 +114,85 @@ const Section2 = () => {
         py-14
         rounded-[2rem]
       `}
-        aria-label="지금까지모임 날짜 잡느라고생 많으셨죠?
-          카톡방에서언제 괜찮아요?무한 반복
-          단체 채팅방에캘린더 스크린샷올리기 지겨우신 분?
-          투표 만들고,결과 정리하느라시간 낭비하셨나요?"
+      aria-label="지금까지 모임 날짜 잡느라 고생 많으셨죠? 카톡방에서 언제 괜찮아요? 무한 반복, 단체 채팅방에 캘린더 스크린샷 올리기 지겨우신 분? 투표 만들고, 결과 정리하느라 시간 낭비하셨나요?"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1] },
+        }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1],},
-          }}          
-        >         
-          <div className={`  
-            ${colorVariants({ color: 'white' })}    
+        <header
+          className={`
+            ${colorVariants({ color: 'white' })}
             px-[0.8rem]
             bg-transparent
-            font-pretendard font-bold text-[3rem] text-white tracking-[-0.02em] leading-[1.4em]        
-          `}>
-            <div className={` whitespace-nowrap `}>지금까지</div>
-            <div className={` whitespace-nowrap `}>모임 날짜 잡느라</div>
-            <div className={` whitespace-nowrap `}>고생 많으셨죠?</div>
-          </div>
-        </motion.div>  
-        <div className="flex gap-4 flex-col justify-center items-center">
-          {cards.map((card, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-                transition: { 
-                  delay: 0.14 * index,  
-                  duration: 1.5, 
-                  ease: [0.25, 1, 0.5, 1],
-                },
-              }}          
-            >                   
-              <Section2Card key={index} {...card} />
-            </motion.div>
-          ))}
-        </div>
-      </section>
+            font-pretendard font-bold text-[3rem] text-white tracking-[-0.02em] leading-[1.4em]
+          `}
+        >
+          <h2>
+            <span className="whitespace-nowrap">지금까지</span>
+            <br />
+            <span className="whitespace-nowrap">모임 날짜 잡느라</span>
+            <br />
+            <span className="whitespace-nowrap">고생 많으셨죠?</span>
+          </h2>
+        </header>
+      </motion.div>
+      <div className="flex gap-4 flex-col justify-center items-center">
+        {cards.map((card, index) => (
+          <motion.article
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              transition: {
+                delay: 0.14 * index, // 각 카드마다 0.14초씩 딜레이 증가
+                duration: 1.5,
+                ease: [0.25, 1, 0.5, 1],
+              },
+            }}
+          >
+            <Section2Card {...card} />
+          </motion.article>
+        ))}
+      </div>
+    </section>
     );
   };
   
   const Section2Card = ({ icon, textParts, highlightIndex }) => (
-    <div className="
-      w-[32.3rem]
-      h-[13.8rem]
-      rounded-[1.5rem]
-      justify-between
-      bg-gradient-to-b from-[#FFFFFF] via-[#FFFFFF]/100 to-[#CCE3FF]
-      rounded-lg p-4 flex items-center space-x-4 pl-[3.6rem] pr-[1em] 
-      font-pretendard font-semibold text-[1.8rem] text-black tracking-[0em] leading-[2.8rem]">
+      <article className="
+        w-[32.3rem]
+        h-[13.8rem]
+        rounded-[1.5rem]
+        justify-between
+        bg-gradient-to-b from-[#FFFFFF] via-[#FFFFFF]/100 to-[#CCE3FF]
+        rounded-lg p-4 flex items-center space-x-4 pl-[3.6rem] pr-[1em] 
+        font-pretendard font-semibold text-[1.8rem] text-black tracking-[0em] leading-[2.8rem]
+      ">
       <div className="text-[3.6rem]">{icon}</div>
       <div className="text-gray-800">
-        <div className=" whitespace-nowrap  text-gray-800 flex flex-col">
-          <div>
+        <div className="whitespace-nowrap text-gray-800 flex flex-col">
+          <p>
             <span>{textParts[0]}</span>
             <span className={highlightIndex === 1 ? "text-[#A32EB2]" : ""}>
               {textParts[1]}
             </span>
-          </div>
+          </p>
           {textParts.length > 2 && (
-            <div>
-              <span className={highlightIndex === 2 ? "text-[#A32EB2]" : ""}>{textParts[2]}</span>
-            </div>
+            <p>
+              <span className={highlightIndex === 2 ? "text-[#A32EB2]" : ""}>
+                {textParts[2]}
+              </span>
+            </p>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
   
 
@@ -211,35 +222,35 @@ const Section3 = () => {
     ];
   
     return (
-      <section className={`
-        flex flex-col 
-        h-auto
-        gap-8
-        bg-[#FAFAFA]
-        py-14
-      `}
-        aria-label="언제볼까?에서 이렇게 해결해드립니다!
-         원클릭 약속방 생성, 링크 공유로 초대하기, 실시간 겹치는 시간 체크, 안전하게 약속 잡고 자동 삭제"      
+      <section
+        className={`
+          flex flex-col 
+          h-auto
+          gap-8
+          bg-[#FAFAFA]
+          py-14
+        `}
+        aria-label="언제볼까?에서 이렇게 해결해드립니다! 원클릭 약속방 생성, 링크 공유로 초대하기, 실시간 겹치는 시간 체크, 안전하게 약속 잡고 자동 삭제"      
       >
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{
             opacity: 1,
             y: 0,
-            transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1],},
+            transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1] },
           }}          
         >  
-          <div className={`
+          <header className={`
             px-[0.8rem]
             font-pretendard font-bold text-[3rem] tracking-[-0.03em] 
             text-[#002A4F] leading-[1.4em] text-left
           `}>
-            <div>언제볼까?에서</div>
-            <div>이렇게 해결해드립니다!</div>
-          </div>
+            <h2>언제볼까?에서</h2>
+            <h2>이렇게 해결해드립니다!</h2>
+          </header>
         </motion.div>
         {cards.map((card, index) => (
-          <motion.div
+          <motion.article
             key={index}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{
@@ -253,37 +264,45 @@ const Section3 = () => {
             }}
           >
             <Section3Card {...card} />
-          </motion.div>
+          </motion.article>
         ))}
       </section>
     );
+    
   };
   
   const Section3Card = ({ title, description, imgURL }) => {
-    return(
-      <div className="
-        min-w-[24.4rem]
-        min-h-[60rem]
-        justify-between gap-8
-        py-4 flex flex-col items-center leading-[1.4em]
-        font-pretendard font-semibold"
+    return (
+      <article
+        className="
+          min-w-[24.4rem]
+          min-h-[60rem]
+          justify-between gap-8
+          py-4 flex flex-col items-center leading-[1.4em]
+          font-pretendard font-semibold
+        "
       >
-        <div className="flex flex-col gap-3 items-center justify-center">
-          <div className={`text-[#002A4F] text-[2.4rem] !font-bold tracking-[-0.04em]`}>{title}</div>
+        <header className="flex flex-col gap-3 items-center justify-center">
+          <h2 className="text-[#002A4F] text-[2.4rem] !font-bold tracking-[-0.04em]">
+            {title}
+          </h2>
           <div className="flex flex-col items-center justify-center">
-            <div className="text-[#2B85D9] text-[1.5rem] tracking-[-0.03em]">
+            <p className="text-[#2B85D9] text-[1.5rem] tracking-[-0.03em]">
               {description[0]}
-            </div>
+            </p>
             {description[1] && (
-              <div className="text-[#2B85D9] text-[1.5rem] tracking-[-0.03em]">
+              <p className="text-[#2B85D9] text-[1.5rem] tracking-[-0.03em]">
                 {description[1]}
-              </div>
-            )}  
+              </p>
+            )}
           </div>
-        </div>
-        <img src={imgURL} className="ml-0" alt="언제볼까? 서비스 화면" />
-      </div>
+        </header>
+        <figure>
+          <img src={imgURL} className="ml-0" alt="언제볼까? 서비스 화면" />
+        </figure>
+      </article>
     );
+    
   }
 //팀 소개
 
@@ -324,27 +343,25 @@ const Section4 = () => {
       };
     };
   
-    return(
-      <section className="
-        flex flex-col justify-center py-10
-        bg-[#0087FC] min-h-[65.7rem] h-auto rounded-[2rem]
-      "
+    return (
+      <section
+        className="
+          flex flex-col justify-center py-10
+          bg-[#0087FC] min-h-[65.7rem] h-auto rounded-[2rem]
+        "
         aria-label="언제볼까? 팀 소개"
       >
-        
-        <div className="
-          px-[0.8rem] h-auto flex flex-col bg-transparent gap-24 text-left
-        ">
+        <div className="px-[0.8rem] h-auto flex flex-col bg-transparent gap-24 text-left">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{
               opacity: 1,
               y: 0,
-              transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1], },
-            }}          
-          >  
-            <div className="justify-start items-start !px-[2rem] flex flex-col gap-6 font-pretendard text-white tracking-[-0.03em] leading-[1.4em]">
-              <div className="font-bold text-[3rem]">팀 소개</div>
+              transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1] },
+            }}
+          >
+            <header className="justify-start items-start !px-[2rem] flex flex-col gap-6 font-pretendard text-white tracking-[-0.03em] leading-[1.4em]">
+              <h2 className="font-bold text-[3rem]">팀 소개</h2>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{
@@ -358,19 +375,25 @@ const Section4 = () => {
                 }}
               >
                 <div className="!font-semibold text-[1.6rem] tracking-[-0.04em] leading-[1.6em]">
-                  <div className=" whitespace-nowrap ">저희는 이런 문제들 속에 있는 대학생입니다.</div>
-                  <div className=" whitespace-nowrap ">회의, 팀플, 동아리 활동... 매번 약속 잡기가 힘들었죠.</div>
-                  <div className=" whitespace-nowrap ">그 경험을 바탕으로 '언제볼까?'가 탄생하게 되었습니다.</div>
+                  <p className="whitespace-nowrap">
+                    저희는 이런 문제들 속에 있는 대학생입니다.
+                  </p>
+                  <p className="whitespace-nowrap">
+                    회의, 팀플, 동아리 활동... 매번 약속 잡기가 힘들었죠.
+                  </p>
+                  <p className="whitespace-nowrap">
+                    그 경험을 바탕으로 '언제볼까?'가 탄생하게 되었습니다.
+                  </p>
                 </div>
               </motion.div>
-            </div>
+            </header>
           </motion.div>
-          <div className="relative flex items-center justify-center">
-            <div className="w-60 h-60 bg-[#299BFF] rounded-full">
+          <figure className="relative flex items-center justify-center">
+            <ul className="w-60 h-60 bg-[#299BFF] rounded-full list-none">
               {positions.map((item, index) => {
                 const targetPosition = calculateMovement(item.x, item.y, index);
-                return(
-                  <motion.div
+                return (
+                  <motion.li
                     key={index}
                     initial={{ x: item.x, y: item.y, opacity: 1 }}
                     whileInView={{ 
@@ -383,17 +406,17 @@ const Section4 = () => {
                     }}
                     className="absolute"
                   >
-                    <div className="">
-                      <Section4Card {...item} />
-                    </div>
-                  </motion.div>
+                    <Section4Card {...item} />
+                  </motion.li>
                 );
               })}
-            </div>
-          </div>
+            </ul>
+          </figure>
         </div>
       </section>
     );
+    
+    
   };
 
   const Section4Card = ({ name, role, profileURL, flag }) => {
@@ -402,38 +425,39 @@ const Section4 = () => {
       flag === "dev"
         ? `https://github.com/${userId}` // GitHub
         : `https://www.instagram.com/${userId}`; // 디자인 포트폴리오 사이트?
-    return (
-      <div
-        className={`
-          !w-[10rem] !h-[3.6rem] bg-white text-center
-          flex items-center rounded-[1.8rem]
-          hover:bg-[#094A82]
-          !hover:text-[#FFFFFF] !hover:text-[white]
-          transition-colors duration-300 ease-in-out
-        `}
-      >
-        <div className={`
-          absolute mt-[-4.5em] ml-[1em]
-          font-pretendard font-medium text-[1.2rem] tracking-[-0.04em] leading-[1.2em] text-left           
-          ${flag === "dev" ? "text-[#C4FFF1]" : "text-[#F4CCFF]"} 
-        `}
-        >
-          {role}
-        </div>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-[12rem] 
-            font-pretendard font-semibold text-[1.4rem] text-[#0D5A9E] 
-             tracking-[-0.04em] leading-[1.2em]  text-center
-            hover:text-[white]
-            "
-        >
-          {name}
-        </a>
-      </div>
-    );
+        return (
+          <article
+            className={`
+              !w-[10rem] !h-[3.6rem] bg-white text-center
+              flex items-center rounded-[1.8rem]
+              hover:bg-[#094A82]
+              !hover:text-[#FFFFFF] !hover:text-[white]
+              transition-colors duration-300 ease-in-out
+            `}
+          >
+            <header
+              className={`
+                absolute mt-[-4.5em] ml-[1em]
+                font-pretendard font-medium text-[1.2rem] tracking-[-0.04em] leading-[1.2em] text-left           
+                ${flag === "dev" ? "text-[#C4FFF1]" : "text-[#F4CCFF]"}
+              `}
+            >
+              {role}
+            </header>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-[12rem] 
+                font-pretendard font-semibold text-[1.4rem] text-[#0D5A9E] 
+                 tracking-[-0.04em] leading-[1.2em]  text-center
+                hover:text-[white]"
+            >
+              {name}
+            </a>
+          </article>
+        );
+        
   };
     
   const Section5 = ({handleScrollToTop, animationData}) => {
@@ -443,14 +467,12 @@ const Section4 = () => {
       "더 많은 만남과 추억을 만들 수 있도록 돕는 것!"
     ];
     
-    return(
-      <section className="flex flex-col py-10
-        bg-[#FFFFF] min-h-[40rem] font-pretendard pt-[19em] pb-[1em] gap-20"
+    return (
+      <section
+        className="flex flex-col py-10 bg-[#FFFFF] min-h-[40rem] font-pretendard pt-[19em] pb-[1em] gap-20"
         aria-label="함께해요! 그래서 우리, 언제 볼까요?"
       >
-        <div className="font-semibold text-[2rem] 
-          text-[#007BE3] tracking-[-0.02em] leading-[1.8em] text-center"
-        >
+        <header className="font-semibold text-[2rem] text-[#007BE3] tracking-[-0.02em] leading-[1.8em] text-center">
           {messages.map((message, index) => (
             <motion.div
               key={index}
@@ -458,51 +480,49 @@ const Section4 = () => {
               whileInView={{
                 opacity: 1,
                 y: 0,
-                transition: { 
+                transition: {
                   delay: 0.2 * index,
                   duration: 0.8,
                   ease: [0.25, 1, 0.5, 1],
                 },
               }}
             >
-              {message}
+              <p>{message}</p>
             </motion.div>
           ))}
-        </div>
+        </header>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{
             opacity: 1,
             y: 0,
-            transition: { 
+            transition: {
               delay: 0.75,
               duration: 0.8,
               ease: [0.25, 1, 0.5, 1],
             },
           }}
-        >        
-          <div className="
-            flex flex-col items-center justify-center
-            font-bold text-[#003273] text-[2.8rem] leading-[1.6em] text-center"
-          >
-            <div className="">함께해요!</div>
-            <div className="">그래서 우리, 언제 볼까요?</div>
-            <div 
-              aria-role="button"
-              aria-label="페이지 맨 위로 이동" 
-              onClick={(e) => handleScrollToTop(e)} 
-              className={`w-[10.6rem] h-[10.6rem] hover:cursor-pointer`}
+        >
+          <div className="flex flex-col items-center justify-center font-bold text-[#003273] text-[2.8rem] leading-[1.6em] text-center">
+            <h2>함께해요!</h2>
+            <h2>그래서 우리, 언제 볼까요?</h2>
+            <button
+              type="button"
+              aria-label="페이지 맨 위로 이동"
+              onClick={(e) => handleScrollToTop(e)}
+              className="w-[10.6rem] h-[10.6rem] hover:cursor-pointer"
             >
               {animationData ? (
                 <Lottie animationData={animationData} loop={true} />
               ) : (
                 <p>Loadding...</p>
               )}
-            </div>
+            </button>
           </div>
         </motion.div>
       </section>
     );
+    
   };
 //연락처 탭
 const Footer = () => (
@@ -512,9 +532,9 @@ const Footer = () => (
        text-left text-[#BDBDBD] text-left
       font-pretendard font-medium text-[1.4rem] leading-[1.6em]
     `}>
-      <div>대표자: 민상연</div>
-      <div>대표 메일: whenwillwemeet.dev@gmail.com</div>
-      <div> © 2025 언제볼까. All rights reserved.</div>
+      <h2>대표자: 민상연</h2>
+      <h2>대표 메일: whenwillwemeet.dev@gmail.com</h2>
+      <h2> © 2025 언제볼까. All rights reserved.</h2>
     </footer>
   );
 
