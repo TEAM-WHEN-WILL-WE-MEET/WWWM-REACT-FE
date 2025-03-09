@@ -55,7 +55,8 @@ const IndividualCalendar = () => {
   const navigate = useNavigate(); 
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
-
+  const minuteSlot=[10,20,30,40,50];
+  
   //서버에 보낼 times 배열 (화면 UI에 display할 selected와는 별개)
   const [bulkTimesArray, setBulkTimesArray] = useState([]);
 
@@ -741,7 +742,8 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
 
 
 
-  return (
+
+    return (
     <>
     <Helmet>
       <title>{eventName ? `언제볼까? - ${eventName} ` : '언제볼까?'}</title>
@@ -825,28 +827,30 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
           </div>
         ))}
       </div>
-      <div className={`flex pt-[2.8rem] mb-[3.6rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
-        <div className="flex items-center gap-2">
-          <input 
-            type="checkbox" 
-            id="all-time" 
-            className="screen-reader" 
-            checked={isVisuallyChecked || isChecked}
-            onChange={(e) => {
-              setIsChecked(e.target.checked);
-              setIsVisuallyChecked(e.target.checked); 
-              handleAllTimeChange(e);
-            }}
-          />
-          <div className="label-box">
-            <label 
-              htmlFor="all-time" 
-              className={`${typographyVariants({ variant: 'b2-md' })} 
-              ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' }) : colorVariants({ color: 'gray-600' })}`}
-            >  
-              <span className="check-icon" aria-hidden="true"></span>
-              모든 시간 가능
-            </label>
+      <div className={`flex pt-[2rem] mb-[3.6rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+        <div className=
+        {`
+          w-[27rem] ml-[4rem] 
+          flex items-center justify-end
+        `}>
+          <div className=
+          {`
+          ${typographyVariants({ variant: 'd3-rg' })} 
+          ${colorVariants({ color: 'gray-700' })}
+            flex items-center 
+            !text-[1.2rem]
+            gap-[1.8rem]
+            pb-[0.4rem]
+            w-[23.7rem]
+          `}>
+              {minuteSlot.map((num,index) =>(
+                <div key={index} className=" flex !w-[2.8rem] p-auto !justify-center !items-center ">
+                  {num}
+                </div>
+              ))}
+              <div className="ml-[0.2rem] w-[1.1rem]">
+                분
+              </div>
           </div>
         </div> 
         {times.map((time, timeIndex) => (
@@ -893,6 +897,30 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
             </div>
           </div>
         ))}
+      </div>
+      <div className="flex items-center justify-center mb-[1.4rem] ">
+          <input 
+            type="checkbox" 
+            id="all-time" 
+            className="screen-reader" 
+            checked={isVisuallyChecked || isChecked}
+            onChange={(e) => {
+              setIsChecked(e.target.checked);
+              setIsVisuallyChecked(e.target.checked); 
+              handleAllTimeChange(e);
+            }}
+          />
+          <div className="label-box">
+            <label 
+              htmlFor="all-time" 
+              className={`${typographyVariants({ variant: 'b2-md' })} 
+              !text-[1.4rem]
+              ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' }) : colorVariants({ color: 'gray-600' })}`}
+            >  
+              <span className="check-icon" aria-hidden="true"></span>
+              모든 시간 가능
+            </label>
+          </div>
       </div>
       <div className="flex !justify-center">
         <Button 

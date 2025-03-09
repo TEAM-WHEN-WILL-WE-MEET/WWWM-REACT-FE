@@ -52,6 +52,7 @@ const EventCalendar = () => {
   const [showToast, setShowToast] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+  const minuteSlot=[10,20,30,40,50];
 
 
 
@@ -403,6 +404,31 @@ const truncateName = (name) => {
           ))}
         </div>
         <div className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+           <div className=
+                  {`
+                    w-[27rem] ml-[4rem] 
+                    flex items-center justify-end
+                  `}>
+                    <div className=
+                    {`
+                    ${typographyVariants({ variant: 'd3-rg' })} 
+                    ${colorVariants({ color: 'gray-700' })}
+                      flex items-center 
+                      !text-[1.2rem]
+                      gap-[1.8rem]
+                      pb-[0.4rem]
+                      w-[23.7rem]
+                    `}>
+                        {minuteSlot.map((num,index) =>(
+                          <div key={index} className=" flex !w-[2.8rem] p-auto !justify-center !items-center ">
+                            {num}
+                          </div>
+                        ))}
+                        <div className="ml-[0.2rem] w-[1.1rem]">
+                          분
+                        </div>
+                    </div>
+                  </div> 
           {times.map((time, timeIndex) => (
             <div key={timeIndex} className="flex items-center">
               <div

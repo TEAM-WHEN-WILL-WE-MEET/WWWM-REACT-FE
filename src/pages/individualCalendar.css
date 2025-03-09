@@ -1,5 +1,6 @@
 [type="checkbox"] {
   appearance: none; /* 기본(네이티브) 모양을 제거 */
+  
 
 }
 .screen-reader { /* 스크린 리더를 고려해서 체크박스를 화면에서 숨김 */
@@ -14,11 +15,12 @@
 }
 .label-box {
   position: relative;
-  margin-bottom:8px;
+ 
+ 
 }
 .check-icon {
-  width: 1.4em;
-  height: 1.4em;
+  width: 1.2em;
+  height: 1.2em;
   border-radius: 50%;
   border: 1px solid var(--gray-500);
   border-radius: 2px;
@@ -45,7 +47,7 @@
 
 }
 label {
-  padding-left: 2.2em;
+  padding-left: 1.7em;
   position: relative;
   cursor: pointer;
   z-index:0;
