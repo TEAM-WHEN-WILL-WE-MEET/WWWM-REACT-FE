@@ -39,12 +39,13 @@ const EventCalendar = () => {
    const navigate = useNavigate(); 
    const location = useLocation();
    const[TotalUsers, setTotalUsers] = useState("");
-
+   
    const state = location.state || {};
    const appointmentId = state.id;
     const userName= state.userName;
     // console.log("userName:: ",userName);
   const[userList, setUserList]=useState("");
+  const [hoverUserList, setHoverUserList] = useState([]);
 
   const [result, setResult] = useState('');
 
@@ -52,6 +53,7 @@ const EventCalendar = () => {
   const [showToast, setShowToast] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+  const minuteSlot=[10,20,30,40,50];
 
 
 
@@ -289,6 +291,29 @@ const KakaoShare = async() => {
     fetchData();
 }, [appointmentId]);
 
+ // 해당 timeslot hover 시 nowUserList(참여자 목록) 생성
+ const handleTimeslotHover = (timeIndex) => {
+  const slotData = selectedTimes[selectedDate] && selectedTimes[selectedDate][timeIndex];
+  let nowUserList = [];
+  if (slotData) {
+    Object.values(slotData).forEach((item) => {
+      if (Array.isArray(item.userList)) {
+        nowUserList = nowUserList.concat(item.userList);
+      }
+    });
+  }
+    // 올바른 user 객체(즉, user && user.name가 존재하는 객체)만 필터링
+    nowUserList = nowUserList.filter(user => user && user.name);  
+    setHoverUserList(nowUserList);
+    console.log("timeIndex: ", timeIndex);
+    console.log("nowUserList: ",nowUserList);
+};
+
+// hover 벗어날 때 nowUserList 초기화
+const handleTimeslotLeave = () => {
+  setHoverUserList([]);
+};
+
 // useEffect(() => {
 //     if (selectedTimes) {
 //         console.log("selectedTimes가 업데이트됨:", selectedTimes);
@@ -403,8 +428,36 @@ const truncateName = (name) => {
           ))}
         </div>
         <div className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+           <div className=
+                  {`
+                    w-[27rem] ml-[4rem] 
+                    flex items-center justify-end
+                  `}>
+                    <div className=
+                    {`
+                    ${typographyVariants({ variant: 'd3-rg' })} 
+                    ${colorVariants({ color: 'gray-700' })}
+                      flex items-center 
+                      !text-[1.2rem]
+                      gap-[1.8rem]
+                      pb-[0.4rem]
+                      w-[23.7rem]
+                    `}>
+                        {minuteSlot.map((num,index) =>(
+                          <div key={index} className=" flex !w-[2.8rem] p-auto !justify-center !items-center ">
+                            {num}
+                          </div>
+                        ))}
+                        <div className="ml-[0.2rem] w-[1.1rem]">
+                          분
+                        </div>
+                    </div>
+                  </div> 
           {times.map((time, timeIndex) => (
-            <div key={timeIndex} className="flex items-center">
+            <div key={timeIndex} 
+                 className="flex items-center" 
+                 onMouseEnter={() => handleTimeslotHover(timeIndex)}
+                 onMouseLeave={handleTimeslotLeave}>
               <div
                 className={`
                   ${typographyVariants({ variant: 'd3-rg' })}
@@ -481,25 +534,41 @@ const truncateName = (name) => {
               `}>{TotalUsers}명</div>
             </div>
             <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
-              {Object.values(userList).map((user) => {
-                return (
-                  <div
-                    key={user.name} 
-                    className={`
-                      ${typographyVariants({ variant: 'b2-md' })}
-                      flex min-w-[6rem] h-[2.4rem] justyfiy-center items-center text-[var(--gray-700)] justify-center text-center
-                      ${user.name === userName.toString() 
-                        ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                        : ''}
-                        max-w-[6rem]
-                        whitespace-nowrap 
-                        
-                    `}
-                  >
-                    {truncateName(user.name)}                  
-                  </div>
-                );
-              })}
+              {/* 만약 slotSelectdFlag가 false면 아래 기존에 있던 userList 보여주고, True면  nowUserList 보여주기*/}
+              {hoverUserList.length > 0
+          ? hoverUserList.map((user, index) => (
+              <div
+                key={user?.name || index}
+                className={`
+                  ${typographyVariants({ variant: 'b2-md' })}
+                  flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
+                  ${user?.name === userName.toString()
+                    ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                    : ''}
+                  max-w-[6rem]
+                  whitespace-nowrap
+                `}
+              >
+                {truncateName(user?.name || '')}
+              </div>
+            ))
+          : Object.values(userList).map((user, index) => (
+              <div
+                key={user?.name || index}
+                className={`
+                  ${typographyVariants({ variant: 'b2-md' })}
+                  flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
+                  ${user?.name === userName.toString()
+                    ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                    : ''}
+                  max-w-[6rem]
+                  whitespace-nowrap
+                `}
+              >
+                {truncateName(user?.name || '')}
+              </div>
+            ))}
+      
             </div>
           </div>
           <AnimatePresence>
