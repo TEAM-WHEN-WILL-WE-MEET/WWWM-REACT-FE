@@ -308,7 +308,11 @@ const KakaoShare = async() => {
     console.log("timeIndex: ", timeIndex);
     console.log("nowUserList: ",nowUserList);
 };
-
+// 참여자 목록을 저장하는 함수
+const handleMouseEnter = (userList) => {
+  setHoverUserList(userList);
+  console.log("userList ft 314 line", userList);
+};
 // hover 벗어날 때 nowUserList 초기화
 const handleTimeslotLeave = () => {
   setHoverUserList([]);
@@ -474,9 +478,12 @@ const truncateName = (name) => {
               >                 
                 {moment(time, 'HH:mm').format('HH시')}
               </div>
+              {/* timeslot */}
               <div className="grid grid-cols-6 gap-0 !h-[2.8rem]">  
                 {[...Array(6)].map((_, buttonIndex) => {
-                  const userCount = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex]?.userCount || 0;
+                      const slot = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
+                      const userCount = slot?.userCount || 0;
+                      
       
                   // 색상 클래스 결정
                   let colorClass = '';
@@ -496,9 +503,20 @@ const truncateName = (name) => {
                       size={"XXS"}
                       additionalClass={`
                         ${colorClass}
-                        pointer-events-none
+                       
                         items-center !transform-none
                       `}
+                      handleMouseEnter={() => {
+                        console.log("스슬롯: ", slot);
+                        if (slot) {
+                          setHoverUserList(slot?.userList || []); // slot이 없거나 userList가 undefined이면 빈 배열
+                          console.log("slot.userList: ", slot.userList);
+                          console.log("slot: ", slot);
+                        } 
+                      }}
+                      onMouseLeave={() => {
+                        setHoverUserList([]);
+                      }}
                     />
                   );
                 })}
@@ -536,38 +554,41 @@ const truncateName = (name) => {
             <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
               {/* 만약 slotSelectdFlag가 false면 아래 기존에 있던 userList 보여주고, True면  nowUserList 보여주기*/}
               {hoverUserList.length > 0
-          ? hoverUserList.map((user, index) => (
-              <div
-                key={user?.name || index}
-                className={`
-                  ${typographyVariants({ variant: 'b2-md' })}
-                  flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
-                  ${user?.name === userName.toString()
-                    ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                    : ''}
-                  max-w-[6rem]
-                  whitespace-nowrap
-                `}
-              >
-                {truncateName(user?.name || '')}
-              </div>
-            ))
-          : Object.values(userList).map((user, index) => (
-              <div
-                key={user?.name || index}
-                className={`
-                  ${typographyVariants({ variant: 'b2-md' })}
-                  flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
-                  ${user?.name === userName.toString()
-                    ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                    : ''}
-                  max-w-[6rem]
-                  whitespace-nowrap
-                `}
-              >
-                {truncateName(user?.name || '')}
-              </div>
-            ))}
+                  ? hoverUserList.map((user, index) => (
+                    
+                      <div
+                        key={user?.name || index}
+                        className={`
+                          ${typographyVariants({ variant: 'b2-md' })}
+                          flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
+                          ${user?.name === userName.toString()
+                            ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                            : ''}
+                          max-w-[6rem]
+                          whitespace-nowrap
+                        `}
+                      >
+                          {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
+                         {typeof user === 'string' ? user : (user?.name || '')}
+                        {console.log("hoverUserList: ",hoverUserList)}
+                      </div>
+                    ))
+                  : Object.values(userList).map((user, index) => (
+                      <div
+                        key={user?.name || index}
+                        className={`
+                          ${typographyVariants({ variant: 'b2-md' })}
+                          flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
+                          ${user?.name === userName.toString()
+                            ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                            : ''}
+                          max-w-[6rem]
+                          whitespace-nowrap
+                        `}
+                      >
+                        {truncateName(user?.name || '')}
+                      </div>
+                ))}
       
             </div>
           </div>

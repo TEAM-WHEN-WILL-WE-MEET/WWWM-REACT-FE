@@ -220,12 +220,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>,
  * @additionalClass 추가할 클래스 속성을 넣어준다
  * @props 추가할 버튼 속성을 넣어준다
  */
-export const Button: FC<ButtonProps> = ({ variant, size, children, label, additionalClass, ...props }) => {
+export const Button: FC<ButtonProps> = ({ variant, size, children, label, additionalClass, handleMouseEnter, onMouseLeave, ...props }) => {
   
   // console.log('Button props:', { variant, size, disabled: props.disabled });
   // console.log('Applied classes:', ButtonVariants({ variant, size }));
   return (
-    <button className={cn(ButtonVariants({ variant, size }), additionalClass)} {...props}>
+    <button className={cn(ButtonVariants({ variant, size }), additionalClass)}
+    onMouseEnter={handleMouseEnter} 
+    onMouseLeave={onMouseLeave}  
+    {...props}>
       {children && children}
       {label && label}
     </button>
