@@ -305,8 +305,8 @@ const KakaoShare = async() => {
     // 올바른 user 객체(즉, user && user.name가 존재하는 객체)만 필터링
     nowUserList = nowUserList.filter(user => user && user.name);  
     setHoverUserList(nowUserList);
-    console.log("timeIndex: ", timeIndex);
-    console.log("nowUserList: ",nowUserList);
+    // console.log("timeIndex: ", timeIndex);
+    // console.log("nowUserList: ",nowUserList);
 };
 // 참여자 목록을 저장하는 함수
 const handleMouseEnter = (userList) => {
@@ -507,11 +507,11 @@ const truncateName = (name) => {
                         items-center !transform-none
                       `}
                       handleMouseEnter={() => {
-                        console.log("스슬롯: ", slot);
+                        // console.log("스슬롯: ", slot);
                         if (slot) {
                           setHoverUserList(slot?.userList || []); // slot이 없거나 userList가 undefined이면 빈 배열
-                          console.log("slot.userList: ", slot.userList);
-                          console.log("slot: ", slot);
+                          // console.log("slot.userList: ", slot.userList);
+                          // console.log("slot: ", slot);
                         } 
                       }}
                       onMouseLeave={() => {
@@ -570,7 +570,7 @@ const truncateName = (name) => {
                       >
                           {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
                          {typeof user === 'string' ? user : (user?.name || '')}
-                        {console.log("hoverUserList: ",hoverUserList)}
+                        {/* {console.log("hoverUserList: ",hoverUserList)} */}
                       </div>
                     ))
                   : Object.values(userList).map((user, index) => (
