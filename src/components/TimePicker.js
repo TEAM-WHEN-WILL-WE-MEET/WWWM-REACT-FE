@@ -5,7 +5,7 @@ import { Button } from './Button.tsx';
 import { cn } from '../utils/cn'; 
 
 
-const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCalendar,isFormReady, setIsFormReady  }) => {
+const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCalendar,isFormReady, setIsFormReady, eventName  }) => {
 
   // console.log('[TimePicker] isFormReady:', isFormReady);
 
@@ -27,7 +27,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
   const [isEndOpen, setIsEndOpen] = useState(false);
   const [endClicked, setEndClicked] = useState(false);
 
-
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const startDialRef = useRef(null);
   const endDialRef = useRef(null);
   useEffect(() => {
@@ -61,6 +61,25 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
     };
   }, [isStartOpen, isEndOpen]);
 
+   // "캘린더 만들기" 버튼을 눌렀을 때 동작
+   const handleCreateButtonClick = () => {
+    // 기존에는 바로 onCreateCalendar()를 호출했지만
+    // 먼저 모달을 띄워 사용자에게 확인을 받도록 함
+    setShowConfirmModal(true);
+  };
+
+  // 모달에서 "만들기" 버튼을 눌렀을 때
+  const handleConfirmCreate = () => {
+    // 모달 닫기
+    setShowConfirmModal(false);
+    // 실제로 부모에서 넘겨받은 onCreateCalendar 콜백 실행
+    onCreateCalendar();
+  };
+
+  // 모달에서 "취소" 버튼을 눌렀을 때
+  const handleCancel = () => {
+    setShowConfirmModal(false);
+  };
   const handleStartClick = () => {
     //다이얼 열림/닫힘 토글
     setIsStartOpen((prev) => !prev);
@@ -540,11 +559,58 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
         <Button label='캘린더 만들기'
                 disabled={!isFormReady} 
                 size={'XL'} 
-                onClick={onCreateCalendar} 
+                // onClick={onCreateCalendar} 
+                onClick={handleCreateButtonClick} 
                 additionalClass='!mt-[44px]'
 
                 />
+        {showConfirmModal && (
+                <div className="modal-backdrop fixed !m-0 inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
+                <div className="modal flex flex-col gap-[2rem]  p-[2.4rem] bg-white text-center w-[28rem] h-[16rem] rounded-[1.2rem] shadow-md">
+                 <div className="flex flex-col gap-[1.2rem]">
+                    <p className={`
+                      ${typographyVariants({ variant: 'h1-sb' })}
+                      !text-[[var(--font-size-20)]]
+                      !text-[2rem]
 
+                      w-auto
+                      `}>
+                        '{eventName}'
+                    </p>
+                    <p className={`
+                        ${typographyVariants({ variant: 'b2-md' })}
+                        !text-[1.4rem]]
+                        w-auto
+                       
+                      `}>
+                      캘린더를 만드시겠습니까?
+                    </p>
+                  </div>
+                  <div className="button-group flex justify-center gap-[1.2rem]">
+                    <button
+                      onClick={handleCancel}
+                      className={`
+                          ${typographyVariants({ variant: 'h3-md' })}
+                         flex !w-[11rem] h-[4rem] py-3 justify-center items-center rounded-[0.6rem] ${ colorVariants({ bg: 'gray-100'}) }
+                        `}
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={handleConfirmCreate}
+                      className={`
+                         !${ colorVariants({ color: 'blue-400'}) }
+                        ${typographyVariants({ variant: 'h3-md' })}
+                        flex !w-[11rem] h-[4rem] px-3 py-3 justify-center items-center rounded-[0.6rem] border border-[var(--blue-400)] bg-white
+                        `} 
+                    >
+                      만들기
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+          )}
       </div>
     </div>
 );

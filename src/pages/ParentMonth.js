@@ -16,7 +16,7 @@ const ParentMonth = () => {
   const [startTime, setStartTime] = useState('09:00'); 
   const [endTime, setEndTime] = useState('20:00');
   const [isFormReady, setIsFormReady] = useState(false);
-
+  const [eventName, setEventName] = useState("이름 없는 캘린더");
   const navigate = useNavigate();
 
    // handleCreateCalendar 함수가 필요한 곳에서 호출될 수 있도록 콜백 설정
@@ -42,7 +42,7 @@ const ParentMonth = () => {
       }
 
       const calendarData = await calendarResponse.json();
-      console.log("나는 캘린더data: ",calendarData);
+      // console.log("나는 캘린더data: ",calendarData);
       const appointmentId = calendarData.object.id;
       // console.log("왜안되는걸까?",appointmentId); //정상작동
       
@@ -78,7 +78,8 @@ const ParentMonth = () => {
       endTime={endTime}
       isFormReady={isFormReady}
       setIsFormReady={setIsFormReady}
-
+      eventName={eventName}
+      setEventName={setEventName}
        />
       <TimePicker
        jsonData={jsonData}
@@ -91,7 +92,7 @@ const ParentMonth = () => {
       onCreateCalendar={() => handleCalendarCreation(jsonData)}
       isFormReady={isFormReady}
       setIsFormReady={setIsFormReady}
-
+      eventName={eventName}
         />
     </>
   );
