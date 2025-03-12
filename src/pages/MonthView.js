@@ -10,9 +10,8 @@ import { twMerge } from 'tailwind-merge';
 import { colors, colorVariants } from '../styles/color.ts';
 import { typographyVariants } from '../styles/typography.ts';
 
-  const MonthView = ({ setJsonData, startTime, endTime, isFormReady, setIsFormReady }) => {
+  const MonthView = ({ setJsonData, startTime, endTime, isFormReady, setIsFormReady, eventName, setEventName }) => {
 
-  const [eventName, setEventName] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [selectedDates, setSelectedDates] = useState([]); 
@@ -25,7 +24,6 @@ import { typographyVariants } from '../styles/typography.ts';
   const [viewMode, setViewMode] = useState('month'); // 월/주 선택 'month' 또는 'week'
   const navigate = useNavigate();
 
-//Utility-First CSS (ft. TailwindCSS) Codes . . .
 
 // input field 
 const inputClasses = twMerge(
