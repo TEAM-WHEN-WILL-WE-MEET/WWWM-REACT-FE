@@ -1,0 +1,67 @@
+[type="checkbox"] {
+    appearance: none; /* 기본(네이티브) 모양을 제거 */
+    font-family: '';
+  
+  }
+  .invite-screen-reader { /* 스크린 리더를 고려해서 체크박스를 화면에서 숨김 */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    margin: -1px;
+    clip-path: inset(50%);
+  }
+  .invite-label-box {
+    position: relative;
+   
+   
+  }
+  .invite-check-icon {
+    width: 1.2em;
+    height: 1.2em;
+    border-radius: 50%;
+    border: 1px solid var(--gray-900);
+    border-radius: 2px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index:1;
+  }
+  /* check 되지않았을때의 체크 표시 */
+  .invite-check-icon::before {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    width: 37%;
+    height: 65%;
+    left: 50%;
+    top: 53%;
+    transform: translateX(-50%) translateY(-70%) rotateZ(50deg);
+    border-right: 1.8px solid var(--white);
+    border-radius:1.5px;
+    border-bottom: 2px solid var(--white);
+    
+    /* display:none; */
+  
+  }
+  label {
+    padding-left: 1.7em;
+    position: relative;
+    cursor: pointer;
+    z-index:0;
+  
+  }
+  /* 체크됐을때의 CSS */
+  [type="checkbox"]:checked + .invite-label-box .invite-check-icon {
+    border-color:  var(-);
+    background-color: var(--gray-900);
+    border-radius: 2px;
+  }
+  /* 체크 표시 */
+  [type="checkbox"]:checked + .invite-label-box .invite-check-icon::before {
+    border-color: var(--white);
+  }
+  

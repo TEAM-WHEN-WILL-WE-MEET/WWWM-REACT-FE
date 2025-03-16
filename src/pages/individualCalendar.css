@@ -35,16 +35,16 @@
   content: "";
   position: absolute;
   box-sizing: border-box;
-  width: 30%;
-  height: 55%;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-70%) rotateZ(40deg);
-  border-right: 1px solid var(--white);
-  border-radius: 2px;
-  border-bottom: 1.7px solid var(--white);
   /* display:none; */
 
+  width: 37%;
+  height: 65%;
+  left: 50%;
+  top: 53%;
+  transform: translateX(-50%) translateY(-70%) rotateZ(50deg);
+  border-right: 1.8px solid var(--white);
+  border-radius:1.5px;
+  border-bottom: 2px solid var(--white);
 }
 label {
   padding-left: 1.7em;
