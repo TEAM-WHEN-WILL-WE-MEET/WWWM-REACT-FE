@@ -47,16 +47,6 @@ const Invite = () => {
     }
 }, [appointmentId]);
 
-  const handleSetName = async() => {
-    const appointmentResponse = await fetch(
-      `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
-    ); 
-    const data = await appointmentResponse.json(); 
-  const eventName = data?.object?.name;
-    setEventname(eventName);
-  };
-
-
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -380,6 +370,7 @@ const Invite = () => {
           label={buttonText}
           size={'XL'} 
           disabled={!isFormValid}  // 폼이 유효하지 않으면 버튼 비활성화
+          onClick={handleSubmit}
           additionalClass={` 
             ${colorVariants({ bg: 'blue-400' })} !text-[var(--white)] !mb-[4rem]  items-center !transform-none`}  
           aria-label="새로 참여하기 버튼"      
