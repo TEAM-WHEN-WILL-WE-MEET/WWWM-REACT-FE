@@ -7,6 +7,7 @@ import { cn } from '../utils/cn';
 import { Button } from '../components/Button.tsx';
 import { Helmet } from 'react-helmet-async';
 import './invite.css';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // import { tryParse } from 'firebase-tools/lib/utils';
 
@@ -25,8 +26,8 @@ const Invite = () => {
   const [password, setPassword] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState(false);
-  const [eventname, setEventname]= useState('언제볼까?');
   const [touched, setTouched] = useState(false); 
+  const [showToast, setShowToast]=useState(false);
   const [buttonText, setButtonText] = useState('회원가입');
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
@@ -73,6 +74,7 @@ const Invite = () => {
         if (response.ok) {
           const responseData = await response.json(); 
           setResponseMessage('로그인(or 회원가입) 성공!');
+          setShowToast(true);
             // console.log("response: ", responseData);
             const appointmentResponse = await fetch(
               `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
@@ -173,7 +175,7 @@ const Invite = () => {
  return (
   <>
   <Helmet>
-    <title>{eventname ? `언제볼까? - ${eventname} ` : '언제볼까?'}</title>
+    <title>언제볼까?</title>
     <meta
       name="description"
       content="언제볼까?와 함께 약속방을 링크 공유로 초대하세요. 공유만 하면 끝, 간편한 친구 초대!"
@@ -362,10 +364,49 @@ const Invite = () => {
           </label>
         </div>
       </div>
-      {/* 체크,박스 ㄱㄱ */}
 
     </div>
     </div>
+    <div className="">
+    <AnimatePresence>
+            {showToast && (
+              <motion.div 
+                className="  mb-[1.6rem] left-0 right-0 flex justify-center "
+                initial={{ y: '800%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '400%' }}
+                transition={{ duration: 0.01, ease: 'easeOut' }}
+              >
+                <Button 
+                  label="로그인 성공!" 
+                  size={'toast'}
+                  // onClick={handleSaveClick} 
+                  additionalClass={`
+                    z-50 pointer-events-none 
+                    py-[0.8rem]
+                    px-[1.2rem]
+                    rounded-[0.8rem] border !bg-white,
+                    !text-[var(--blue-400)]
+                    border-[var(--blue-300)]
+                    shadow-[0px_0px_8px_0px_var(--blue-100)]
+                    ${typographyVariants({ variant: "d1-sb" })}, 
+                    text-center tracking-[-0.3px]
+                    !text-[1.2rem]
+                    gap-[0.4rem]
+                     !justify-end
+                     !items-center
+                    w-[10.1rem]
+                    h-[3.2rem]
+                    whitespace-nowrap
+                    `
+                  }
+                >
+                  <img src="check_blue.svg" alt="체크모양 아이콘" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
     <Button 
           label={buttonText}
           size={'XL'} 
@@ -373,8 +414,11 @@ const Invite = () => {
           onClick={handleSubmit}
           additionalClass={` 
             ${colorVariants({ bg: 'blue-400' })} !text-[var(--white)] !mb-[4rem]  items-center !transform-none`}  
-          aria-label="새로 참여하기 버튼"      
+          a
+          ria-label="새로 참여하기 버튼"      
     />  
+    </div>
+    
   </div>
   </>
  );
