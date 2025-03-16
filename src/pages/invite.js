@@ -6,6 +6,7 @@ import { colorVariants, colors } from '../styles/color.ts';
 import { cn } from '../utils/cn'; 
 import { Button } from '../components/Button.tsx';
 import { Helmet } from 'react-helmet-async';
+import './invite.css';
 
 // import { tryParse } from 'firebase-tools/lib/utils';
 
@@ -25,8 +26,13 @@ const Invite = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState(false);
   const [eventname, setEventname]= useState('언제볼까?');
-
+  const [touched, setTouched] = useState(false); 
   const [buttonText, setButtonText] = useState('회원가입');
+  const [isChecked, setIsChecked] = useState(false);
+  const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
+
+  //form 유효한지 검사
+  const isFormValid = name.trim().length > 0 && password.trim().length > 0 && !responseMessage;
 
   useEffect(() => {
     // localStorage에서 로그인 여부 확인
@@ -50,9 +56,7 @@ const Invite = () => {
     setEventname(eventName);
   };
 
-  useEffect(()=> {
-    handleSetName();
-  }, []);
+
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -153,7 +157,7 @@ const Invite = () => {
               setResponseMessage('사용자 스케줄을 가져오는데 실패했습니다.');
             }
           } else {
-            setResponseMessage( '이름이나 패스워드를 확인하세요.');
+            setResponseMessage( '위 이름으로 설정했던 비밀번호를 입력해주세요.');
           }
       } catch(error) {
         console.error('Error:', error);
@@ -185,37 +189,47 @@ const Invite = () => {
       content="언제볼까?와 함께 약속방을 링크 공유로 초대하세요. 공유만 하면 끝, 간편한 친구 초대!"
     />
   </Helmet>
-  <div className="flex justify-center items-center h-[80rem] bg-[var(--gray-50,#FBFBFB)] flex-col">
-    <div className={`
-      ${typographyVariants({ variant: 'h1-sb' })} 
-      ${colorVariants({ color: 'gray-800' })} 
-      flex 
-      bg-transparent
-      !mb-[1.6rem]
-    `}>
-      {eventname}
+  <div className="flex px-[2rem] justify-between  items- h-[80rem] bg-[var(--white)] flex-col ">
+    <div className='flex flex-col justify-center '>
+    <img 
+        src="/home_noPadding.svg" 
+        className="hover:cursor-pointer items-start mt-[1.6rem] w-[2.4rem] h-[2.4rem]"
+        alt="홈으로 돌아가기"
+        onClick={() => navigate('/MonthView')} 
+     />
+    <div className={
+      cn(typographyVariants({ variant: 'h1-sb' }), colorVariants({ color: 'gray-900' }),
+      `!text-[2rem] !items-start !w-full mt-[2.3rem] `  )}>
+      <div className={`
+      !text-left
+      !self-start
+      `}>
+        이 캘린더에 참여하려면
+      </div>
+      <div className={`
+      !text-left
+      !self-start
+      `}>
+        아래 정보를 입력해주세요.
+      </div>
     </div>
+   
     <div className={`
       ${colorVariants({ bg: 'white' })} 
       ${colorVariants({ color: 'gray-800' })} 
-      w-[31.2rem] 
-      h-[25.8rem] 
-      flex-shrink-0 
-      rounded-[1.2rem] 
-      border-[0.1rem] 
-      border-[var(--gray-800,#444)] 
-      shadow-[0.1rem_0.1rem_0px_0px_var(--gray-800,#444)]
-      pt-[2.8rem] 
-      px-[3.2rem]
+      w-[32rem] 
+      mt-[3.2rem]
       items-center
-      justify-between
+      
       flex
+      flex-col
+      !gap-y-[2rem]
     `}>
       <form 
         onSubmit={handleSubmit}   
-        className="flex flex-col items-center justify-center w-full !h-auto"
+        className="flex flex-col items-center justify-center w-full !h-auto flex gap-y-[2rem]"
       >
-        <div className="mb-[1.8rem]">
+        <div className=" flex flex-col ">
           <label 
             htmlFor="name"
             className={`
@@ -226,40 +240,53 @@ const Invite = () => {
               !text-[var(--font-size-12)]
             `}
           >
-            참여자 이름
           </label>
           <input
             type="text"
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => setTouched(true)} // input을 떠날 때 touched 활성화
+            onFocus={() => setTouched(true)} // input을 클릭했을 때 touched 활성화
             className={`
-                  border
-                  border-[var(--gray-300,#E0E0E0)] 
-                  ${!name
-                  ? `
-                    placeholder-[var(--gray-500,#E0E0E0)] 
-                    bg-[var(--gray-50)] 
-                    `
-                  : ` 
-                    placeholder-[var(--gray-300,#E0E0E0)] 
-                    bg-[var(--white)] 
-                    `
-                }
-              flex 
-              w-[24.8rem] 
-              h-[4rem] 
-              px-[1.2rem] 
-              py-[1.1rem] 
-              items-center 
-              flex-shrink-0 
-              rounded-[0.6rem] 
-              border-[0.1rem] 
-              ${typographyVariants({ variant: 'b2-md' })} 
+              border
+              border-[var(--gray-300,#E0E0E0)] 
+              ${!name
+              ? `
+                placeholder-[var(--gray-700,#E0E0E0)] 
+                `
+              : ` 
+                placeholder-[var(--gray-900,#E0E0E0)] 
+                `
+            }
+          ${typographyVariants({ variant: 'b2-md' })} 
+          flex 
+          w-[32rem] 
+          px-[0.4rem] 
+          py-[1.2rem] 
+          items-center 
+          gap-[1rem] 
+          flex-shrink-0
+          border-[var(--white)] 
+          border-b-[var(--gray-300,#E0E0E0)] 
+            ${touched && (!name || name.trim().length === 0) ? '!border-b-[var(--red-300)]' : ''}
             `}
-            placeholder="이름을 입력해주세요"
+            placeholder="참여자 이름"
             aria-label="참여자 이름 작성란"
           />
+          {touched &&(!name || name.trim().length === 0) && (
+            <p className={`
+              ${colorVariants({ color: 'red-300' })} 
+              ${typographyVariants({ variant: 'b2-md' })} 
+              bg-transparent
+              pt-[0.8rem]
+              pl-[0.4rem]
+            `}
+              aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
+            >
+             이름을 1자 이상 입력해주세요.
+            </p>
+          )}
         </div>
         <div className="">
           <label 
@@ -271,64 +298,92 @@ const Invite = () => {
               p-0
             `}
           >
-            패스워드
           </label>
+  
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="패스워드를 입력해주세요"
+            placeholder="내 비밀번호 설정"
             className={`
                   border
                   border-[var(--gray-300,#E0E0E0)] 
                   ${!password
                   ? `
-                    placeholder-[var(--gray-500,#E0E0E0)] 
-                    bg-[var(--gray-50)] 
+                    placeholder-[var(--gray-700,#E0E0E0)] 
                     `
                   : ` 
-                    placeholder-[var(--gray-300,#E0E0E0)] 
-                    bg-[var(--white)] 
+                    placeholder-[var(--gray-900,#E0E0E0)] 
                     `
                 }
               ${typographyVariants({ variant: 'b2-md' })} 
               flex 
-              w-[24.8rem] 
+              w-[32rem] 
               h-[4rem] 
-              px-[1.2rem] 
-              py-[1.1rem] 
+              px-[0.4rem] 
+              py-[1.2rem] 
               items-center 
               gap-[1rem] 
-              flex-shrink-0 
-              rounded-[0.6rem] 
-              border-[0.1rem] 
-              border-[var(--gray-300,#E0E0E0)] 
-              ${error ? '!outline-[0.1rem] !outline-[#ff0000] !outline-none' : ''}
+              flex-shrink-0
+              border-[var(--white)] 
+              border-b-[var(--gray-300,#E0E0E0)] 
+              ${responseMessage ? '!  !border-b-[var(--red-300)] ' : ''}
             `}              
             aria-label="참여자 비밀번호 작성란"
           />
+          {responseMessage && (
+            <p className={`
+              ${colorVariants({ color: 'red-300' })} 
+              ${typographyVariants({ variant: 'b2-md' })} 
+              bg-transparent
+              pt-[0.8rem]
+              pl-[0.4rem]
+            `}
+              aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
+            >
+              {responseMessage}
+            </p>
+          )}
         </div>
-        <Button 
-          label={buttonText}
-          size={'participate'} 
-          additionalClass='!mt-[2.8rem] items-center !transform-none'  
-          aria-label="새로 참여하기 버튼"      
-        />  
+        
+        
       </form>
+      <div className="w-full flex flex-col !items-end !justify-end  ">
+        <input 
+          type="checkbox" 
+          id="Keep-logged-in" 
+          className="invite-screen-reader" 
+          checked={isVisuallyChecked || isChecked}
+          onChange={(e) => {
+            setIsChecked(e.target.checked);
+            setIsVisuallyChecked(e.target.checked); 
+          }}   
+        />
+        <div className="invite-label-box">
+          <label 
+            htmlFor="Keep-logged-in" 
+            className={`${typographyVariants({ variant: 'b2-md' })} 
+            !text-[1.4rem]
+            ${(isVisuallyChecked || isChecked) ? colorVariants({ color: 'gray-900' }) : colorVariants({ color: 'gray-700' })}`}
+          >  
+            <span className="invite-check-icon" aria-hidden="true"></span>
+            로그인 유지하기
+          </label>
+        </div>
+      </div>
+      {/* 체크,박스 ㄱㄱ */}
+
     </div>
-    {responseMessage && (
-      <p className={`
-        ${colorVariants({ color: 'red-300' })} 
-        ${typographyVariants({ variant: 'b2-md' })} 
-        bg-transparent
-        p-2
-      `}
-        aria-live="assertive" //에러 메시지가 발생하자마자 스크린 리더가 바로 내용을 읽음
-      >
-        {responseMessage}
-      </p>
-    )}
+    </div>
+    <Button 
+          label={buttonText}
+          size={'XL'} 
+          disabled={!isFormValid}  // 폼이 유효하지 않으면 버튼 비활성화
+          additionalClass={` 
+            ${colorVariants({ bg: 'blue-400' })} !text-[var(--white)] !mb-[4rem]  items-center !transform-none`}  
+          aria-label="새로 참여하기 버튼"      
+    />  
   </div>
   </>
  );
