@@ -679,7 +679,7 @@ const handleAllTimeChange = async (e) => {
   }
 
   // console.log("모든 시간 가능 체크 후 bulkTimesArray:", bulkTimesArray);
-  // 여기서 bulkTimesArray를 이용해 추후 handleSaveClick 등에서 서버에 일괄 업데이트 요청을 보내도록 처리하면 됩니다.
+  // 여기서 bulkTimesArray를 이용해 추후 handleSaveClick 등에서 서버에 일괄 업데이트 요청을 보내도록 처리리
 };
 
   const handleTimeClick = async (timeIndex, buttonIndex) => {

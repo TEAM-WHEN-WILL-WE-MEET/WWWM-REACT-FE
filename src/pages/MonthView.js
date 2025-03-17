@@ -290,7 +290,7 @@ const inputClasses = twMerge(
 
   return (
     <div className="flex flex-col w-auto h-auto !px-[0.8rem]">
-      <div className="flex-row justify-start">
+      <div className="flex  justify-between">
         <img 
           alt="언제볼까? 서비스 로고"
           src="/wwmtLogo.svg" 
@@ -298,12 +298,12 @@ const inputClasses = twMerge(
           // onClick={() => navigate('/mypage')} 
           onClick={() => navigate('/')}  
         />
-        {/* <img 
+        <img 
           alt=""
           src="/hambugerMenu.svg" 
-          className="   cursor-pointer "
-          onClick={() => navigate('/mypage')} 
-        /> */}
+          className="cursor-pointer p-[1.2rem] "
+          onClick={() => navigate('/menu')} 
+        />
       </div>
       <div className="relative px-4">
         <input
