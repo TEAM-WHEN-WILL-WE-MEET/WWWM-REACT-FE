@@ -9,7 +9,7 @@ import IndividualCalendar from './pages/individualCalendar';
 import MyPage from './pages/MyPage';
 import AccountManagement from './pages/AccountManagement';
 import LandingPage from "./components/LandingPage";
-
+import Menu from './pages/menu';
 
 function App() {
   return (
@@ -20,6 +20,7 @@ function App() {
           <Route path="/MonthView" element={<ParentMonth />} />
           <Route path="/getAppointment" element={<GetAppointmentRedirect />} />   
           <Route path="/invite"   element={<> <Invite /> </>} />
+          <Route path="/menu"   element={<> <Menu /> </>} />
           <Route path="/eventCalendar" element={<> <EventCalendar /> </>} />
           <Route path="/individualCalendar" element={<><IndividualCalendar /></>}/>  
           <Route path="/mypage" element={<MyPage />} />

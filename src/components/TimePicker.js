@@ -563,7 +563,7 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
                 onClick={handleCreateButtonClick} 
                 additionalClass='!mt-[44px]'
 
-                />
+        />
         {showConfirmModal && (
                 <div className="modal-backdrop fixed !m-0 inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
                 <div className="modal flex flex-col gap-[2rem]  p-[2.4rem] bg-white text-center w-[28rem] h-[16rem] rounded-[1.2rem] shadow-md">
