@@ -80,7 +80,7 @@ const handleShare = () => {
     setIsOpen(false);
   };
   // Share 공유 ( 클립보드 복사)
-const shareString = `https://when-will-we-meet.site/invite?appointmentId=${appointmentId}`;
+const shareString = `https://when-will-we-meet.com/invite?appointmentId=${appointmentId}`;
 const clipboardShare = async() =>{
   try{
     await navigator.clipboard.writeText(shareString);

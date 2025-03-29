@@ -299,12 +299,12 @@ const inputClasses = twMerge(
           // onClick={() => navigate('/mypage')} 
           onClick={() => navigate('/')}  
         />
-        <img 
+        {/* <img 
           alt=""
           src="/hambugerMenu.svg" 
           className="cursor-pointer p-[1.2rem] "
           onClick={() => navigate('/menu')} 
-        />
+        /> */}
       </div>
       <div className="relative px-4">
         <input
