@@ -8,6 +8,7 @@ import { Button } from '../components/Button.tsx';
 import { Helmet } from 'react-helmet-async';
 import './invite.css';
 import { AnimatePresence, motion } from 'framer-motion';
+import Loading from "../components/Loading";
 
 // import { tryParse } from 'firebase-tools/lib/utils';
 
@@ -24,6 +25,8 @@ const Invite = () => {
   
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [autoLogin, setAutoLogin] = useState(false);
+
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState(false);
   const [touched, setTouched] = useState(false); 
@@ -35,20 +38,28 @@ const Invite = () => {
   //form 유효한지 검사
   const isFormValid = name.trim().length > 0 && password.trim().length > 0 && !responseMessage;
 
-  useEffect(() => {
-    // localStorage에서 로그인 여부 확인
-    const isLoggedIn = localStorage.getItem(`loggedInFlag_${appointmentId}`);
-
-    if (isLoggedIn === 'true') {
-        setButtonText('로그인'); // 이전에 로그인한 사용자
-        // console.log(`Logged-in flag for appointmentId ${appointmentId}: true`);
-    } else {
-        setButtonText('새로 참여하기'); // 신규 사용자
-        // console.log(`Logged-in flag for appointmentId ${appointmentId}: false`);
-    }
-}, [appointmentId]);
-
   
+
+  // 재로그인: localStorage에서 name, password 불러와서 폼 채우기 & autoLogin 설정
+  useEffect(() => {
+    const storedName = localStorage.getItem(`name_${appointmentId}`);
+    const storedPW = localStorage.getItem(`password_${appointmentId}`);
+    if (storedName && storedPW) {
+      setName(storedName);
+      setPassword(storedPW);
+      setAutoLogin(true); // 자동 로그인을 위해 플래그 설정
+    }
+  }, [appointmentId]);
+
+    // 자동 로그인 실행: 폼 채워지면 handleSubmit 자동 호출
+  useEffect(() => {
+    if (autoLogin && name && password) {
+      // synthetic event: preventDefault 호출 가능한 객체 전달
+      handleSubmit({ preventDefault: () => {} });
+      setAutoLogin(false); // 한 번 실행 후 재실행 방지
+    }
+  }, [autoLogin, name, password]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password.trim() === '') {
@@ -79,12 +90,16 @@ const Invite = () => {
             const appointmentResponse = await fetch(
               `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
-
-            // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
-            //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
+            
+            //백엔드 ver2 붙이고  토큰 도입시 다시 아래 로직으로 롤백할 수 있으므로, 아직은은 남겨두겠음음
+              // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
+              //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
             if (responseData.object.name) {
               const key = `loggedInFlag_${appointmentId}`;
               localStorage.setItem(key, 'true'); // 로그인 플래그 설정
+              localStorage.setItem(`name_${appointmentId}`, data.name);
+              localStorage.setItem(`password_${appointmentId}`, data.password);
+              
               // console.log(`Login flag saved to localStorage for appointmentId ${appointmentId}: true`);
           }
               if (appointmentResponse.ok) {
@@ -144,7 +159,7 @@ const Invite = () => {
                 setResponseMessage('약속 정보를 가져오는데 실패했습니다.');
                 return;
               }
-              navigate('/individualCalendar', { state: { responseData, appointmentId, userName: name } });
+              navigate('/eventCalendar', { state: { responseData, appointmentId, userName: name } });
             } else {
               setResponseMessage('사용자 스케줄을 가져오는데 실패했습니다.');
             }

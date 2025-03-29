@@ -41,8 +41,9 @@ const EventCalendar = () => {
    const[TotalUsers, setTotalUsers] = useState("");
    
    const state = location.state || {};
-   const appointmentId = state.id;
+   const appointmentId = state.appointmentId;
     const userName= state.userName;
+    const responseData= state.responseData;
     // console.log("userName:: ",userName);
   const[userList, setUserList]=useState("");
   const [hoverUserList, setHoverUserList] = useState([]);
@@ -339,7 +340,9 @@ const truncateName = (name) => {
    // 수정 버튼 클릭 시 invite페이지로 이동
    const handleSaveClick = () => {
      // 필요한 로직 처리 후 페이지 이동
-     navigate(`/getAppointment?appointmentId=${appointmentId}`);
+    //  navigate(`/getAppointment?appointmentId=${appointmentId}`);
+     navigate('/individualCalendar', { state: { responseData, appointmentId, userName } });
+
     };
 
     

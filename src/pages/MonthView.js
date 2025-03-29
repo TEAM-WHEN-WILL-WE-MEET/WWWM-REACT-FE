@@ -9,6 +9,7 @@ import { twMerge } from 'tailwind-merge';
 
 import { colors, colorVariants } from '../styles/color.ts';
 import { typographyVariants } from '../styles/typography.ts';
+import Loading from "../components/Loading";
 
   const MonthView = ({ setJsonData, startTime, endTime, isFormReady, setIsFormReady, eventName, setEventName }) => {
 

@@ -603,15 +603,15 @@ const handleSaveClick = async () => {
 
     if (response.ok) {
       // console.log("스케줄 저장 성공");
-      navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
-      // console.log(response);
+      // navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
+      navigate(`/getAppointment?appointmentId=${appointmentId}`);      // console.log(response);
 
     } else { //times에 아무런 시간도 저장되지 않았을 때
-
+      navigate(`/getAppointment?appointmentId=${appointmentId}`);
       // console.log("스케줄 저장 실패");
       // console.log(response);
       // alert("스케줄 저장에 실패했습니다.");
-      navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
+      // navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
     }
   } catch (error) {
     console.error("저장 요청 중 오류:", error);
