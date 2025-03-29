@@ -3,6 +3,8 @@ import MonthView from './MonthView';
 import TimePicker from '../components/TimePicker';
 import { useNavigate } from 'react-router-dom'; 
 import { Helmet } from 'react-helmet-async';
+import Loading from "../components/Loading";
+
 const ParentMonth = () => {
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   // console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
@@ -18,6 +20,7 @@ const ParentMonth = () => {
   const [isFormReady, setIsFormReady] = useState(false);
   const [eventName, setEventName] = useState("이름 없는 캘린더");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
    // handleCreateCalendar 함수가 필요한 곳에서 호출될 수 있도록 콜백 설정
    const handleCalendarCreation = async (data) => {
@@ -25,7 +28,7 @@ const ParentMonth = () => {
       console.error('jsonData가 아직 준비되지 않았습니다.');
       return;
     }
-    
+    setLoading(true); 
     try {
       //createAppointment, 캘린더 생성 요청
       const calendarResponse = await fetch(`${BASE_URL}/appointment/createAppointment`, {
@@ -51,6 +54,8 @@ const ParentMonth = () => {
       
     } catch (error) {
       console.error('Error:', error);
+    }finally{
+      setLoading(false); 
     }
 
   };
@@ -68,6 +73,7 @@ const ParentMonth = () => {
             content="언제볼까? 서비스와 함께 원클릭 약속방 생성, 클릭 한 번으로 약속 잡기 시작! "
           />
       </Helmet>
+      {loading && <Loading />} 
       <MonthView 
         setJsonData={(data) => {
         setJsonData(data);

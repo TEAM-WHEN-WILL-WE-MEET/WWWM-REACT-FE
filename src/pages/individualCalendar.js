@@ -18,6 +18,7 @@ const BASE_URL = process.env.NODE_ENV === "production"
     : process.env.REACT_APP_WWWM_BE_DEV_EP;
 
 const IndividualCalendar = () => {
+  const [loading, setLoading] = useState(false);
 
   const dragStartRef = useRef(null); // 초기 마우스 좌표
   const isDraggingRef = useRef(false); // 드래그 여부 플래그

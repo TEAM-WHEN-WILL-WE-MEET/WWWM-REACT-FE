@@ -13,10 +13,12 @@ import CryptoJS from 'crypto-js';
 // import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {
+  
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   const BASE_URL = process.env.NODE_ENV === "production" 
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -79,7 +81,7 @@ const Invite = () => {
         password: password,
         appointmentId: appointmentId,
       };
- 
+      setLoading(true);
       try {
         const response = await fetch(`${BASE_URL}/user/login`, {
           method: 'POST',
@@ -180,6 +182,8 @@ const Invite = () => {
       } catch(error) {
         console.error('Error:', error);
         setResponseMessage('서버 오류가 발생했습니다.');
+      }finally{
+        setLoading(false);
       }
     }
  };   
@@ -207,6 +211,7 @@ const Invite = () => {
       content="언제볼까?와 함께 약속방을 링크 공유로 초대하세요. 공유만 하면 끝, 간편한 친구 초대!"
     />
   </Helmet>
+  {loading && <Loading />} 
   <div className="flex px-[2rem] justify-between  items- h-[80rem] bg-[var(--white)] flex-col ">
     <div className='flex flex-col justify-center '>
     <img 

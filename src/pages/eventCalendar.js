@@ -11,6 +11,7 @@ import { Button } from '../components/Button.tsx';
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import Loading from "../components/Loading";
 
 
 const EventCalendar = () => {
@@ -26,7 +27,8 @@ const EventCalendar = () => {
   const BASE_URL = process.env.NODE_ENV === "production" 
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
- 
+  const [loading, setLoading] = useState(false);
+
   //공유 key
   const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
   
@@ -134,6 +136,7 @@ const KakaoShare = async() => {
   
    useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // 요청 시작 전에 로딩 상태 true
         try {
             if (!appointmentId) {
                 console.error('appointmentId가 없습니다');
@@ -287,6 +290,8 @@ const KakaoShare = async() => {
             }
         } catch (error) {
             console.error(error);
+        }finally{
+          setLoading(false); // 요청 끝나면 로딩끄기
         }
     };
     fetchData();
@@ -355,7 +360,7 @@ const truncateName = (name) => {
             content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요. 최적의 시간을 척척 찾아드려요! "
           />
         </Helmet>
-
+        {loading && <Loading />} {/* 로딩 중일 때 Loading 컴포넌트 렌더링 */}
       <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
         <div className={`flex items-center flex-row justify-between ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}>
           {/* <h2>{eventName}</h2> */}
