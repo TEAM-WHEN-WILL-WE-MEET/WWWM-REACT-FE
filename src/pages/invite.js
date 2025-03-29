@@ -9,7 +9,7 @@ import { Helmet } from 'react-helmet-async';
 import './invite.css';
 import { AnimatePresence, motion } from 'framer-motion';
 import Loading from "../components/Loading";
-
+import CryptoJS from 'crypto-js';
 // import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {
@@ -39,17 +39,24 @@ const Invite = () => {
   const isFormValid = name.trim().length > 0 && password.trim().length > 0 && !responseMessage;
 
   
+  const secretKey = 'mySecretKey';
 
-  // 재로그인: localStorage에서 name, password 불러와서 폼 채우기 & autoLogin 설정
-  useEffect(() => {
-    const storedName = localStorage.getItem(`name_${appointmentId}`);
-    const storedPW = localStorage.getItem(`password_${appointmentId}`);
-    if (storedName && storedPW) {
-      setName(storedName);
-      setPassword(storedPW);
-      setAutoLogin(true); // 자동 로그인을 위해 플래그 설정
+ // 로컬 스토리지에서 암호화된 name과 password를 불러와 복호화 후 state에 할당 및 autoLogin 플래그 설정
+ useEffect(() => {
+  const storedNameCipher = localStorage.getItem(`name_${appointmentId}`);
+  const storedPWCipher = localStorage.getItem(`password_${appointmentId}`);
+  if (storedNameCipher && storedPWCipher) {
+    const bytesName = CryptoJS.AES.decrypt(storedNameCipher, secretKey);
+    const decryptedName = bytesName.toString(CryptoJS.enc.Utf8);
+    const bytesPW = CryptoJS.AES.decrypt(storedPWCipher, secretKey);
+    const decryptedPW = bytesPW.toString(CryptoJS.enc.Utf8);
+    if (decryptedName && decryptedPW) {
+      setName(decryptedName);
+      setPassword(decryptedPW);
+      setAutoLogin(true); // 암호화된 값이 있으면 자동 로그인 진행
     }
-  }, [appointmentId]);
+  }
+}, [appointmentId, secretKey]);
 
     // 자동 로그인 실행: 폼 채워지면 handleSubmit 자동 호출
   useEffect(() => {
@@ -95,11 +102,15 @@ const Invite = () => {
               // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
               //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
             if (responseData.object.name) {
-              const key = `loggedInFlag_${appointmentId}`;
-              localStorage.setItem(key, 'true'); // 로그인 플래그 설정
-              localStorage.setItem(`name_${appointmentId}`, data.name);
-              localStorage.setItem(`password_${appointmentId}`, data.password);
-              
+              localStorage.setItem(`loggedInFlag_${appointmentId}`, 'true');
+              localStorage.setItem(
+                `name_${appointmentId}`, 
+                CryptoJS.AES.encrypt(data.name, secretKey).toString()
+              );
+              localStorage.setItem(
+                `password_${appointmentId}`, 
+                CryptoJS.AES.encrypt(data.password, secretKey).toString()
+              );
               // console.log(`Login flag saved to localStorage for appointmentId ${appointmentId}: true`);
           }
               if (appointmentResponse.ok) {
