@@ -8,14 +8,17 @@ import { Button } from '../components/Button.tsx';
 import { Helmet } from 'react-helmet-async';
 import './invite.css';
 import { AnimatePresence, motion } from 'framer-motion';
-
+import Loading from "../components/Loading";
+import CryptoJS from 'crypto-js';
 // import { tryParse } from 'firebase-tools/lib/utils';
 
 const Invite = () => {
+  
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   const BASE_URL = process.env.NODE_ENV === "production" 
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -24,6 +27,8 @@ const Invite = () => {
   
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [autoLogin, setAutoLogin] = useState(false);
+
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState(false);
   const [touched, setTouched] = useState(false); 
@@ -35,20 +40,35 @@ const Invite = () => {
   //form 유효한지 검사
   const isFormValid = name.trim().length > 0 && password.trim().length > 0 && !responseMessage;
 
-  useEffect(() => {
-    // localStorage에서 로그인 여부 확인
-    const isLoggedIn = localStorage.getItem(`loggedInFlag_${appointmentId}`);
-
-    if (isLoggedIn === 'true') {
-        setButtonText('로그인'); // 이전에 로그인한 사용자
-        // console.log(`Logged-in flag for appointmentId ${appointmentId}: true`);
-    } else {
-        setButtonText('새로 참여하기'); // 신규 사용자
-        // console.log(`Logged-in flag for appointmentId ${appointmentId}: false`);
-    }
-}, [appointmentId]);
-
   
+  const secretKey = 'mySecretKey';
+
+ // 로컬 스토리지에서 암호화된 name과 password를 불러와 복호화 후 state에 할당 및 autoLogin 플래그 설정
+ useEffect(() => {
+  const storedNameCipher = localStorage.getItem(`name_${appointmentId}`);
+  const storedPWCipher = localStorage.getItem(`password_${appointmentId}`);
+  if (storedNameCipher && storedPWCipher) {
+    const bytesName = CryptoJS.AES.decrypt(storedNameCipher, secretKey);
+    const decryptedName = bytesName.toString(CryptoJS.enc.Utf8);
+    const bytesPW = CryptoJS.AES.decrypt(storedPWCipher, secretKey);
+    const decryptedPW = bytesPW.toString(CryptoJS.enc.Utf8);
+    if (decryptedName && decryptedPW) {
+      setName(decryptedName);
+      setPassword(decryptedPW);
+      setAutoLogin(true); // 암호화된 값이 있으면 자동 로그인 진행
+    }
+  }
+}, [appointmentId, secretKey]);
+
+    // 자동 로그인 실행: 폼 채워지면 handleSubmit 자동 호출
+  useEffect(() => {
+    if (autoLogin && name && password) {
+      // synthetic event: preventDefault 호출 가능한 객체 전달
+      handleSubmit({ preventDefault: () => {} });
+      setAutoLogin(false); // 한 번 실행 후 재실행 방지
+    }
+  }, [autoLogin, name, password]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password.trim() === '') {
@@ -61,7 +81,7 @@ const Invite = () => {
         password: password,
         appointmentId: appointmentId,
       };
- 
+      setLoading(true);
       try {
         const response = await fetch(`${BASE_URL}/user/login`, {
           method: 'POST',
@@ -79,12 +99,20 @@ const Invite = () => {
             const appointmentResponse = await fetch(
               `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
             ); 
-
-            // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
-            //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
+            
+            //백엔드 ver2 붙이고  토큰 도입시 다시 아래 로직으로 롤백할 수 있으므로, 아직은은 남겨두겠음음
+              // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
+              //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
             if (responseData.object.name) {
-              const key = `loggedInFlag_${appointmentId}`;
-              localStorage.setItem(key, 'true'); // 로그인 플래그 설정
+              localStorage.setItem(`loggedInFlag_${appointmentId}`, 'true');
+              localStorage.setItem(
+                `name_${appointmentId}`, 
+                CryptoJS.AES.encrypt(data.name, secretKey).toString()
+              );
+              localStorage.setItem(
+                `password_${appointmentId}`, 
+                CryptoJS.AES.encrypt(data.password, secretKey).toString()
+              );
               // console.log(`Login flag saved to localStorage for appointmentId ${appointmentId}: true`);
           }
               if (appointmentResponse.ok) {
@@ -144,7 +172,7 @@ const Invite = () => {
                 setResponseMessage('약속 정보를 가져오는데 실패했습니다.');
                 return;
               }
-              navigate('/individualCalendar', { state: { responseData, appointmentId, userName: name } });
+              navigate('/eventCalendar', { state: { responseData, appointmentId, userName: name } });
             } else {
               setResponseMessage('사용자 스케줄을 가져오는데 실패했습니다.');
             }
@@ -154,6 +182,8 @@ const Invite = () => {
       } catch(error) {
         console.error('Error:', error);
         setResponseMessage('서버 오류가 발생했습니다.');
+      }finally{
+        setLoading(false);
       }
     }
  };   
@@ -181,6 +211,7 @@ const Invite = () => {
       content="언제볼까?와 함께 약속방을 링크 공유로 초대하세요. 공유만 하면 끝, 간편한 친구 초대!"
     />
   </Helmet>
+  {loading && <Loading />} 
   <div className="flex px-[2rem] justify-between  items- h-[80rem] bg-[var(--white)] flex-col ">
     <div className='flex flex-col justify-center '>
     <img 

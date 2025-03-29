@@ -11,6 +11,7 @@ import { Button } from '../components/Button.tsx';
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import Loading from "../components/Loading";
 
 
 const EventCalendar = () => {
@@ -26,7 +27,8 @@ const EventCalendar = () => {
   const BASE_URL = process.env.NODE_ENV === "production" 
   ? process.env.REACT_APP_WWWM_BE_ENDPOINT 
   : process.env.REACT_APP_WWWM_BE_DEV_EP;
- 
+  const [loading, setLoading] = useState(false);
+
   //공유 key
   const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
   
@@ -41,12 +43,13 @@ const EventCalendar = () => {
    const[TotalUsers, setTotalUsers] = useState("");
    
    const state = location.state || {};
-   const appointmentId = state.id;
+   const appointmentId = state.appointmentId;
     const userName= state.userName;
+    const responseData= state.responseData;
     // console.log("userName:: ",userName);
   const[userList, setUserList]=useState("");
   const [hoverUserList, setHoverUserList] = useState([]);
-
+  const[isTimeslotAreaHovered ,setIsTimeslotAreaHovered]=useState(true);
   const [result, setResult] = useState('');
 
 
@@ -133,6 +136,7 @@ const KakaoShare = async() => {
   
    useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // 요청 시작 전에 로딩 상태 true
         try {
             if (!appointmentId) {
                 console.error('appointmentId가 없습니다');
@@ -286,6 +290,8 @@ const KakaoShare = async() => {
             }
         } catch (error) {
             console.error(error);
+        }finally{
+          setLoading(false); // 요청 끝나면 로딩끄기
         }
     };
     fetchData();
@@ -339,7 +345,9 @@ const truncateName = (name) => {
    // 수정 버튼 클릭 시 invite페이지로 이동
    const handleSaveClick = () => {
      // 필요한 로직 처리 후 페이지 이동
-     navigate(`/getAppointment?appointmentId=${appointmentId}`);
+    //  navigate(`/getAppointment?appointmentId=${appointmentId}`);
+     navigate('/individualCalendar', { state: { responseData, appointmentId, userName } });
+
     };
 
     
@@ -352,7 +360,7 @@ const truncateName = (name) => {
             content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요. 최적의 시간을 척척 찾아드려요! "
           />
         </Helmet>
-
+        {loading && <Loading />} {/* 로딩 중일 때 Loading 컴포넌트 렌더링 */}
       <div className={`h-auto flex flex-col ${colorVariants({ bg: 'gray-50' })}`}>
         <div className={`flex items-center flex-row justify-between ${colorVariants({ bg: 'white' })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}>
           {/* <h2>{eventName}</h2> */}
@@ -431,7 +439,16 @@ const truncateName = (name) => {
             </div>
           ))}
         </div>
-        <div className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+        <div className={`
+          flex mb-[3.6rem] mt-[2.8rem] flex-col items-center
+           ${colorVariants({ bg: 'gray-50' })}
+           `}
+           onMouseEnter={() => setIsTimeslotAreaHovered(true)}
+          onMouseLeave={() => {
+            setIsTimeslotAreaHovered(false);
+            setHoverUserList([]); // 영역을 벗어나면 hoverUserList 초기화
+          }}
+           >      
            <div className=
                   {`
                     w-[27rem] ml-[4rem] 
@@ -553,9 +570,9 @@ const truncateName = (name) => {
             </div>
             <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
               {/* 만약 slotSelectdFlag가 false면 아래 기존에 있던 userList 보여주고, True면  nowUserList 보여주기*/}
-              {hoverUserList.length > 0
-                  ? hoverUserList.map((user, index) => (
-                    
+              {isTimeslotAreaHovered ? (
+                  hoverUserList.length > 0 ? (
+                    hoverUserList.map((user, index) => (
                       <div
                         key={user?.name || index}
                         className={`
@@ -568,28 +585,31 @@ const truncateName = (name) => {
                           whitespace-nowrap
                         `}
                       >
-                          {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
-                         {typeof user === 'string' ? user : (user?.name || '')}
+                        {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
+                        {typeof user === 'string' ? user : (user?.name || '')}
                         {/* {console.log("hoverUserList: ",hoverUserList)} */}
                       </div>
                     ))
-                  : Object.values(userList).map((user, index) => (
-                      <div
-                        key={user?.name || index}
-                        className={`
-                          ${typographyVariants({ variant: 'b2-md' })}
-                          flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
-                          ${user?.name === userName.toString()
-                            ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                            : ''}
-                          max-w-[6rem]
-                          whitespace-nowrap
-                        `}
-                      >
-                        {truncateName(user?.name || '')}
-                      </div>
-                ))}
-      
+                  ) : null
+                ) : (
+                  Object.values(userList).map((user, index) => (
+                    <div
+                      key={user?.name || index}
+                      className={`
+                        ${typographyVariants({ variant: 'b2-md' })}
+                        flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
+                        ${user?.name === userName.toString()
+                          ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                          : ''}
+                        max-w-[6rem]
+                        whitespace-nowrap
+                      `}
+                    >
+                      {truncateName(user?.name || '')}
+                    </div>
+                  ))
+                )}
+
             </div>
           </div>
           <AnimatePresence>
