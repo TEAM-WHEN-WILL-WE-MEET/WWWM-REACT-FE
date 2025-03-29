@@ -49,7 +49,7 @@ const EventCalendar = () => {
     // console.log("userName:: ",userName);
   const[userList, setUserList]=useState("");
   const [hoverUserList, setHoverUserList] = useState([]);
-
+  const[isTimeslotAreaHovered ,setIsTimeslotAreaHovered]=useState(true);
   const [result, setResult] = useState('');
 
 
@@ -439,7 +439,16 @@ const truncateName = (name) => {
             </div>
           ))}
         </div>
-        <div className={`flex mb-[3.6rem] mt-[2.8rem] flex-col items-center ${colorVariants({ bg: 'gray-50' })}`}>      
+        <div className={`
+          flex mb-[3.6rem] mt-[2.8rem] flex-col items-center
+           ${colorVariants({ bg: 'gray-50' })}
+           `}
+           onMouseEnter={() => setIsTimeslotAreaHovered(true)}
+          onMouseLeave={() => {
+            setIsTimeslotAreaHovered(false);
+            setHoverUserList([]); // 영역을 벗어나면 hoverUserList 초기화
+          }}
+           >      
            <div className=
                   {`
                     w-[27rem] ml-[4rem] 
@@ -561,9 +570,9 @@ const truncateName = (name) => {
             </div>
             <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
               {/* 만약 slotSelectdFlag가 false면 아래 기존에 있던 userList 보여주고, True면  nowUserList 보여주기*/}
-              {hoverUserList.length > 0
-                  ? hoverUserList.map((user, index) => (
-                    
+              {isTimeslotAreaHovered ? (
+                  hoverUserList.length > 0 ? (
+                    hoverUserList.map((user, index) => (
                       <div
                         key={user?.name || index}
                         className={`
@@ -576,28 +585,31 @@ const truncateName = (name) => {
                           whitespace-nowrap
                         `}
                       >
-                          {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
-                         {typeof user === 'string' ? user : (user?.name || '')}
+                        {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
+                        {typeof user === 'string' ? user : (user?.name || '')}
                         {/* {console.log("hoverUserList: ",hoverUserList)} */}
                       </div>
                     ))
-                  : Object.values(userList).map((user, index) => (
-                      <div
-                        key={user?.name || index}
-                        className={`
-                          ${typographyVariants({ variant: 'b2-md' })}
-                          flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
-                          ${user?.name === userName.toString()
-                            ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
-                            : ''}
-                          max-w-[6rem]
-                          whitespace-nowrap
-                        `}
-                      >
-                        {truncateName(user?.name || '')}
-                      </div>
-                ))}
-      
+                  ) : null
+                ) : (
+                  Object.values(userList).map((user, index) => (
+                    <div
+                      key={user?.name || index}
+                      className={`
+                        ${typographyVariants({ variant: 'b2-md' })}
+                        flex min-w-[6rem] h-[2.4rem] justify-center items-center text-[var(--gray-700)] text-center
+                        ${user?.name === userName.toString()
+                          ? `${typographyVariants({ variant: 'b2-sb' })} !text-[var(--gray-900)]`
+                          : ''}
+                        max-w-[6rem]
+                        whitespace-nowrap
+                      `}
+                    >
+                      {truncateName(user?.name || '')}
+                    </div>
+                  ))
+                )}
+
             </div>
           </div>
           <AnimatePresence>
