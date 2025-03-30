@@ -9,8 +9,6 @@ const TimePicker = ({ startTime, endTime, setStartTime, setEndTime, onCreateCale
 
   // console.log('[TimePicker] isFormReady:', isFormReady);
 
-  const startMeridiemDialRef = useRef(null);
-  const startHourDialRef = useRef(null);
   const endMeridiemDialRef = useRef(null);
   const endHourDialRef = useRef(null);
 
