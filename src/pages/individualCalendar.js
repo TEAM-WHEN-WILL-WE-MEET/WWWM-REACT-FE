@@ -188,39 +188,6 @@ const IndividualCalendar = () => {
   };
 
 
-// 연속된 업데이트 처리를 위한 디바운스 함수
-const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
-  if (scheduledUpdateRef.current) {
-    clearTimeout(scheduledUpdateRef.current);
-  }
-
-  scheduledUpdateRef.current = setTimeout(() => {
-    updateTimeSlot(
-      timeIndex,
-      buttonIndex,
-      newValue,
-      selectedTimes,
-      setSelectedTimes,
-      selectedDate,
-      dates,
-      times,
-      userName,
-      appointmentId,
-      BASE_URL
-    );
-  }, 16); // 약 1프레임 (60fps) 딜레이
-}, [selectedTimes, setSelectedTimes, selectedDate, dates, times]);
- // 드래그 상태 초기화
- const resetDragState = useCallback(() => {
-  isDraggingRef.current = false;
-  dragStartPointRef.current = null;
-  dragModeRef.current = null;
-  processedCellsRef.current.clear();
-  if (scheduledUpdateRef.current) {
-    clearTimeout(scheduledUpdateRef.current);
-    scheduledUpdateRef.current = null;
-  }
-}, []);
 
   //timeslot drag 관련
   useEffect(() => {
@@ -235,39 +202,6 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
       window.removeEventListener('mouseup', handleWindowMouseUp);
     };
   }, []);
-    // 드래그 시작 시 해당 timeslot의 현재 상태를 반전한 값을 기준으로 드래그 모드를 설정
-    const handleMouseDown = (timeIndex, buttonIndex) => {
-      isDraggingRef.current = true;
-      hasDraggedRef.current = false; // 클릭과 드래그를 구분하기 위한 플래그 초기화
-      // 현재 timeslot의 상태를 확인한 후, 반전값을 drag 모드 값으로 지정
-      const currentValue = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
-      const newValue = !currentValue;
-      dragSelectModeRef.current = newValue;
-      // 해당 timeslot을 드래그 내에서 업데이트했음을 기록
-      draggedSlotsRef.current.add(`${timeIndex}-${buttonIndex}`);
-      updateTimeSlot(timeIndex, buttonIndex, newValue, selectedTimes, setSelectedTimes, selectedDate);
-    };
-  
-    // 드래그 중 다른 timeslot에 진입 시, 아직 업데이트하지 않은 경우 dragSelectMode의 값으로 업데이트
-    const handleMouseEnter = (timeIndex, buttonIndex) => {
-      if (isDraggingRef.current) {
-        hasDraggedRef.current = true;
-        const key = `${timeIndex}-${buttonIndex}`;
-        if (!draggedSlotsRef.current.has(key)) {
-          draggedSlotsRef.current.add(key);
-          updateTimeSlot(timeIndex, buttonIndex, dragSelectModeRef.current, selectedTimes, setSelectedTimes, selectedDate);
-        }
-      }
-    };
-  
-    // 마우스 버튼을 떼면 드래그 상태 초기화
-    const handleMouseUp = () => {
-      isDraggingRef.current = false;
-      draggedSlotsRef.current.clear();
-      dragSelectModeRef.current = null;
-      hasDraggedRef.current = false;
-    };
-
 
   // window의 mouseup 이벤트를 통해 드래그 종료 및 단일 클릭 처리
   useEffect(() => {
@@ -325,59 +259,6 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
 
     return { timeIndex, buttonIndex };
   };
-  const handleDragStart = (timeIndex, buttonIndex) => {
-    const currentValue = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
-    dragSelectModeRef.current = !currentValue; // 현재 값의 반대값으로 설정
-    
-    // 초기 셀 정보 저장
-    initialCellRef.current = {
-      timeIndex,
-      buttonIndex,
-      intendedValue: !currentValue
-    };
-
-    // 첫 번째 셀 업데이트
-    updateTimeSlot(
-      timeIndex,
-      buttonIndex,
-      dragSelectModeRef.current,
-      selectedTimes,
-      setSelectedTimes,
-      selectedDate
-    );
-    updatedSlotsRef.current.add(`${timeIndex}-${buttonIndex}`);
-  };
-
-  const handleDragMove = (timeIndex, buttonIndex) => {
-    if (!initialCellRef.current) return;
-    
-    const key = `${timeIndex}-${buttonIndex}`;
-    if (!updatedSlotsRef.current.has(key)) {
-      updateTimeSlot(
-        timeIndex,
-        buttonIndex,
-        dragSelectModeRef.current,
-        selectedTimes,
-        setSelectedTimes,
-        selectedDate
-      );
-      updatedSlotsRef.current.add(key);
-      hasDraggedRef.current = true;
-    }
-  };
-  const findTimeSlotFromPoint = (x, y) => {
-    const element = document.elementFromPoint(x, y);
-    if (!element) return null;
-
-    const timeSlot = element.closest('[data-timeslot]');
-    if (!timeSlot) return null;
-
-    return {
-      timeIndex: parseInt(timeSlot.getAttribute('data-time-index')),
-      buttonIndex: parseInt(timeSlot.getAttribute('data-button-index'))
-    };
-  };
-    
 
   // 버튼의 mousedown: 단일 클릭/드래그 판단을 위한 초기 좌표와 셀 정보를 기록 (즉, 실제 업데이트는 여기서 진행하지 않음)
   const handleButtonMouseDown = (timeIndex, buttonIndex, event) => {
@@ -445,7 +326,7 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
       }
   
       // console.log("schedules 보호구역: ",schedules);
-      // console.log("이거슨 appointment자체의 스케줄", schedules);
+      console.log("이거슨 individualCalendar 로드할때 appointment자체의 스케줄", schedules);
       // 날짜 및 시간 데이터 설정
       const datesArray = schedules.map((schedule, index) => {
         const dateString = schedule.date;
@@ -490,9 +371,7 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
       const timesFormatted = timesArray.map(timeHM => moment(timeHM, 'HH').format('HH:mm'));
 
       setDates(datesArray);
-      // console.log("datesArray: ", datesArray);
       setTimes(timesFormatted);
-      // console.log("timesFormatted????: ", timesFormatted);
 
 
       // console.log("첫로그인?: ",responseData.firstLogin);
@@ -517,7 +396,7 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
           return acc;
       }, {});
       
-      // console.log("정리된 사용자 선택입니다~:", userSelections);
+      console.log("정리된 사용자 선택입니다~:", userSelections);
         const savedTimes = {};
         
         datesArray.forEach((dateInfo, dateIndex) => {
@@ -577,10 +456,18 @@ useEffect(() => {
   
 // 저장 버튼 클릭 시: 누적된 상태를 기반으로 서버 업데이트 후 페이지 이동
 const handleSaveClick = async () => {
+  // if (bulkTimesArray.length === 0) {
+  //   console.log("개별 선택된 timeslot이 없습니다.");
+  //   return;
+  // }
   const selectedDateInfo = dates[selectedDate];
   const timesArray = bulkTimesArray;
   // console.log("저장버튼 클릭시: bulkTimesArray", bulkTimesArray) ;
+
   
+
+
+                 
   // timeslot이 하나도 선택되지 않은 경우에도 selectedDateInfo.date를 올바른 포맷으로 변환
   const formattedDate = timesArray.length > 0 
     ? timesArray[0].time 
@@ -592,7 +479,7 @@ const handleSaveClick = async () => {
     times: timesArray,
     appointmentId: appointmentId,
   };
-
+  console.log("save버튼 클릭시 payload", payload);
   // console.log("저장 버튼 클릭 시 서버에 보낼 payload:", payload);
 
   try {
@@ -605,6 +492,7 @@ const handleSaveClick = async () => {
     if (response.ok) {
       // console.log("스케줄 저장 성공");
       // navigate('/eventCalendar', { state: { id: appointmentId, userName: userName } });
+      // 저장 후 bulkTimesArray 초기화
       navigate(`/getAppointment?appointmentId=${appointmentId}`);      // console.log(response);
 
     } else { //times에 아무런 시간도 저장되지 않았을 때
@@ -620,22 +508,22 @@ const handleSaveClick = async () => {
   }
 };
 
-
+//모든 시간 가능 버튼
 const handleAllTimeChange = async (e) => {
   const isChecked = e.target.checked; // 체크박스 체크 여부
   console.log("체크박스 상태 변경:", isChecked);
 
   const newSelectedTimes = { ...selectedTimes };
-
   if (!newSelectedTimes[selectedDate]) {
     newSelectedTimes[selectedDate] = {};
   }
 
   // 이전 상태를 깊은 복사로 저장
-  const prevState = JSON.parse(JSON.stringify(selectedTimes[selectedDate] || {}));
+  // const prevState = JSON.parse(JSON.stringify(selectedTimes[selectedDate] || {}));
   // console.log("이전 상태:", prevState);
   // console.log("업데이트 전 현재 상태:", selectedTimes[selectedDate]);
-
+  setIsChecked(isChecked);
+  setIsVisuallyChecked(isChecked);
   times.forEach((_, timeIndex) => {
     if (!newSelectedTimes[selectedDate][timeIndex]) {
       newSelectedTimes[selectedDate][timeIndex] = {};
@@ -644,40 +532,109 @@ const handleAllTimeChange = async (e) => {
       newSelectedTimes[selectedDate][timeIndex][buttonIndex] = isChecked;
     });
   });
-
-  // console.log("업데이트할 새로운 상태:", newSelectedTimes[selectedDate]);
   setSelectedTimes(newSelectedTimes);
 
-  // 변경된 시간 슬롯만을 bulkTimesArray에 모으기
-  for (let timeIndex = 0; timeIndex < times.length; timeIndex++) {
-    if (!prevState[timeIndex]) {
-      prevState[timeIndex] = {};
-    }
+  // 전체 시간대에 대한 payload 구성
+  const timesPayload = [];
+  times.forEach((time, timeIndex) => {
     for (let buttonIndex = 0; buttonIndex < 6; buttonIndex++) {
-      const prevSelected = prevState[timeIndex][buttonIndex] || false;
-      const newSelected = newSelectedTimes[selectedDate][timeIndex][buttonIndex];
+      const hour = time.split(":")[0];
+      const minute = buttonIndex * 10;
+      const dateTime = `${dates[selectedDate].date}T${hour}:${String(minute).padStart(2, "0")}:00`;
+      const kstMoment = moment.tz(dateTime, "Asia/Seoul");
+      const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
+
+      timesPayload.push({
+        time: sendTimeString,
+        users: [userName],
+      });
+    }
+  });
+
+  const selectedDateInfo = dates[selectedDate];
+  const payload = {
+    id: selectedDateInfo.id,
+    date:
+      timesPayload.length > 0
+        ? timesPayload[0].time
+        : moment(selectedDateInfo.date, "YYYY-M-D").format("YYYY-MM-DDT00:00:00.SSS"),
+    times: timesPayload,
+    appointmentId: appointmentId,
+  };
+  console.log("전체시간 가능 버튼 클릭시, payload", payload);
+  // 모든 시간대에 대해 API 요청 (저장 버튼과 무관하게 바로 호출)
+  try {
+    const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      // 필요하다면 성공 메시지 처리
+      console.log("전체 시간 API 요청 성공");
+      // bulkTimesArray 초기화(개별 선택과 혼동되지 않도록)
+      // setBulkTimesArray([]);
+    } else {
+      console.error("전체 시간 API 요청 실패");
+    }
+  } catch (error) {
+    console.error("전체 시간 API 요청 중 오류:", error);
+  }
+  // console.log("업데이트할 새로운 상태:", newSelectedTimes[selectedDate]);
+
+  // // 변경된 시간 슬롯만을 bulkTimesArray에 모으기
+  // for (let timeIndex = 0; timeIndex < times.length; timeIndex++) {
+  //   if (!prevState[timeIndex]) {
+  //     prevState[timeIndex] = {};
+  //   }
+  //   for (let buttonIndex = 0; buttonIndex < 6; buttonIndex++) {
+  //     const prevSelected = prevState[timeIndex][buttonIndex] || false;
+  //     const newSelected = newSelectedTimes[selectedDate][timeIndex][buttonIndex];
       
-      // 상태가 변경된 경우에만 처리
-      if (prevSelected !== newSelected) {
-        // isChecked가 true이면 기존에 선택되지 않았던 시간( false -> true )만,
-        // isChecked가 false이면 기존에 선택되어 있던 시간( true -> false )만 처리
-        // (두 경우 모두 prevSelected !== newSelected 조건에 부합합니다.)
+  //     // 상태가 변경된 경우에만 처리
+  //     if (prevSelected !== newSelected) {
+  //       // isChecked가 true이면 기존에 선택되지 않았던 시간( false -> true )만,
+  //       // isChecked가 false이면 기존에 선택되어 있던 시간( true -> false )만 처리
+  //       // (두 경우 모두 prevSelected !== newSelected 조건에 부합합니다.)
+  //       const hour = times[timeIndex].split(':')[0];
+  //       const minute = buttonIndex * 10;
+  //       const dateTime = `${dates[selectedDate].date}T${hour}:${String(minute).padStart(2, '0')}:00`;
+  //       const kstMoment = moment.tz(dateTime, "Asia/Seoul");
+  //       const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
+
+  //       const newItem = {
+  //         time: sendTimeString,
+  //         users: [userName],
+  //       };
+  
+  //       setBulkTimesArray((prev) => [...prev, newItem]);
+
+  //     }
+  //   }
+  // }
+  if (isChecked) {
+    // 모든 timeblock에 대해 bulkTimesArray 생성
+    const newBulkTimes = [];
+    times.forEach((time, timeIndex) => {
+      for (let buttonIndex = 0; buttonIndex < 6; buttonIndex++) {
         const hour = times[timeIndex].split(':')[0];
         const minute = buttonIndex * 10;
         const dateTime = `${dates[selectedDate].date}T${hour}:${String(minute).padStart(2, '0')}:00`;
         const kstMoment = moment.tz(dateTime, "Asia/Seoul");
         const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
-
-        const newItem = {
+        newBulkTimes.push({
           time: sendTimeString,
           users: [userName],
-        };
-  
-        setBulkTimesArray((prev) => [...prev, newItem]);
-
+        });
       }
-    }
+    });
+    setBulkTimesArray(newBulkTimes);
+  } else {
+    // 선택 해제인 경우 해당 날짜의 모든 timeblock 제거
+    setBulkTimesArray((prev) => prev.filter(item => !item.time.startsWith(dates[selectedDate].date)));
   }
+
 
   // console.log("모든 시간 가능 체크 후 bulkTimesArray:", bulkTimesArray);
   // 여기서 bulkTimesArray를 이용해 추후 handleSaveClick 등에서 서버에 일괄 업데이트 요청을 보내도록 처리리
@@ -694,6 +651,7 @@ const handleAllTimeChange = async (e) => {
       ...newSelectedTimes[selectedDate][timeIndex],[buttonIndex]: !isSelected,
     };
     setSelectedTimes(newSelectedTimes);
+
     const hour = times[timeIndex].split(":")[0];
     const minute = buttonIndex * 10;
     const dateTime = `${dates[selectedDate].date}T${hour}:${String(minute).padStart(2, "0")}:00`;
@@ -705,7 +663,21 @@ const handleAllTimeChange = async (e) => {
       users: [userName],
     };
   
-    setBulkTimesArray((prev) => [...prev, newItem]);
+    // setBulkTimesArray((prev) => [...prev, newItem]);
+    setBulkTimesArray((prev) => {
+      if (!isSelected) {
+        // 선택되는 경우: newItem이 없으면 추가
+        if (!prev.find(item => item.time === sendTimeString)) {
+          // return [...prev, newItem];
+          return [...prev, { time: sendTimeString, users: [userName] }];
+
+        }
+        return prev;
+      } else {
+        // 해제되는 경우: 해당 timeblock 제거
+        return prev.filter(item => item.time !== sendTimeString);
+      }
+    });
   
   };
 
@@ -911,7 +883,7 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
               handleAllTimeChange(e);
             }}
           />
-          <div className="label-box">
+          {/* <div className="label-box">
             <label 
               htmlFor="all-time" 
               className={`${typographyVariants({ variant: 'b2-md' })} 
@@ -921,7 +893,7 @@ const updateTimeSlot = async (timeIndex, buttonIndex, newValue, selectedTimes, s
               <span className="check-icon" aria-hidden="true"></span>
               모든 시간 가능
             </label>
-          </div>
+          </div> */}
       </div>
       <div className="flex !justify-center">
         <Button 
