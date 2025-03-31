@@ -284,6 +284,7 @@ const debouncedUpdate = useCallback((timeIndex, buttonIndex, newValue) => {
           setSelectedTimes,
           selectedDate,
         );
+ 
       }
       // 드래그 상태 초기화
       dragStartRef.current = null;

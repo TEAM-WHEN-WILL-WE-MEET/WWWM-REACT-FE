@@ -148,7 +148,7 @@ const KakaoShare = async() => {
             );
             const responseData = await appointmentResponse.json();
 
-            console.log("[TEST] responseData의 스케줄: ", responseData.object.schedules[0].times);
+            // console.log("[TEST] responseData의 스케줄: ", responseData.object.schedules[0].times);
             if (!responseData || !responseData.object) {
                 console.error('응답 데이터가 올바르지 않습니다');
                 return;
