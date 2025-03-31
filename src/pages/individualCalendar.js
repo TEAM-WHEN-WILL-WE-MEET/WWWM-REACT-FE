@@ -218,6 +218,7 @@ const IndividualCalendar = () => {
           setSelectedTimes,
           selectedDate,
         );
+ 
       }
       // 드래그 상태 초기화
       dragStartRef.current = null;
