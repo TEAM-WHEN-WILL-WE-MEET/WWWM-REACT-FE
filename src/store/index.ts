@@ -1,2 +1,3 @@
-export { default as useUserStore } from "./userStore";
-export { default as useUIStore } from "./uiStore";
+export { useUserStore } from "./userStore.ts";
+export { useUIStore } from "./uiStore.ts";
+export { useCalendarStore } from "./calendarStore.ts";
