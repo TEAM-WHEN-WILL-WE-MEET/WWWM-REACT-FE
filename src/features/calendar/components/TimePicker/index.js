@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { typographyVariants } from "../styles/typography.ts";
-import { colorVariants, colors } from "../styles/color.ts";
-import { Button } from "./Button.tsx";
-import { cn } from "../utils/cn";
-import { useCalendarStore } from "../store/index.ts";
+import { typographyVariants } from "../../../../styles/typography.ts";
+import { colorVariants, colors } from "../../../../styles/color.ts";
+import { Button } from "../../../../components/Button.tsx";
+import { cn } from "../../../../utils/cn";
+import { useCalendarStore } from "../../../../store/index.ts";
 
 const TimePicker = ({ onCreateCalendar }) => {
   const {

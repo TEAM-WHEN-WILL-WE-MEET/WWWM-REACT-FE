@@ -5,7 +5,7 @@ import { ReactPlugin } from "@stagewise-plugins/react";
 import "./App.css";
 import Invite from "./pages/invite";
 import EventCalendar from "./pages/eventCalendar";
-import ParentMonth from "./pages/ParentMonth";
+import CreateCalendar from "./features/calendar/pages/CreateCalendar";
 import GetAppointmentRedirect from "./pages/GetAppointmentRedirect";
 import IndividualCalendar from "./pages/individualCalendar";
 import MyPage from "./pages/MyPage";
@@ -21,7 +21,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/MonthView" element={<ParentMonth />} />
+            <Route path="/MonthView" element={<CreateCalendar />} />
             <Route
               path="/getAppointment"
               element={<GetAppointmentRedirect />}

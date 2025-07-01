@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import MonthView from "./MonthView";
-import TimePicker from "../components/TimePicker";
+import MonthView from "../../components/MonthViewCalendar";
+import TimePicker from "../../components/TimePicker";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import Loading from "../components/Loading";
-import { useCalendarStore } from "../store/index.ts";
+import Loading from "../../../../components/Loading";
+import { useCalendarStore } from "../../../../store/index.ts";
 
-const ParentMonth = () => {
+const CreateCalendar = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { jsonData } = useCalendarStore();
@@ -66,4 +66,4 @@ const ParentMonth = () => {
   );
 };
 
-export default ParentMonth;
+export default CreateCalendar;

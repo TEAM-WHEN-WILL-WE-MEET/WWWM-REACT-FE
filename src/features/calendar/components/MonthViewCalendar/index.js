@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import { useNavigate } from "react-router-dom";
-import "./MonthView.css";
+import "./styles.css";
 // import moment from "moment";
 import moment from "moment-timezone";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { colors, colorVariants } from "../styles/color.ts";
-import { typographyVariants } from "../styles/typography.ts";
-import Loading from "../components/Loading";
-import { useCalendarStore } from "../store/index.ts";
+import { colors, colorVariants } from "../../../../styles/color.ts";
+import { typographyVariants } from "../../../../styles/typography.ts";
+import Loading from "../../../../components/Loading";
+import { useCalendarStore } from "../../../../store/index.ts";
 
 const MonthView = () => {
   const navigate = useNavigate();
