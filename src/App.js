@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { StagewiseToolbar } from "@stagewise/toolbar-react";
 import { ReactPlugin } from "@stagewise-plugins/react";
 import "./App.css";
-import Invite from "./pages/invite";
+import Invite from "./features/invite/pages/Invite";
 import EventCalendar from "./pages/eventCalendar";
 import CreateCalendar from "./features/calendar/pages/CreateCalendar";
 import GetAppointmentRedirect from "./pages/GetAppointmentRedirect";
