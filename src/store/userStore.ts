@@ -1,21 +1,31 @@
 import { create } from "zustand";
+import { Schedule } from "./types";
 
 interface UserState {
-  isAuthenticated: boolean;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  } | null;
-  setUser: (user: UserState["user"]) => void;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
-  logout: () => void;
+  userName: string;
+  isFirstLogin: boolean;
+  userSchedule: Schedule[];
+
+  // actions
+  setUserInfo: (userName: string, isFirstLogin: boolean) => void;
+  setUserSchedule: (schedule: Schedule[]) => void;
+  clearUserInfo: () => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
-  isAuthenticated: false,
-  user: null,
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
-  setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-  logout: () => set({ user: null, isAuthenticated: false }),
+  userName: "",
+  isFirstLogin: true,
+  userSchedule: [],
+
+  setUserInfo: (userName: string, isFirstLogin: boolean) =>
+    set({ userName, isFirstLogin }),
+
+  setUserSchedule: (schedule: Schedule[]) => set({ userSchedule: schedule }),
+
+  clearUserInfo: () =>
+    set({
+      userName: "",
+      isFirstLogin: true,
+      userSchedule: [],
+    }),
 }));
