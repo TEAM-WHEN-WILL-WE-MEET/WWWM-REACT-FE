@@ -8,8 +8,6 @@ import EventCalendar from "./pages/eventCalendar";
 import CreateCalendar from "./features/calendar/pages/CreateCalendar";
 import GetAppointmentRedirect from "./pages/GetAppointmentRedirect";
 import IndividualCalendar from "./pages/individualCalendar";
-import MyPage from "./pages/MyPage";
-import AccountManagement from "./pages/AccountManagement";
 import LandingPage from "./components/LandingPage";
 import Menu from "./pages/menu";
 
@@ -61,8 +59,6 @@ function App() {
                 </>
               }
             />
-            <Route path="/mypage" element={<MyPage />} />
-            <Route path="/account-management" element={<AccountManagement />} />
           </Routes>
         </div>
       </Router>
