@@ -1,52 +1,22 @@
-import React, { useState } from "react";
-import MonthView from "../../components/MonthViewCalendar";
-import TimePicker from "../../components/TimePicker";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import MonthView from "../../components/MonthViewCalendar";
+import TimePicker from "../../components/TimePicker";
 import Loading from "../../../../components/Loading";
 import { useCalendarStore } from "../../../../store/index.ts";
 
 const CreateCalendar = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const { jsonData } = useCalendarStore();
+  const { isLoading, error, createCalendar } = useCalendarStore();
 
-  // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
-  const BASE_URL =
-    process.env.NODE_ENV === "production"
-      ? process.env.REACT_APP_WWWM_BE_ENDPOINT
-      : process.env.REACT_APP_WWWM_BE_DEV_EP;
-
-  const handleCalendarCreation = async (data) => {
-    if (!data) {
-      console.error("jsonData가 아직 준비되지 않았습니다.");
-      return;
-    }
-    setLoading(true);
+  const handleCalendarCreation = async () => {
     try {
-      const calendarResponse = await fetch(
-        `${BASE_URL}/appointment/createAppointment`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (!calendarResponse.ok) {
-        console.error("서버 응답 에러:", calendarResponse.statusText);
-        return;
-      }
-
-      const calendarData = await calendarResponse.json();
-      const appointmentId = calendarData.object.id;
+      const appointmentId = await createCalendar();
       navigate(`/getAppointment?appointmentId=${appointmentId}`);
     } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
+      console.error("Failed to create calendar:", error);
+      // 에러는 이미 store에서 처리되므로 여기서는 로깅만
     }
   };
 
@@ -59,9 +29,14 @@ const CreateCalendar = () => {
           content="언제볼까? 서비스와 함께 원클릭 약속방 생성, 클릭 한 번으로 약속 잡기 시작! "
         />
       </Helmet>
-      {loading && <Loading />}
+      {isLoading && <Loading />}
+      {error && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md z-50">
+          <p>{error}</p>
+        </div>
+      )}
       <MonthView />
-      <TimePicker onCreateCalendar={() => handleCalendarCreation(jsonData)} />
+      <TimePicker onCreateCalendar={handleCalendarCreation} />
     </>
   );
 };

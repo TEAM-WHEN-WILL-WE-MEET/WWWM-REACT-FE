@@ -13,56 +13,20 @@ import Menu from "./pages/menu";
 
 function App() {
   return (
-    <>
-      <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/MonthView" element={<CreateCalendar />} />
-            <Route
-              path="/getAppointment"
-              element={<GetAppointmentRedirect />}
-            />
-            <Route
-              path="/invite"
-              element={
-                <>
-                  {" "}
-                  <Invite />{" "}
-                </>
-              }
-            />
-            <Route
-              path="/menu"
-              element={
-                <>
-                  {" "}
-                  <Menu />{" "}
-                </>
-              }
-            />
-            <Route
-              path="/eventCalendar"
-              element={
-                <>
-                  {" "}
-                  <EventCalendar />{" "}
-                </>
-              }
-            />
-            <Route
-              path="/individualCalendar"
-              element={
-                <>
-                  <IndividualCalendar />
-                </>
-              }
-            />
-          </Routes>
-        </div>
-      </Router>
-    </>
+    <Router>
+      <div className="App">
+        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/MonthView" element={<CreateCalendar />} />
+          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
+          <Route path="/invite" element={<Invite />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/eventCalendar" element={<EventCalendar />} />
+          <Route path="/individualCalendar" element={<IndividualCalendar />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

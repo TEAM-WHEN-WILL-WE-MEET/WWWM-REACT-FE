@@ -18,8 +18,12 @@ const TimePicker = ({ onCreateCalendar }) => {
   const endMeridiemDialRef = useRef(null);
   const endHourDialRef = useRef(null);
 
-  const [startHour24, setStartHour24] = useState(9); // 기본 09:00
-  const [endHour24, setEndHour24] = useState(13); // 기본 13:00 (오후 1시)
+  // Store의 기본값과 동기화
+  const startHour24Initial = parseInt(startTime.split(":")[0], 10);
+  const endHour24Initial = parseInt(endTime.split(":")[0], 10);
+
+  const [startHour24, setStartHour24] = useState(startHour24Initial);
+  const [endHour24, setEndHour24] = useState(endHour24Initial);
   const startMeridiem = getMeridiem(startHour24);
   const startHour12 = to12Hour(startHour24);
   const endMeridiem = getMeridiem(endHour24);

@@ -12,11 +12,14 @@ const GetAppointmentRedirect = () => {
   const [loading, setLoading] = useState(true);
 
   // Store actions
-  const setAppointment = useAppointmentStore((state) => state.setAppointment);
+  const initializeFromResponse = useAppointmentStore(
+    (state) => state.initializeFromResponse
+  );
   const initializeFromSchedules = useCalendarStore(
     (state) => state.initializeFromSchedules
   );
-  const { setUserInfo, setUserSchedule } = useUserStore();
+  const setUserInfo = useUserStore((state) => state.setUserInfo);
+  const setUserSchedule = useUserStore((state) => state.setUserSchedule);
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -42,17 +45,20 @@ const GetAppointmentRedirect = () => {
         }
 
         // Store 초기화
-        setAppointment(responseData);
+        initializeFromResponse(responseData);
         initializeFromSchedules(
           responseData.object.schedules,
           responseData.object.startTime,
           responseData.object.endTime
         );
-        setUserInfo(responseData.userName, responseData.firstLogin);
-        setUserSchedule(responseData.userSchedule);
+        setUserInfo(
+          responseData.userName || "Test User",
+          responseData.firstLogin || true
+        );
+        setUserSchedule(responseData.userSchedule || []);
 
         // 페이지 이동
-        navigate("/eventCalendar");
+        navigate(`/invite?appointmentId=${appointmentId}`);
       } catch (error) {
         console.error("Error fetching appointment:", error);
         navigate("/");
@@ -65,7 +71,7 @@ const GetAppointmentRedirect = () => {
   }, [
     searchParams,
     navigate,
-    setAppointment,
+    initializeFromResponse,
     initializeFromSchedules,
     setUserInfo,
     setUserSchedule,

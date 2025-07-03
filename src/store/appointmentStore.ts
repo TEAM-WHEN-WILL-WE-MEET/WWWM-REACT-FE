@@ -86,23 +86,31 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
     const timeSet = new Set();
     if (schedules[0]?.times) {
       schedules[0].times.forEach((timeSlot: any) => {
-        const timeHM = moment.tz(timeSlot.time, "Asia/Seoul").format("HH");
-        if (timeHM >= startTimeH && timeHM <= endTimeHM - 1) {
+        const timeHM = parseInt(
+          moment.tz(timeSlot.time, "Asia/Seoul").format("HH"),
+          10
+        );
+        const startTimeHNum = parseInt(startTimeH, 10);
+        const endTimeHNum = parseInt(endTimeHM, 10);
+        if (timeHM >= startTimeHNum && timeHM <= endTimeHNum - 1) {
           timeSet.add(timeHM);
         }
       });
     }
 
-    const timesArray = Array.from(timeSet)
-      .sort((a: any, b: any) => moment(a, "HH").diff(moment(b, "HH")))
-      .map((timeHM: any) => moment(timeHM, "HH").format("HH:mm"));
+    const timesArray = Array.from(timeSet) as number[];
+    const sortedTimesArray = timesArray
+      .sort((a, b) =>
+        moment(a.toString(), "HH").diff(moment(b.toString(), "HH"))
+      )
+      .map((timeHM) => moment(timeHM.toString(), "HH").format("HH:mm"));
 
     set({
       responseData,
       appointmentId: responseData.object.id,
       eventName: responseData.object.name,
       dates: datesArray,
-      times: timesArray,
+      times: sortedTimesArray,
       selectedDate: 0,
       startTime: responseData.object.startTime,
       endTime: responseData.object.endTime,

@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { DateInfo, SelectedTimesMap, TimeSlotUpdate } from "./types";
 import moment from "moment-timezone";
+import { fetchApi } from "../utils/api";
+import { API_CONFIG, API_ENDPOINTS } from "../config/environment";
+
+interface TimeSlot {
+  time: string;
+}
 
 interface CalendarState {
   selectedDate: number;
@@ -13,6 +19,8 @@ interface CalendarState {
   startTime: string;
   endTime: string;
   isFormReady: boolean;
+  isLoading: boolean;
+  error: string | null;
   jsonData: any;
 
   // actions
@@ -39,6 +47,9 @@ interface CalendarState {
   setIsFormReady: (isReady: boolean) => void;
   setJsonData: (data: any) => void;
   resetForm: () => void;
+  updateJsonData: () => void;
+  handleDateChange: (date: string) => void;
+  createCalendar: () => Promise<string>;
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
@@ -52,6 +63,8 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   startTime: "09:00",
   endTime: "20:00",
   isFormReady: false,
+  isLoading: false,
+  error: null,
   jsonData: null,
 
   // Simple actions
@@ -115,13 +128,22 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       id: schedule.id,
     }));
 
-    const startTimeH = moment.tz(startTime, "Asia/Seoul").format("HH");
-    const endTimeHM = moment.tz(endTime, "Asia/Seoul").format("HH");
+    const startTimeH = parseInt(
+      moment.tz(startTime, "Asia/Seoul").format("HH"),
+      10
+    );
+    const endTimeHM = parseInt(
+      moment.tz(endTime, "Asia/Seoul").format("HH"),
+      10
+    );
 
-    const timeSet = new Set();
+    const timeSet = new Set<number>();
     if (schedules[0]?.times) {
-      schedules[0].times.forEach((timeSlot) => {
-        const timeHM = moment.tz(timeSlot.time, "Asia/Seoul").format("HH");
+      schedules[0].times.forEach((timeSlot: TimeSlot) => {
+        const timeHM = parseInt(
+          moment.tz(timeSlot.time, "Asia/Seoul").format("HH"),
+          10
+        );
         if (timeHM >= startTimeH && timeHM <= endTimeHM - 1) {
           timeSet.add(timeHM);
         }
@@ -129,8 +151,10 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     }
 
     const timesArray = Array.from(timeSet)
-      .sort((a, b) => moment(a, "HH").diff(moment(b, "HH")))
-      .map((timeHM) => moment(timeHM, "HH").format("HH:mm"));
+      .sort((a, b) => a - b)
+      .map((timeHM) =>
+        moment(timeHM.toString().padStart(2, "0"), "HH").format("HH:mm")
+      );
 
     set({
       dates: datesArray,
@@ -150,9 +174,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   handleDateChange: (date) => {
     const dateString = moment(date).format("YYYY-MM-DD");
-    const monthKey = moment(get().dates[get().selectedDate]?.date).format(
-      "YYYY-MM"
-    );
+    const monthKey = moment(date).format("YYYY-MM");
     const currentMonthDates = get().savedDates[monthKey] || [];
 
     // Update savedDates
@@ -160,61 +182,84 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       ? currentMonthDates.filter((d) => d !== dateString)
       : [...currentMonthDates, dateString];
 
+    // Update both savedDates and selectedDates
     set((state) => ({
       savedDates: {
         ...state.savedDates,
         [monthKey]: updatedMonthDates,
       },
-    }));
-
-    // Update selectedDates
-    set((state) => ({
-      selectedDate: state.dates.findIndex((d) => d.date === dateString),
+      selectedDates: state.selectedDates.includes(dateString)
+        ? state.selectedDates.filter((d) => d !== dateString)
+        : [...state.selectedDates, dateString],
     }));
   },
 
   updateJsonData: () => {
-    const state = get();
-    if (state.selectedDate >= 0 && state.eventName) {
-      const schedules = state.dates
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map((dateInfo) => ({
-          date: dateInfo.date,
+    const { selectedDates, eventName, startTime, endTime } = get();
+
+    if (selectedDates.length > 0 && eventName) {
+      const schedules = selectedDates
+        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+        .map((dateString) => ({
+          date: moment
+            .tz(dateString, "YYYY-MM-DD", API_CONFIG.TIMEZONE)
+            .format("YYYY-MM-DDTHH:mm:ss[Z]"),
         }));
 
-      const sortedDates = [...state.dates].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      );
-      const earliestDateString = sortedDates[0].date;
-      const latestDateString = sortedDates[sortedDates.length - 1].date;
+      const sortedDates = [...selectedDates].sort();
+      const earliestDate = sortedDates[0];
+      const latestDate = sortedDates[sortedDates.length - 1];
 
       const startDateTime = moment
         .tz(
-          `${earliestDateString} ${state.startTime}`,
+          `${earliestDate} ${startTime}`,
           "YYYY-MM-DD HH:mm",
-          "Asia/Seoul"
+          API_CONFIG.TIMEZONE
         )
         .format("YYYY-MM-DDTHH:mm:ss[Z]");
 
       const endDateTime = moment
-        .tz(
-          `${latestDateString} ${state.endTime}`,
-          "YYYY-MM-DD HH:mm",
-          "Asia/Seoul"
-        )
+        .tz(`${latestDate} ${endTime}`, "YYYY-MM-DD HH:mm", API_CONFIG.TIMEZONE)
         .format("YYYY-MM-DDTHH:mm:ss[Z]");
 
       const data = {
-        name: state.eventName,
+        name: eventName,
         schedules,
         startTime: startDateTime,
         endTime: endDateTime,
-        timeZone: "Asia/Seoul",
+        timeZone: API_CONFIG.TIMEZONE,
       };
 
       set({ jsonData: data, isFormReady: true });
     } else {
       set({ isFormReady: false });
+    }
+  },
+
+  createCalendar: async () => {
+    const { jsonData } = get();
+
+    if (!jsonData) {
+      throw new Error("Calendar data is not ready");
+    }
+
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await fetchApi(API_ENDPOINTS.CREATE_APPOINTMENT, {
+        method: "POST",
+        body: jsonData,
+      });
+
+      const appointmentId = response.object.id;
+      return appointmentId;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create calendar";
+      set({ error: errorMessage });
+      throw error;
+    } finally {
+      set({ isLoading: false });
     }
   },
 }));

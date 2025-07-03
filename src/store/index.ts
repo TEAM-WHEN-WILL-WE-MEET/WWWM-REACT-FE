@@ -1,6 +1,4 @@
-export { useUserStore } from "./userStore.ts";
-export { useUIStore } from "./uiStore.ts";
-export { useCalendarStore } from "./calendarStore.ts";
-export { useInviteStore } from "./inviteStore.ts";
-
-
+export { useUserStore } from "./userStore";
+export { useUIStore } from "./uiStore";
+export { useCalendarStore } from "./calendarStore";
+export { useInviteStore } from "./inviteStore";
