@@ -4,17 +4,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 
 import "moment/locale/ko";
-import { typographyVariants } from "../styles/typography.ts";
-import { colorVariants, colors } from "../styles/color.ts";
-import { cn } from "../utils/cn.js";
-import { Button } from "../components/Button.tsx";
+import { typographyVariants } from "../../../../styles/typography.ts";
+import { colorVariants, colors } from "../../../../styles/color.ts";
+import { cn } from "../../../../utils/cn.js";
+import { Button } from "../../../../components/Button.tsx";
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import Loading from "../components/Loading";
-import { useAppointmentStore } from "../store/appointmentStore";
-import { useCalendarStore } from "../store/calendarStore";
-import { useUserStore } from "../store/userStore";
+import Loading from "../../../../components/Loading";
+import { useAppointmentStore } from "../../../../store/appointmentStore";
+import { useCalendarStore } from "../../../../store/calendarStore";
+import { useUserStore } from "../../../../store/userStore";
 
 const EventCalendar = () => {
   // const { responseData, appointmentId, userSchedule } = location.state;

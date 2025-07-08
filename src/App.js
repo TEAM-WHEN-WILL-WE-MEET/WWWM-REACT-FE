@@ -4,10 +4,10 @@ import { StagewiseToolbar } from "@stagewise/toolbar-react";
 import { ReactPlugin } from "@stagewise-plugins/react";
 import "./App.css";
 import Invite from "./features/invite/pages/Invite";
-import EventCalendar from "./pages/eventCalendar";
+import EventCalendar from "./features/calendar/pages/EventCalendar";
 import CreateCalendar from "./features/calendar/pages/CreateCalendar";
-import GetAppointmentRedirect from "./pages/GetAppointmentRedirect";
-import IndividualCalendar from "./pages/individualCalendar";
+import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect";
+import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
 import LandingPage from "./components/LandingPage";
 import Menu from "./pages/menu";
 

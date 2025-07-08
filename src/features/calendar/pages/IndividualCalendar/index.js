@@ -1,18 +1,17 @@
-// individualCalendar.js
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment-timezone";
 import "moment/locale/ko";
-import "./individualCalendar.css";
-import { typographyVariants } from "../styles/typography.ts";
-import { colorVariants, colors } from "../styles/color.ts";
-import { cn } from "../utils/cn";
-import { Button } from "../components/Button.tsx";
+import "./styles.css";
+import { typographyVariants } from "../../../../styles/typography.ts";
+import { colorVariants, colors } from "../../../../styles/color.ts";
+import { cn } from "../../../../utils/cn";
+import { Button } from "../../../../components/Button.tsx";
 import { Helmet } from "react-helmet-async";
-import { useAppointmentStore } from "../store/appointmentStore";
-import { useCalendarStore } from "../store/calendarStore";
-import { useUserStore } from "../store/userStore";
-import Loading from "../components/Loading";
+import { useAppointmentStore } from "../../../../store/appointmentStore";
+import { useCalendarStore } from "../../../../store/calendarStore";
+import { useUserStore } from "../../../../store/userStore";
+import Loading from "../../../../components/Loading";
 
 // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
 const BASE_URL =
