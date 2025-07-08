@@ -10,7 +10,7 @@ import { typographyVariants } from "../../../../styles/typography.ts";
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(true);
-
+  
   const closeSidebar = () => setIsOpen(false);
   const navigate = useNavigate();
   // 2) 체크박스에서 선택된 아이템의 id들을 별도로 저장

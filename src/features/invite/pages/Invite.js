@@ -13,6 +13,7 @@ import CryptoJS from "crypto-js";
 import { useInviteStore } from "../../../store/index.ts";
 // import { tryParse } from 'firebase-tools/lib/utils';
 
+
 const Invite = () => {
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   const BASE_URL =
