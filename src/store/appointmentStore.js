@@ -15,6 +15,7 @@ const BASE_URL =
   users: import('./types').User[],
   schedules: import('./types').Schedule[],
   setAppointment: (data: import('./types').AppointmentResponse) => void,
+  initializeFromResponse: (data: import('./types').AppointmentResponse) => void,
   clearAppointment: () => void,
   updateSchedule: (scheduleData: import('./types').ScheduleUpdatePayload) => Promise<void>
 }>} */
@@ -28,6 +29,17 @@ const createStore = (set) => ({
   schedules: [],
 
   setAppointment: (data) =>
+    set({
+      appointmentId: data.object.id,
+      eventName: data.object.name,
+      responseData: data,
+      startTime: data.object.startTime,
+      endTime: data.object.endTime,
+      users: data.object.users,
+      schedules: data.object.schedules,
+    }),
+
+  initializeFromResponse: (data) =>
     set({
       appointmentId: data.object.id,
       eventName: data.object.name,
