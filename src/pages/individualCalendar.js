@@ -177,7 +177,7 @@ const IndividualCalendar = () => {
 
       for (let t = minTime; t <= maxTime; t++) {
         for (let b = minButton; b <= maxButton; b++) {
-          updateTimeSlot(t, b, desiredValue, true);
+          updateTimeSlot(t, b, desiredValue, true, true);
         }
       }
     }
@@ -208,9 +208,9 @@ const IndividualCalendar = () => {
       if (initialCellRef.current && !isDraggingRef.current) {
         // 드래그가 감지되지 않았으면 단일 클릭으로 처리
         const { timeIndex, buttonIndex } = initialCellRef.current;
-
         handleTimeClick(timeIndex, buttonIndex);
       }
+
       // 드래그 상태 초기화
       dragStartRef.current = null;
       isDraggingRef.current = false;
@@ -282,7 +282,8 @@ const IndividualCalendar = () => {
           initialCellRef.current.timeIndex,
           initialCellRef.current.buttonIndex,
           initialCellRef.current.intendedValue,
-          false
+          false,
+          true
         );
         updatedSlotsRef.current.add(keyInitial);
       }
@@ -294,7 +295,8 @@ const IndividualCalendar = () => {
           timeIndex,
           buttonIndex,
           initialCellRef.current.intendedValue,
-          false
+          false,
+          true
         );
         updatedSlotsRef.current.add(key);
       }
@@ -424,11 +426,18 @@ const IndividualCalendar = () => {
       return;
     }
 
+    console.log("저장 버튼 클릭 - bulkTimesArray:", bulkTimesArray);
+
+    if (bulkTimesArray.length === 0) {
+      // 클릭한 timeslot이 없으면 바로 이동
+      navigate(`/getAppointment?appointmentId=${appointmentId}`);
+      return;
+    }
+
     const selectedDateInfo = dates[selectedDate];
-    const timesArray = bulkTimesArray;
     const formattedDate =
-      timesArray.length > 0
-        ? timesArray[0].time
+      bulkTimesArray.length > 0
+        ? bulkTimesArray[0].time
         : moment(selectedDateInfo.date, "YYYY-M-D").format(
             "YYYY-MM-DDT00:00:00.SSS"
           );
@@ -436,16 +445,22 @@ const IndividualCalendar = () => {
     const payload = {
       id: selectedDateInfo.id,
       date: formattedDate,
-      times: timesArray,
+      times: bulkTimesArray,
       appointmentId: appointmentId,
     };
 
+    console.log("배치 처리 서버 요청:", payload);
+
     try {
+      setLoading(true);
       await updateSchedule(payload);
+      console.log("배치 처리 서버 요청 성공");
       navigate(`/getAppointment?appointmentId=${appointmentId}`);
     } catch (error) {
-      console.error("저장 요청 중 오류:", error);
+      console.error("배치 처리 서버 요청 실패:", error);
       alert("서버 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -571,6 +586,11 @@ const IndividualCalendar = () => {
         }
       });
       setBulkTimesArray(newBulkTimes);
+      console.log(
+        "전체 시간 선택 - bulkTimesArray 설정:",
+        newBulkTimes.length,
+        "개"
+      );
     } else {
       // 선택 해제인 경우 해당 날짜의 모든 timeblock 제거
       const store = useAppointmentStore.getState();
@@ -583,10 +603,8 @@ const IndividualCalendar = () => {
             !item.time.startsWith(currentDates[currentSelectedDate].date)
         )
       );
+      console.log("전체 시간 해제 - bulkTimesArray에서 해당 날짜 제거");
     }
-
-    // console.log("모든 시간 가능 체크 후 bulkTimesArray:", bulkTimesArray);
-    // 여기서 bulkTimesArray를 이용해 추후 handleSaveClick 등에서 서버에 일괄 업데이트 요청을 보내도록 처리리
   };
 
   const handleTimeClick = async (timeIndex, buttonIndex) => {
@@ -600,8 +618,11 @@ const IndividualCalendar = () => {
 
     const isSelected =
       currentSelectedTimes[currentSelectedDate]?.[timeIndex]?.[buttonIndex];
-    updateTimeSlot(timeIndex, buttonIndex, !isSelected);
 
+    // UI 상태 업데이트
+    updateTimeSlot(timeIndex, buttonIndex, !isSelected, false, false);
+
+    // 클릭된 timeslot을 bulkTimesArray에 추가 (새로 선택 + 재클릭 모두)
     const hour = currentTimes[timeIndex].split(":")[0];
     const minute = buttonIndex * 10;
     const dateTime = `${
@@ -610,15 +631,25 @@ const IndividualCalendar = () => {
     const kstMoment = moment.tz(dateTime, "Asia/Seoul");
     const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
 
+    // 모든 클릭된 timeslot을 bulkTimesArray에 추가 (서버에서 토글 처리)
     setBulkTimesArray((prev) => {
-      if (!isSelected) {
-        if (!prev.find((item) => item.time === sendTimeString)) {
-          return [...prev, { time: sendTimeString, users: [currentUserName] }];
-        }
-        return prev;
+      // 이미 존재하는지 확인하고 추가
+      const existingIndex = prev.findIndex(
+        (item) => item.time === sendTimeString
+      );
+      if (existingIndex === -1) {
+        // 처음 클릭하는 경우 추가
+        return [...prev, { time: sendTimeString, users: [currentUserName] }];
       } else {
-        return prev.filter((item) => item.time !== sendTimeString);
+        // 재클릭하는 경우에도 추가 (서버에서 토글 처리)
+        return [...prev, { time: sendTimeString, users: [currentUserName] }];
       }
+    });
+
+    console.log("timeslot 클릭 - bulkTimesArray에 추가:", {
+      timeslot: sendTimeString,
+      previousState: isSelected ? "선택됨" : "선택안됨",
+      action: "배치 배열에 추가 (서버에서 토글 처리)",
     });
   };
 
@@ -627,7 +658,8 @@ const IndividualCalendar = () => {
     timeIndex,
     buttonIndex,
     newValue,
-    forceUpdate = false
+    forceUpdate = false,
+    addToBulk = true
   ) => {
     // Store에서 현재 상태 가져오기
     const store = useAppointmentStore.getState();
@@ -648,23 +680,29 @@ const IndividualCalendar = () => {
       [buttonIndex]: newValue,
     };
     store.setSelectedTimes(newSelectedTimes);
-    // 변경된 시간 슬롯을 bulkTimesArray에 저장
-    const currentTimes = store.times;
-    const currentDates = store.dates;
-    const hour = currentTimes[timeIndex].split(":")[0];
-    const minute = buttonIndex * 10;
-    const dateTime = `${
-      currentDates[currentSelectedDate].date
-    }T${hour}:${String(minute).padStart(2, "0")}:00`;
-    const kstMoment = moment.tz(dateTime, "Asia/Seoul");
-    const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
 
-    const newItem = {
-      time: sendTimeString,
-      users: [store.userName],
-    };
+    // bulkTimesArray에 추가 (드래그 완료시에만)
+    if (addToBulk) {
+      const currentTimes = store.times;
+      const currentDates = store.dates;
+      const hour = currentTimes[timeIndex].split(":")[0];
+      const minute = buttonIndex * 10;
+      const dateTime = `${
+        currentDates[currentSelectedDate].date
+      }T${hour}:${String(minute).padStart(2, "0")}:00`;
+      const kstMoment = moment.tz(dateTime, "Asia/Seoul");
+      const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
 
-    setBulkTimesArray((prev) => [...prev, newItem]);
+      setBulkTimesArray((prev) => [
+        ...prev,
+        { time: sendTimeString, users: [store.userName] },
+      ]);
+
+      console.log("드래그 timeslot - bulkTimesArray에 추가:", {
+        timeslot: sendTimeString,
+        newValue: newValue ? "선택" : "해제",
+      });
+    }
   };
 
   if (loading) {
