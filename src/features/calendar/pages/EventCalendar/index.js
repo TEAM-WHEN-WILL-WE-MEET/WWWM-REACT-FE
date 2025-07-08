@@ -76,7 +76,7 @@ const EventCalendar = () => {
     setSelectedDate: setStoreSelectedDate,
   } = useCalendarStore();
 
-  const { userName: storeUserName, setUserInfo } = useUserStore();
+  const { name: storeUserName, setUserInfo } = useUserStore();
 
   useEffect(() => {
     const script = document.createElement("script");
