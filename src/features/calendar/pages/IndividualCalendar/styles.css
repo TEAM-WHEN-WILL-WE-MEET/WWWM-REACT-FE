@@ -1,9 +1,8 @@
 [type="checkbox"] {
   appearance: none; /* 기본(네이티브) 모양을 제거 */
-  
-
 }
-.screen-reader { /* 스크린 리더를 고려해서 체크박스를 화면에서 숨김 */
+.screen-reader {
+  /* 스크린 리더를 고려해서 체크박스를 화면에서 숨김 */
   position: absolute;
   width: 1px;
   height: 1px;
@@ -15,8 +14,6 @@
 }
 .label-box {
   position: relative;
- 
- 
 }
 .check-icon {
   width: 1.2em;
@@ -28,7 +25,7 @@
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  z-index:1;
+  z-index: 1;
 }
 /* check 되지않았을때의 체크 표시 */
 .check-icon::before {
@@ -43,19 +40,18 @@
   top: 53%;
   transform: translateX(-50%) translateY(-70%) rotateZ(50deg);
   border-right: 1.8px solid var(--white);
-  border-radius:1.5px;
+  border-radius: 1.5px;
   border-bottom: 2px solid var(--white);
 }
 label {
   padding-left: 1.7em;
   position: relative;
   cursor: pointer;
-  z-index:0;
-
+  z-index: 0;
 }
 /* 체크됐을때의 CSS */
 [type="checkbox"]:checked + .label-box .check-icon {
-  border-color:  var(--blue-500);
+  border-color: var(--blue-500);
   background-color: var(--blue-50);
   border-radius: 2px;
 }
@@ -63,6 +59,3 @@ label {
 [type="checkbox"]:checked + .label-box .check-icon::before {
   border-color: var(--blue-500);
 }
-
-
-
