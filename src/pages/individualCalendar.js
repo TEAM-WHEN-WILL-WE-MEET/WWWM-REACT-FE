@@ -12,6 +12,7 @@ import { Helmet } from "react-helmet-async";
 import { useAppointmentStore } from "../store/appointmentStore";
 import { useCalendarStore } from "../store/calendarStore";
 import { useUserStore } from "../store/userStore";
+import Loading from "../components/Loading";
 
 // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
 const BASE_URL =
@@ -21,6 +22,7 @@ const BASE_URL =
 
 const IndividualCalendar = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const dragStartRef = useRef(null);
   const isDraggingRef = useRef(false);
@@ -44,20 +46,15 @@ const IndividualCalendar = () => {
     responseData,
     appointmentId,
     userName,
+    eventName,
     dates,
     times,
-    eventName,
     selectedDate,
     selectedTimes,
     setSelectedDate,
-    setSelectedTimes,
-    setEventName,
-    setDates,
-    setTimes,
     updateSchedule,
   } = useAppointmentStore();
 
-  const navigate = useNavigate();
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
   const minuteSlot = [10, 20, 30, 40, 50];
@@ -150,7 +147,7 @@ const IndividualCalendar = () => {
       ...selectedTimes,
       [selectedDate]: newSelectedForDay,
     };
-    setSelectedTimes(newSelectedTimes);
+    useAppointmentStore.getState().setSelectedTimes(newSelectedTimes);
   };
 
   // 모바일 터치 종료: 미리보기 영역을 최종 선택으로 확정하고, 각 셀에 대해 서버 업데이트 호출
@@ -180,15 +177,7 @@ const IndividualCalendar = () => {
 
       for (let t = minTime; t <= maxTime; t++) {
         for (let b = minButton; b <= maxButton; b++) {
-          updateTimeSlot(
-            t,
-            b,
-            desiredValue,
-            selectedTimes,
-            setSelectedTimes,
-            selectedDate,
-            true
-          );
+          updateTimeSlot(t, b, desiredValue, true);
         }
       }
     }
@@ -220,13 +209,7 @@ const IndividualCalendar = () => {
         // 드래그가 감지되지 않았으면 단일 클릭으로 처리
         const { timeIndex, buttonIndex } = initialCellRef.current;
 
-        handleTimeClick(
-          timeIndex,
-          buttonIndex,
-          selectedTimes,
-          setSelectedTimes,
-          selectedDate
-        );
+        handleTimeClick(timeIndex, buttonIndex);
       }
       // 드래그 상태 초기화
       dragStartRef.current = null;
@@ -251,7 +234,7 @@ const IndividualCalendar = () => {
       window.removeEventListener("touchend", handleGlobalEnd);
       window.removeEventListener("touchcancel", handleGlobalEnd);
     };
-  }, [selectedTimes, setSelectedTimes, selectedDate, times, dates]);
+  }, [selectedTimes, selectedDate, times, dates]);
 
   const findCellFromPoint = (x, y) => {
     // document.elementFromPoint를 사용하여 현재 터치/마우스 포인트 아래의 요소 찾기
@@ -299,11 +282,7 @@ const IndividualCalendar = () => {
           initialCellRef.current.timeIndex,
           initialCellRef.current.buttonIndex,
           initialCellRef.current.intendedValue,
-          selectedTimes,
-          setSelectedTimes,
-          selectedDate,
-          dates,
-          times
+          false
         );
         updatedSlotsRef.current.add(keyInitial);
       }
@@ -315,141 +294,114 @@ const IndividualCalendar = () => {
           timeIndex,
           buttonIndex,
           initialCellRef.current.intendedValue,
-          selectedTimes,
-          setSelectedTimes,
-          selectedDate
+          false
         );
         updatedSlotsRef.current.add(key);
       }
     }
   };
+
+  // Store 데이터 확인 및 초기화
   useEffect(() => {
-    //step1. appointment 전체의 스케줄 틀 불러옴
-    if (responseData) {
-      setEventName(responseData.object.name);
-      moment.locale("ko");
-      const schedules = responseData.object.schedules;
-      if (!schedules) {
-        console.error("schedules 비어있음");
-        return;
-      }
+    console.log("Store 상태 확인:", {
+      appointmentId,
+      eventName,
+      dates: dates?.length,
+      times: times?.length,
+      userName,
+      responseData: !!responseData,
+    });
 
-      // console.log("schedules 보호구역: ",schedules);
-      console.log(
-        "이거슨 individualCalendar 로드할때 appointment자체의 스케줄",
-        schedules
+    // appointmentId가 없으면 홈으로 리다이렉트
+    if (!appointmentId) {
+      console.log("appointmentId가 없어서 홈으로 리다이렉트");
+      navigate("/");
+      return;
+    }
+
+    // 데이터가 있으면 초기 설정 진행
+    if (responseData && dates?.length > 0 && times?.length > 0) {
+      console.log("데이터 로드 완료, 초기 설정 진행");
+      // 기존 초기화 로직 실행
+      initializeUserSchedule();
+    }
+  }, [appointmentId, responseData, dates, times, navigate]);
+
+  const initializeUserSchedule = () => {
+    if (!responseData) return;
+
+    moment.locale("ko");
+    const schedules = responseData.object.schedules;
+    if (!schedules) {
+      console.error("schedules 비어있음");
+      return;
+    }
+
+    console.log(
+      "이거슨 individualCalendar 로드할때 appointment자체의 스케줄",
+      schedules
+    );
+
+    // 재로그인 case
+    if (responseData.firstLogin === false) {
+      const userSelections = responseData.userSchedule.reduce(
+        (acc, daySchedule) => {
+          daySchedule.times.forEach((slot) => {
+            const slotDate = moment
+              .tz(slot.time, "Asia/Seoul")
+              .format("YYYY-MM-DD");
+            const slotHour = moment.tz(slot.time, "Asia/Seoul").format("HH");
+            const slotMinute = moment.tz(slot.time, "Asia/Seoul").format("mm");
+            if (!acc[slotDate]) acc[slotDate] = {};
+            if (!acc[slotDate][slotHour]) acc[slotDate][slotHour] = [];
+
+            acc[slotDate][slotHour].push(parseInt(slotMinute));
+          });
+          return acc;
+        },
+        {}
       );
-      // 날짜 및 시간 데이터 설정
-      const datesArray = schedules.map((schedule, index) => {
-        const dateString = schedule.date;
 
-        const date = moment.tz(dateString, "Asia/Seoul").format("YYYY-MM-DD");
+      console.log("정리된 사용자 선택입니다~:", userSelections);
+      const savedTimes = {};
 
-        return { date, key: index, id: schedule.id };
-      });
+      const { dates: storeDates, times: storeTimes } =
+        useAppointmentStore.getState();
+      storeDates.forEach((dateInfo, dateIndex) => {
+        const datePath = dateInfo.date;
+        if (userSelections[datePath]) {
+          if (!savedTimes[dateIndex]) savedTimes[dateIndex] = {};
 
-      const startTimeString = responseData.object.startTime;
-      const endTimeString = responseData.object.endTime;
-      const startTimeH = moment.tz(startTimeString, "Asia/Seoul").format("HH");
-      const endTimeHM = moment.tz(endTimeString, "Asia/Seoul").format("HH");
-
-      const scheduleTimes = schedules[0]?.times;
-
-      if (!scheduleTimes) {
-        console.error("스케줄에 times가 없습니다.");
-        return;
-      }
-
-      const timeSet = new Set();
-      scheduleTimes.forEach((timeSlot) => {
-        const timeString = timeSlot.time;
-        // const timeHM = moment.utc(timeString).format('HH');
-        const timeHM = moment.tz(timeString, "Asia/Seoul").format("HH");
-        if (timeHM >= startTimeH && timeHM <= endTimeHM - 1) {
-          //ex 09:00 ~ 20:00로 설정해놨다치면 19:00시간대까지만 사용자 화면에 보여야함
-          timeSet.add(timeHM);
+          storeTimes.forEach((time, timeIndex) => {
+            const hour = moment(time, "HH:mm").format("HH");
+            const minutes = userSelections[datePath][hour];
+            if (minutes) {
+              savedTimes[dateIndex][timeIndex] = {};
+              minutes.forEach((minute) => {
+                const buttonIndex = minute / 10;
+                savedTimes[dateIndex][timeIndex][buttonIndex] = true;
+              });
+            }
+          });
         }
       });
 
-      const timesArray = Array.from(timeSet).sort((a, b) => {
-        return moment(a, "HH").diff(moment(b, "HH"));
+      const { setSelectedTimes } = useAppointmentStore.getState();
+      if (typeof setSelectedTimes === "function") {
+        setSelectedTimes(savedTimes);
+      } else {
+        console.error("setSelectedTimes function not available");
+      }
+
+      const allTimesSelected = storeTimes.every((_, timeIndex) => {
+        return [...Array(6)].every((_, buttonIndex) => {
+          return savedTimes[0]?.[timeIndex]?.[buttonIndex] === true;
+        });
       });
 
-      const timesFormatted = timesArray.map((timeHM) =>
-        moment(timeHM, "HH").format("HH:mm")
-      );
-
-      setDates(datesArray);
-      setTimes(timesFormatted);
-
-      // console.log("첫로그인?: ",responseData.firstLogin);
-      // console.log("responseData 원본?: ",responseData);
-
-      //재로그인 case
-      if (responseData.firstLogin === false) {
-        // console.log("사용자가 이전 로그인에서 저장했었던 times?: ", responseData.userSchedule[0].times);
-
-        // const userSelections = responseData.userSchedule[0].times.reduce((acc, slot) => {
-        //개인용 스케줄 페이지
-        const userSelections = responseData.userSchedule.reduce(
-          (acc, daySchedule) => {
-            daySchedule.times.forEach((slot) => {
-              const slotDate = moment
-                .tz(slot.time, "Asia/Seoul")
-                .format("YYYY-MM-DD");
-              const slotHour = moment.tz(slot.time, "Asia/Seoul").format("HH");
-              const slotMinute = moment
-                .tz(slot.time, "Asia/Seoul")
-                .format("mm");
-              if (!acc[slotDate]) acc[slotDate] = {};
-              if (!acc[slotDate][slotHour]) acc[slotDate][slotHour] = [];
-
-              acc[slotDate][slotHour].push(parseInt(slotMinute));
-            });
-            return acc;
-          },
-          {}
-        );
-
-        console.log("정리된 사용자 선택입니다~:", userSelections);
-        const savedTimes = {};
-
-        datesArray.forEach((dateInfo, dateIndex) => {
-          const datePath = dateInfo.date;
-          //   console.log("처리중인 날짜:", {
-          //     datePath,
-          //     existingSelections: userSelections[datePath]
-          // });
-          if (userSelections[datePath]) {
-            if (!savedTimes[dateIndex]) savedTimes[dateIndex] = {};
-
-            timesFormatted.forEach((time, timeIndex) => {
-              const hour = moment(time, "HH:mm").format("HH"); // 시간만 추출해서 비교
-
-              const minutes = userSelections[datePath][hour];
-              if (minutes) {
-                savedTimes[dateIndex][timeIndex] = {};
-                minutes.forEach((minute) => {
-                  const buttonIndex = minute / 10;
-                  savedTimes[dateIndex][timeIndex][buttonIndex] = true;
-                });
-              }
-            });
-          }
-        });
-        // console.log("최종적으로 이전 로그인에서 저장했던 savedTimes:", savedTimes);
-        setSelectedTimes(savedTimes);
-        const allTimesSelected = timesFormatted.every((_, timeIndex) => {
-          return [...Array(6)].every((_, buttonIndex) => {
-            return savedTimes[0]?.[timeIndex]?.[buttonIndex] === true;
-          });
-        });
-
-        // 모든 시간대가 선택되어 있다면 체크박스 시각적으로 체크
-        setIsVisuallyChecked(allTimesSelected);
-      }
+      setIsVisuallyChecked(allTimesSelected);
     }
-  }, [responseData]);
+  };
 
   // selectedTimes 변경 감지 (ft. selectedTimes)
   useEffect(() => {
@@ -521,7 +473,7 @@ const IndividualCalendar = () => {
         newSelectedTimes[selectedDate][timeIndex][buttonIndex] = isChecked;
       });
     });
-    setSelectedTimes(newSelectedTimes);
+    useAppointmentStore.getState().setSelectedTimes(newSelectedTimes);
 
     // 전체 시간대에 대한 payload 구성
     const timesPayload = [];
@@ -594,28 +546,42 @@ const IndividualCalendar = () => {
     //   }
     // }
     if (isChecked) {
+      // Store에서 현재 상태 가져오기
+      const store = useAppointmentStore.getState();
+      const currentTimes = store.times;
+      const currentDates = store.dates;
+      const currentSelectedDate = store.selectedDate;
+      const currentUserName = store.userName;
+
       // 모든 timeblock에 대해 bulkTimesArray 생성
       const newBulkTimes = [];
-      times.forEach((time, timeIndex) => {
+      currentTimes.forEach((time, timeIndex) => {
         for (let buttonIndex = 0; buttonIndex < 6; buttonIndex++) {
-          const hour = times[timeIndex].split(":")[0];
+          const hour = currentTimes[timeIndex].split(":")[0];
           const minute = buttonIndex * 10;
-          const dateTime = `${dates[selectedDate].date}T${hour}:${String(
-            minute
-          ).padStart(2, "0")}:00`;
+          const dateTime = `${
+            currentDates[currentSelectedDate].date
+          }T${hour}:${String(minute).padStart(2, "0")}:00`;
           const kstMoment = moment.tz(dateTime, "Asia/Seoul");
           const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
           newBulkTimes.push({
             time: sendTimeString,
-            users: [userName],
+            users: [currentUserName],
           });
         }
       });
       setBulkTimesArray(newBulkTimes);
     } else {
       // 선택 해제인 경우 해당 날짜의 모든 timeblock 제거
+      const store = useAppointmentStore.getState();
+      const currentDates = store.dates;
+      const currentSelectedDate = store.selectedDate;
+
       setBulkTimesArray((prev) =>
-        prev.filter((item) => !item.time.startsWith(dates[selectedDate].date))
+        prev.filter(
+          (item) =>
+            !item.time.startsWith(currentDates[currentSelectedDate].date)
+        )
       );
     }
 
@@ -624,21 +590,30 @@ const IndividualCalendar = () => {
   };
 
   const handleTimeClick = async (timeIndex, buttonIndex) => {
-    const isSelected = selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
+    // Store에서 현재 상태 가져오기
+    const store = useAppointmentStore.getState();
+    const currentSelectedTimes = store.selectedTimes;
+    const currentSelectedDate = store.selectedDate;
+    const currentTimes = store.times;
+    const currentDates = store.dates;
+    const currentUserName = store.userName;
+
+    const isSelected =
+      currentSelectedTimes[currentSelectedDate]?.[timeIndex]?.[buttonIndex];
     updateTimeSlot(timeIndex, buttonIndex, !isSelected);
 
-    const hour = times[timeIndex].split(":")[0];
+    const hour = currentTimes[timeIndex].split(":")[0];
     const minute = buttonIndex * 10;
-    const dateTime = `${dates[selectedDate].date}T${hour}:${String(
-      minute
-    ).padStart(2, "0")}:00`;
+    const dateTime = `${
+      currentDates[currentSelectedDate].date
+    }T${hour}:${String(minute).padStart(2, "0")}:00`;
     const kstMoment = moment.tz(dateTime, "Asia/Seoul");
     const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
 
     setBulkTimesArray((prev) => {
       if (!isSelected) {
         if (!prev.find((item) => item.time === sendTimeString)) {
-          return [...prev, { time: sendTimeString, users: [userName] }];
+          return [...prev, { time: sendTimeString, users: [currentUserName] }];
         }
         return prev;
       } else {
@@ -652,41 +627,54 @@ const IndividualCalendar = () => {
     timeIndex,
     buttonIndex,
     newValue,
-    selectedTimes,
-    setSelectedTimes,
-    selectedDate,
     forceUpdate = false
   ) => {
+    // Store에서 현재 상태 가져오기
+    const store = useAppointmentStore.getState();
+    const currentSelectedTimes = store.selectedTimes;
+    const currentSelectedDate = store.selectedDate;
+
     // 이미 원하는 상태이면 업데이트하지 않음
     const currentValue =
-      selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
+      currentSelectedTimes[currentSelectedDate]?.[timeIndex]?.[buttonIndex];
     if (!forceUpdate && currentValue === newValue) return;
 
-    const newSelectedTimes = { ...selectedTimes };
-    if (!newSelectedTimes[selectedDate]) {
-      newSelectedTimes[selectedDate] = {};
+    const newSelectedTimes = { ...currentSelectedTimes };
+    if (!newSelectedTimes[currentSelectedDate]) {
+      newSelectedTimes[currentSelectedDate] = {};
     }
-    newSelectedTimes[selectedDate][timeIndex] = {
-      ...newSelectedTimes[selectedDate][timeIndex],
+    newSelectedTimes[currentSelectedDate][timeIndex] = {
+      ...newSelectedTimes[currentSelectedDate][timeIndex],
       [buttonIndex]: newValue,
     };
-    setSelectedTimes(newSelectedTimes);
+    store.setSelectedTimes(newSelectedTimes);
     // 변경된 시간 슬롯을 bulkTimesArray에 저장
-    const hour = times[timeIndex].split(":")[0];
+    const currentTimes = store.times;
+    const currentDates = store.dates;
+    const hour = currentTimes[timeIndex].split(":")[0];
     const minute = buttonIndex * 10;
-    const dateTime = `${dates[selectedDate].date}T${hour}:${String(
-      minute
-    ).padStart(2, "0")}:00`;
+    const dateTime = `${
+      currentDates[currentSelectedDate].date
+    }T${hour}:${String(minute).padStart(2, "0")}:00`;
     const kstMoment = moment.tz(dateTime, "Asia/Seoul");
     const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss.SSS");
 
     const newItem = {
       time: sendTimeString,
-      users: [userName],
+      users: [store.userName],
     };
 
     setBulkTimesArray((prev) => [...prev, newItem]);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  // 데이터가 없으면 로딩 상태 표시
+  if (!appointmentId || !dates || dates.length === 0) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -746,7 +734,7 @@ const IndividualCalendar = () => {
           }}
           aria-label="날짜 탭"
         >
-          {dates.map(({ date, key }) => (
+          {dates?.map(({ date, key }) => (
             <div
               key={key}
               className={`
@@ -805,7 +793,7 @@ const IndividualCalendar = () => {
               <div className="ml-[0.2rem] w-[1.1rem]">분</div>
             </div>
           </div>
-          {times.map((time, timeIndex) => (
+          {times?.map((time, timeIndex) => (
             <div key={timeIndex} className="flex items-center">
               <div
                 className={`

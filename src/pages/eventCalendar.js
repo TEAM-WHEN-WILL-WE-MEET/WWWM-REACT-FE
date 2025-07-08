@@ -66,7 +66,6 @@ const EventCalendar = () => {
     users: storeTotalUsers,
     responseData: storeResponseData,
     initializeFromResponse,
-    setUserName,
   } = useAppointmentStore();
 
   const {
@@ -77,7 +76,7 @@ const EventCalendar = () => {
     setSelectedDate: setStoreSelectedDate,
   } = useCalendarStore();
 
-  const { userName: storeUserName } = useUserStore();
+  const { userName: storeUserName, setUserInfo } = useUserStore();
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -368,7 +367,14 @@ const EventCalendar = () => {
 
   const handleAppointmentData = (responseData, appointmentId, userName) => {
     initializeFromResponse(responseData);
+
+    // appointmentStore에 userName 설정
+    const { setUserName } = useAppointmentStore.getState();
     setUserName(userName);
+
+    // userStore에도 사용자 정보 업데이트 (호환성 유지)
+    setUserInfo(userName, false);
+
     navigate("/individualCalendar");
   };
 
@@ -436,7 +442,7 @@ const EventCalendar = () => {
             msOverflowStyle: "none",
           }}
         >
-          {dates.map(({ date, key }) => (
+          {dates?.map(({ date, key }) => (
             <div
               key={key}
               className={`
@@ -508,7 +514,7 @@ const EventCalendar = () => {
               <div className="ml-[0.2rem] w-[1.1rem]">분</div>
             </div>
           </div>
-          {times.map((time, timeIndex) => (
+          {times?.map((time, timeIndex) => (
             <div
               key={timeIndex}
               className="flex items-center"
