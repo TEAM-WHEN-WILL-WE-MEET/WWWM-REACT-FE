@@ -9,7 +9,7 @@ import CreateCalendar from "./features/calendar/pages/CreateCalendar";
 import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect";
 import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
 import LandingPage from "./components/LandingPage";
-import Menu from "./pages/menu";
+import Menu from "./features/layout/components/Menu";
 
 function App() {
   return (
