@@ -1,8 +1,12 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
+
+# 내가 언급하지 않은 기능이나 구조에 대하여 기존 코드를 수정하거나 주석을 변경하는 행위에 대해 매우 보수적으로 접근해라,
+
+# 만약 변경이 필요하다면 대화를 중단하고 사용자에게 변경 의사를 묻도록 해라.
 
 # Frontend Design Guideline
 
