@@ -13,7 +13,6 @@ import CryptoJS from "crypto-js";
 import { useInviteStore } from "../../../store/index.ts";
 // import { tryParse } from 'firebase-tools/lib/utils';
 
-
 const Invite = () => {
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   const BASE_URL =
@@ -28,6 +27,7 @@ const Invite = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [autoLogin, setAutoLogin] = useState(false);
 
@@ -49,21 +49,28 @@ const Invite = () => {
 
   //form 유효한지 검사
   const isFormValid =
-    name.trim().length > 0 && password.trim().length > 0 && !responseMessage;
+    name.trim().length > 0 &&
+    email.trim().length > 0 &&
+    password.trim().length > 0 &&
+    !responseMessage;
 
   const secretKey = "mySecretKey";
 
-  // 로컬 스토리지에서 암호화된 name과 password를 불러와 복호화 후 state에 할당 및 autoLogin 플래그 설정
+  // 로컬 스토리지에서 암호화된 name, email, password를 불러와 복호화 후 state에 할당 및 autoLogin 플래그 설정
   useEffect(() => {
     const storedNameCipher = localStorage.getItem(`name_${appointmentId}`);
+    const storedEmailCipher = localStorage.getItem(`email_${appointmentId}`);
     const storedPWCipher = localStorage.getItem(`password_${appointmentId}`);
-    if (storedNameCipher && storedPWCipher) {
+    if (storedNameCipher && storedEmailCipher && storedPWCipher) {
       const bytesName = CryptoJS.AES.decrypt(storedNameCipher, secretKey);
       const decryptedName = bytesName.toString(CryptoJS.enc.Utf8);
+      const bytesEmail = CryptoJS.AES.decrypt(storedEmailCipher, secretKey);
+      const decryptedEmail = bytesEmail.toString(CryptoJS.enc.Utf8);
       const bytesPW = CryptoJS.AES.decrypt(storedPWCipher, secretKey);
       const decryptedPW = bytesPW.toString(CryptoJS.enc.Utf8);
-      if (decryptedName && decryptedPW) {
+      if (decryptedName && decryptedEmail && decryptedPW) {
         setName(decryptedName);
+        setEmail(decryptedEmail);
         setPassword(decryptedPW);
         setAutoLogin(true); // 암호화된 값이 있으면 자동 로그인 진행
       }
@@ -72,12 +79,12 @@ const Invite = () => {
 
   // 자동 로그인 실행: 폼 채워지면 handleSubmit 자동 호출
   useEffect(() => {
-    if (autoLogin && name && password) {
+    if (autoLogin && name && email && password) {
       // synthetic event: preventDefault 호출 가능한 객체 전달
       handleSubmit({ preventDefault: () => {} });
       setAutoLogin(false); // 한 번 실행 후 재실행 방지
     }
-  }, [autoLogin, name, password]);
+  }, [autoLogin, name, email, password]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -100,12 +107,12 @@ const Invite = () => {
 
       const data = {
         name: name,
+        email: email,
         password: password,
-        appointmentId: appointmentId,
       };
       setStoreLoading(true);
       try {
-        const response = await fetch(`${BASE_URL}/user/login`, {
+        const response = await fetch(`${BASE_URL}/users/auth/signup`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -113,9 +120,9 @@ const Invite = () => {
           body: JSON.stringify(data),
         });
 
-        if (response.ok) {
+        if (response.status === 201) {
           const responseData = await response.json();
-          setResponseMessage("로그인(or 회원가입) 성공!");
+          setResponseMessage("회원가입이 정상적으로 완료되었습니다!");
           setShowToast(true);
           // console.log("response: ", responseData);
           const appointmentResponse = await fetch(
@@ -125,11 +132,15 @@ const Invite = () => {
           //백엔드 ver2 붙이고  토큰 도입시 다시 아래 로직으로 롤백할 수 있으므로, 아직은은 남겨두겠음음
           // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
           //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
-          if (responseData.object.name) {
+          if (responseData.object && responseData.object.name) {
             localStorage.setItem(`loggedInFlag_${appointmentId}`, "true");
             localStorage.setItem(
               `name_${appointmentId}`,
               CryptoJS.AES.encrypt(data.name, secretKey).toString()
+            );
+            localStorage.setItem(
+              `email_${appointmentId}`,
+              CryptoJS.AES.encrypt(data.email, secretKey).toString()
             );
             localStorage.setItem(
               `password_${appointmentId}`,
@@ -198,8 +209,12 @@ const Invite = () => {
           } else {
             setResponseMessage("사용자 스케줄을 가져오는데 실패했습니다.");
           }
+        } else if (response.status === 400) {
+          setResponseMessage("이미 존재하는 Email입니다.");
+        } else if (response.status === 500) {
+          setResponseMessage("서버 오류가 발생했습니다.");
         } else {
-          setResponseMessage("위 이름으로 설정했던 비밀번호를 입력해주세요.");
+          setResponseMessage("알 수 없는 오류가 발생했습니다.");
         }
       } catch (error) {
         console.error("Error:", error);
@@ -359,6 +374,70 @@ const Invite = () => {
                   </p>
                 )}
               </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="email"
+                  className={`
+              ${typographyVariants({ variant: "d1-sb" })} 
+              ${colorVariants({ color: "gray-800" })} 
+              tracking-[-0.3px]
+              p-0
+              !text-[var(--font-size-12)]
+            `}
+                ></label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => setTouched(true)}
+                  onFocus={() => setTouched(true)}
+                  className={`
+              border
+              border-[var(--gray-300,#E0E0E0)] 
+              ${
+                !email
+                  ? `
+                placeholder-[var(--gray-700,#E0E0E0)] 
+                `
+                  : ` 
+                placeholder-[var(--gray-900,#E0E0E0)] 
+                `
+              }
+          ${typographyVariants({ variant: "b2-md" })} 
+          flex 
+          w-[32rem] 
+          px-[0.4rem] 
+          py-[1.2rem] 
+          items-center 
+          gap-[1rem] 
+          flex-shrink-0
+          border-[var(--white)] 
+          border-b-[var(--gray-300,#E0E0E0)] 
+            ${
+              touched && (!email || email.trim().length === 0)
+                ? "!border-b-[var(--red-300)]"
+                : ""
+            }
+            `}
+                  placeholder="이메일 주소"
+                  aria-label="이메일 주소 작성란"
+                />
+                {touched && (!email || email.trim().length === 0) && (
+                  <p
+                    className={`
+              ${colorVariants({ color: "red-300" })} 
+              ${typographyVariants({ variant: "b2-md" })} 
+              bg-transparent
+              pt-[0.8rem]
+              pl-[0.4rem]
+            `}
+                    aria-live="assertive"
+                  >
+                    이메일을 입력해주세요.
+                  </p>
+                )}
+              </div>
               <div className="">
                 <label
                   htmlFor="password"
@@ -459,7 +538,7 @@ const Invite = () => {
                 transition={{ duration: 0.01, ease: "easeOut" }}
               >
                 <Button
-                  label="로그인 성공!"
+                  label="회원가입 성공!"
                   size={"toast"}
                   // onClick={handleSaveClick}
                   additionalClass={`
