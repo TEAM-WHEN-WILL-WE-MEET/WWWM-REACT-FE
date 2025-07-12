@@ -9,7 +9,6 @@ import { Helmet } from "react-helmet-async";
 import "../styles/invite.css";
 import { AnimatePresence, motion } from "framer-motion";
 import Loading from "../../../components/Loading";
-import CryptoJS from "crypto-js";
 import { useInviteStore } from "../../../store/index.ts";
 // import { tryParse } from 'firebase-tools/lib/utils';
 
@@ -27,15 +26,13 @@ const Invite = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [autoLogin, setAutoLogin] = useState(false);
 
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
   const [touched, setTouched] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [buttonText, setButtonText] = useState("회원가입");
+  const [buttonText, setButtonText] = useState("로그인");
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
 
@@ -49,42 +46,150 @@ const Invite = () => {
 
   //form 유효한지 검사
   const isFormValid =
-    name.trim().length > 0 &&
-    email.trim().length > 0 &&
-    password.trim().length > 0 &&
-    !responseMessage;
+    name.trim().length > 0 && password.trim().length > 0 && !responseMessage;
 
-  const secretKey = "mySecretKey";
-
-  // 로컬 스토리지에서 암호화된 name, email, password를 불러와 복호화 후 state에 할당 및 autoLogin 플래그 설정
-  useEffect(() => {
-    const storedNameCipher = localStorage.getItem(`name_${appointmentId}`);
-    const storedEmailCipher = localStorage.getItem(`email_${appointmentId}`);
-    const storedPWCipher = localStorage.getItem(`password_${appointmentId}`);
-    if (storedNameCipher && storedEmailCipher && storedPWCipher) {
-      const bytesName = CryptoJS.AES.decrypt(storedNameCipher, secretKey);
-      const decryptedName = bytesName.toString(CryptoJS.enc.Utf8);
-      const bytesEmail = CryptoJS.AES.decrypt(storedEmailCipher, secretKey);
-      const decryptedEmail = bytesEmail.toString(CryptoJS.enc.Utf8);
-      const bytesPW = CryptoJS.AES.decrypt(storedPWCipher, secretKey);
-      const decryptedPW = bytesPW.toString(CryptoJS.enc.Utf8);
-      if (decryptedName && decryptedEmail && decryptedPW) {
-        setName(decryptedName);
-        setEmail(decryptedEmail);
-        setPassword(decryptedPW);
-        setAutoLogin(true); // 암호화된 값이 있으면 자동 로그인 진행
+  // JWT 토큰 디코딩 함수
+  const decodeJWT = (token) => {
+    try {
+      // JWT는 header.payload.signature 형태로 구성됨
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        throw new Error("Invalid JWT token format");
       }
-    }
-  }, [appointmentId, secretKey]);
 
-  // 자동 로그인 실행: 폼 채워지면 handleSubmit 자동 호출
-  useEffect(() => {
-    if (autoLogin && name && email && password) {
-      // synthetic event: preventDefault 호출 가능한 객체 전달
-      handleSubmit({ preventDefault: () => {} });
-      setAutoLogin(false); // 한 번 실행 후 재실행 방지
+      // payload 부분 (두 번째 부분) 디코딩
+      const payload = parts[1];
+
+      // base64 URL 디코딩을 위해 패딩 추가
+      const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64.padEnd(
+        base64.length + ((4 - (base64.length % 4)) % 4),
+        "="
+      );
+
+      // base64 디코딩 후 JSON 파싱
+      const decoded = JSON.parse(atob(padded));
+      return decoded;
+    } catch (error) {
+      console.error("JWT 디코딩 실패:", error);
+      return null;
     }
-  }, [autoLogin, name, email, password]);
+  };
+
+  // 토큰에서 사용자명 추출 함수
+  const extractUsernameFromToken = (token) => {
+    if (!token || typeof token !== "string") {
+      console.warn("유효하지 않은 토큰입니다.");
+      return null;
+    }
+
+    const payload = decodeJWT(token);
+    if (!payload) {
+      console.warn("토큰 페이로드 디코딩에 실패했습니다.");
+      return null;
+    }
+
+    // 다양한 필드명으로 사용자명 시도 (우선순위 순)
+    const username =
+      payload.username ||
+      payload.name ||
+      payload.email?.split("@")[0] || // 이메일에서 @ 앞부분만 추출
+      payload.sub ||
+      null;
+
+    if (!username) {
+      console.warn("토큰에서 사용자명을 찾을 수 없습니다. 페이로드:", payload);
+      return null;
+    }
+
+    return username;
+  };
+
+  // 토큰 유효성 검사 함수
+  const validateToken = async (token) => {
+    try {
+      const response = await fetch(`${BASE_URL}/auth/validate`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.ok;
+    } catch (error) {
+      console.error("Token validation error:", error);
+      return false;
+    }
+  };
+
+  // 토큰 기반 자동 로그인 확인
+  useEffect(() => {
+    const checkTokenAndAutoLogin = async () => {
+      const token = localStorage.getItem("authToken");
+
+      if (token) {
+        setStoreLoading(true);
+        const isValidToken = await validateToken(token);
+
+        if (isValidToken) {
+          // 유효한 토큰이면 직접 약속 정보 가져오기
+          try {
+            const appointmentResponse = await fetch(
+              `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Cache-Control": "no-cache",
+                },
+              }
+            );
+
+            if (appointmentResponse.ok) {
+              const appointmentData = await appointmentResponse.json();
+
+              // 토큰에서 사용자명 추출
+              const userName = extractUsernameFromToken(token);
+
+              if (!userName) {
+                console.warn(
+                  "토큰에서 사용자명 추출 실패, 토큰 삭제 후 로그인 폼으로 이동"
+                );
+                localStorage.removeItem("authToken");
+                setStoreLoading(false);
+                return;
+              }
+
+              console.log("자동 로그인 - 추출된 사용자명:", userName);
+
+              const responseData = {
+                ...appointmentData,
+                firstLogin: false, // 토큰이 있으면 재로그인으로 간주
+              };
+
+              navigate("/eventCalendar", {
+                state: { responseData, appointmentId, userName },
+              });
+            } else {
+              // 약속 정보 가져오기 실패 시 토큰 삭제
+              localStorage.removeItem("authToken");
+            }
+          } catch (error) {
+            console.error("Auto login error:", error);
+            localStorage.removeItem("authToken");
+          }
+        } else {
+          // 유효하지 않은 토큰이면 삭제
+          localStorage.removeItem("authToken");
+        }
+        setStoreLoading(false);
+      }
+      // 토큰이 없으면 로그인 폼 표시 (아무것도 하지 않음)
+    };
+
+    if (appointmentId) {
+      checkTokenAndAutoLogin();
+    }
+  }, [appointmentId, BASE_URL, navigate, setStoreLoading]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -106,13 +211,12 @@ const Invite = () => {
       setError(false);
 
       const data = {
-        name: name,
-        email: email,
+        email: name,
         password: password,
       };
       setStoreLoading(true);
       try {
-        const response = await fetch(`${BASE_URL}/users/auth/signup`, {
+        const response = await fetch(`${BASE_URL}/users/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -120,34 +224,34 @@ const Invite = () => {
           body: JSON.stringify(data),
         });
 
-        if (response.status === 201) {
+        if (response.status === 200) {
           const responseData = await response.json();
-          setResponseMessage("회원가입이 정상적으로 완료되었습니다!");
+          setResponseMessage("로그인이 정상적으로 완료되었습니다!");
           setShowToast(true);
           // console.log("response: ", responseData);
-          const appointmentResponse = await fetch(
-            `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
+
+          // Bearer 토큰 저장
+          const token = responseData.object;
+          localStorage.setItem("authToken", token);
+
+          // 토큰에서 사용자명 추출하여 로깅 (디버깅 목적)
+          const tokenUserName = extractUsernameFromToken(token);
+          console.log(
+            "로그인 성공 - 입력된 이름:",
+            name,
+            "토큰의 사용자명:",
+            tokenUserName
           );
 
-          //백엔드 ver2 붙이고  토큰 도입시 다시 아래 로직으로 롤백할 수 있으므로, 아직은은 남겨두겠음음
-          // 사용자 이전 로그인 여부를 flag로 localStorage에 저장,
-          //  appointmentId와 쌍으로 저장해 정확히 일치할때만 재로그인으로 간주
-          if (responseData.object && responseData.object.name) {
-            localStorage.setItem(`loggedInFlag_${appointmentId}`, "true");
-            localStorage.setItem(
-              `name_${appointmentId}`,
-              CryptoJS.AES.encrypt(data.name, secretKey).toString()
-            );
-            localStorage.setItem(
-              `email_${appointmentId}`,
-              CryptoJS.AES.encrypt(data.email, secretKey).toString()
-            );
-            localStorage.setItem(
-              `password_${appointmentId}`,
-              CryptoJS.AES.encrypt(data.password, secretKey).toString()
-            );
-            // console.log(`Login flag saved to localStorage for appointmentId ${appointmentId}: true`);
-          }
+          const appointmentResponse = await fetch(
+            `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Cache-Control": "no-cache",
+              },
+            }
+          );
           if (appointmentResponse.ok) {
             const appointmentData = await appointmentResponse.json();
             //  console.log("저쪽 invite.js 신사 분이 보내주신 전체 인원의 스케줄 정보: ", appointmentData);
@@ -157,6 +261,7 @@ const Invite = () => {
               {
                 method: "GET",
                 headers: {
+                  Authorization: `Bearer ${token}`,
                   "Cache-Control": "no-cache",
                 },
               }
@@ -209,8 +314,10 @@ const Invite = () => {
           } else {
             setResponseMessage("사용자 스케줄을 가져오는데 실패했습니다.");
           }
+        } else if (response.status === 404) {
+          setResponseMessage("등록되지 않은 이름입니다.");
         } else if (response.status === 400) {
-          setResponseMessage("이미 존재하는 Email입니다.");
+          setResponseMessage("비밀번호가 일치하지 않습니다.");
         } else if (response.status === 500) {
           setResponseMessage("서버 오류가 발생했습니다.");
         } else {
@@ -374,70 +481,7 @@ const Invite = () => {
                   </p>
                 )}
               </div>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="email"
-                  className={`
-              ${typographyVariants({ variant: "d1-sb" })} 
-              ${colorVariants({ color: "gray-800" })} 
-              tracking-[-0.3px]
-              p-0
-              !text-[var(--font-size-12)]
-            `}
-                ></label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => setTouched(true)}
-                  onFocus={() => setTouched(true)}
-                  className={`
-              border
-              border-[var(--gray-300,#E0E0E0)] 
-              ${
-                !email
-                  ? `
-                placeholder-[var(--gray-700,#E0E0E0)] 
-                `
-                  : ` 
-                placeholder-[var(--gray-900,#E0E0E0)] 
-                `
-              }
-          ${typographyVariants({ variant: "b2-md" })} 
-          flex 
-          w-[32rem] 
-          px-[0.4rem] 
-          py-[1.2rem] 
-          items-center 
-          gap-[1rem] 
-          flex-shrink-0
-          border-[var(--white)] 
-          border-b-[var(--gray-300,#E0E0E0)] 
-            ${
-              touched && (!email || email.trim().length === 0)
-                ? "!border-b-[var(--red-300)]"
-                : ""
-            }
-            `}
-                  placeholder="이메일 주소"
-                  aria-label="이메일 주소 작성란"
-                />
-                {touched && (!email || email.trim().length === 0) && (
-                  <p
-                    className={`
-              ${colorVariants({ color: "red-300" })} 
-              ${typographyVariants({ variant: "b2-md" })} 
-              bg-transparent
-              pt-[0.8rem]
-              pl-[0.4rem]
-            `}
-                    aria-live="assertive"
-                  >
-                    이메일을 입력해주세요.
-                  </p>
-                )}
-              </div>
+
               <div className="">
                 <label
                   htmlFor="password"
@@ -538,7 +582,7 @@ const Invite = () => {
                 transition={{ duration: 0.01, ease: "easeOut" }}
               >
                 <Button
-                  label="회원가입 성공!"
+                  label="로그인 성공!"
                   size={"toast"}
                   // onClick={handleSaveClick}
                   additionalClass={`
