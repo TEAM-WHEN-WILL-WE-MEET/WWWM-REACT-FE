@@ -194,12 +194,18 @@ const MonthView = () => {
 
   return (
     <div className="flex flex-col w-auto h-auto !px-[0.8rem]">
-      <div className="flex  justify-between">
+      <div className="flex justify-between items-center w-full">
         <img
           alt="언제볼까? 서비스 로고"
           src="/wwmtLogo.svg"
           className="flex px-[1.2rem] py-[1.2rem] cursor-pointer"
           onClick={() => navigate("/")}
+        />
+        <img
+          alt="메뉴 열기"
+          src="/hambugerMenu.svg"
+          className="cursor-pointer w-[2.4rem] h-[2.4rem] mr-[1.2rem]"
+          onClick={() => navigate("/menu")}
         />
       </div>
       <div className="relative px-4">
