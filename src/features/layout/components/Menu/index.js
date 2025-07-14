@@ -10,7 +10,7 @@ import { typographyVariants } from "../../../../styles/typography.ts";
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(true);
-  
+
   const closeSidebar = () => setIsOpen(false);
   const navigate = useNavigate();
   // 2) 체크박스에서 선택된 아이템의 id들을 별도로 저장
@@ -58,6 +58,12 @@ export default function Menu() {
   const handleLogOutButtonClick = () => {
     setShowModalLogOut(true);
   };
+
+  const handleProfileClick = () => {
+    console.log("개인정보 수정 버튼 클릭됨 - 프로필 페이지로 이동");
+    navigate("/profile");
+  };
+
   const handleLogOut = () => {
     setShowModalLogOut(false);
   };
@@ -270,7 +276,10 @@ export default function Menu() {
                 variant: "b2-md",
               })} text-[1.4rem] flex  flex-col gap-[1.2rem]`}
             >
-              <li className="flex items-center gap-x-[0.4rem] border-b border-[var(--gray-100)] pb-[0.8rem] cursor-pointer">
+              <li
+                onClick={handleProfileClick}
+                className="flex items-center gap-x-[0.4rem] border-b border-[var(--gray-100)] pb-[0.8rem] cursor-pointer"
+              >
                 <img
                   src="/User.svg"
                   alt="개인정보 수정"
