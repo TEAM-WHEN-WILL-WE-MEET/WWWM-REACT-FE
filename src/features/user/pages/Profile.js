@@ -157,11 +157,22 @@ const Profile = () => {
 
           {/* 액션 버튼들 */}
           <Button
+            label="내 정보 수정"
+            size="XL"
+            onClick={() => navigate("/profile/edit")}
+            additionalClass={cn(
+              "w-full mb-[1.2rem]",
+              colorVariants({ bg: "blue-500" }),
+              "!text-[var(--white)]"
+            )}
+          />
+
+          <Button
             label="정보 새로고침"
             size="XL"
             onClick={fetchMyInfo}
             additionalClass={cn(
-              "w-full",
+              "w-full mb-[1.2rem]",
               colorVariants({ bg: "blue-400" }),
               "!text-[var(--white)]"
             )}
