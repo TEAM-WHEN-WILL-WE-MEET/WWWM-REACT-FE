@@ -12,9 +12,6 @@ import { Button } from "../../../../components/Button.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import Loading from "../../../../components/Loading";
-import { useAppointmentStore } from "../../../../store/appointmentStore";
-import { useCalendarStore } from "../../../../store/calendarStore";
-import { useUserStore } from "../../../../store/userStore";
 import { fetchApi } from "../../../../utils/api";
 import { API_ENDPOINTS } from "../../../../config/environment";
 
@@ -60,25 +57,6 @@ const EventCalendar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const minuteSlot = [10, 20, 30, 40, 50];
-
-  // Store states
-  const {
-    appointmentId: storeAppointmentId,
-    eventName: storeEventName,
-    users: storeTotalUsers,
-    responseData: storeResponseData,
-    initializeFromResponse,
-  } = useAppointmentStore();
-
-  const {
-    selectedDate: storeSelectedDate,
-    dates: storeDates,
-    times: storeTimes,
-    selectedTimes: storeSelectedTimes,
-    setSelectedDate: setStoreSelectedDate,
-  } = useCalendarStore();
-
-  const { name: storeUserName, setUserInfo } = useUserStore();
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -163,9 +141,9 @@ const EventCalendar = () => {
           }
         );
 
-        // console.log("[TEST] responseData의 스케줄: ", responseData.object.schedules[0].times);
         if (!responseData || !responseData.object) {
           console.error("응답 데이터가 올바르지 않습니다");
+          setLoading(false);
           return;
         }
 
@@ -174,12 +152,12 @@ const EventCalendar = () => {
           setEventName(responseData.object.name);
           moment.locale("ko");
           const schedules = responseData.object.schedules;
-          if (!schedules) {
-            console.error("schedules 비어있음");
+
+          if (!schedules || schedules.length === 0) {
+            console.error("schedules가 비어있음");
+            setLoading(false);
             return;
           }
-
-          // console.log("schedules 보호구역: ", schedules); //정상작동
 
           // 날짜 및 시간 데이터 설정
           const datesArray = schedules.map((schedule, index) => {
@@ -191,28 +169,30 @@ const EventCalendar = () => {
             return { date, key: index, id: schedule.id };
           });
 
-          const startTimeString = responseData.object.startTime;
+                    const startTimeString = responseData.object.startTime;
           const endTimeString = responseData.object.endTime;
-          const startTimeH = moment
-            .tz(startTimeString, "Asia/Seoul")
-            .format("HH");
-          const endTimeHM = moment.tz(endTimeString, "Asia/Seoul").format("HH");
+          
+          console.log("=== 시간 데이터 생성 디버깅 ===");
+          console.log("startTimeString:", startTimeString);
+          console.log("endTimeString:", endTimeString);
+          
+          // 시간만 포함된 문자열을 파싱 (HH:mm:ss 형태)
+          const startTimeH = moment(startTimeString, "HH:mm:ss").format("HH");
+          const endTimeHM = moment(endTimeString, "HH:mm:ss").format("HH");
+          
+          console.log("파싱된 시간:", { startTimeH, endTimeHM });
 
-          const scheduleTimes = schedules[0]?.times;
-
-          if (!scheduleTimes) {
-            console.error("스케줄에 times가 없습니다.");
-            return;
+          // startTime과 endTime 사이의 모든 시간대를 생성
+          const timeSet = new Set();
+          for (
+            let hour = parseInt(startTimeH);
+            hour < parseInt(endTimeHM);
+            hour++
+          ) {
+            timeSet.add(hour.toString().padStart(2, "0"));
           }
 
-          const timeSet = new Set();
-          scheduleTimes.forEach((timeSlot) => {
-            const timeString = timeSlot.time;
-            const timeHM = moment.tz(timeString, "Asia/Seoul").format("HH");
-            if (timeHM >= startTimeH && timeHM <= endTimeHM - 1) {
-              timeSet.add(timeHM);
-            }
-          });
+          console.log("생성된 timeSet:", timeSet);
 
           const timesArray = Array.from(timeSet).sort((a, b) => {
             return moment(a, "HH").diff(moment(b, "HH"));
@@ -222,11 +202,10 @@ const EventCalendar = () => {
             moment(timeHM, "HH").format("HH:mm")
           );
 
+          console.log("최종 timesFormatted:", timesFormatted);
+
           setDates(datesArray);
           setTimes(timesFormatted);
-
-          // console.log("그냥 responseData.object: ", responseData.object);
-          // console.log("responseData.object.schedules: ", responseData.object.schedules);
 
           // 공용 스케줄 페이지 - 화면에 색 입힐 유저 몇명인지 찾는 과정
           const userSelections = responseData.object.schedules.reduce(
@@ -249,24 +228,16 @@ const EventCalendar = () => {
                   acc[slotDate][slotHour] = [];
                 }
 
-                if (slot.users.length > 0) {
-                  acc[slotDate][slotHour].push({
-                    minute: slotMinute,
-                    users: slot.users,
-                    count: slot.users.length,
-                  });
-                }
+                acc[slotDate][slotHour].push({
+                  minute: slotMinute,
+                  users: slot.users,
+                  count: slot.users.length,
+                });
               });
               return acc;
             },
             {}
           );
-
-          // console.log("userSelections입니다 ~!!: ", userSelections);
-
-          // const TotalUsers = responseData.object.users.length;
-          // console.log("responseData.object.users: ", responseData.object.users);
-          // console.log("TotalUsers: ", TotalUsers);
 
           setTotalUsers(responseData.object.users.length);
           setUserList(responseData.object.users);
@@ -275,39 +246,36 @@ const EventCalendar = () => {
 
           datesArray.forEach((dateInfo, dateIndex) => {
             const datePath = dateInfo.date;
-            // console.log("처리중인 날짜:", {
-            //     datePath,
-            //     existingSelections: userSelections[datePath],
-            // });
 
-            if (userSelections[datePath]) {
-              if (!savedTimes[dateIndex]) {
-                savedTimes[dateIndex] = {};
+            if (!savedTimes[dateIndex]) {
+              savedTimes[dateIndex] = {};
+            }
+
+            timesFormatted.forEach((time, timeIndex) => {
+              const hour = moment(time, "HH:mm").format("HH");
+              const mm = moment(time, "HH:mm").format("mm");
+
+              const minutesArray = userSelections[datePath]?.[hour] || [];
+
+              if (!savedTimes[dateIndex][timeIndex]) {
+                savedTimes[dateIndex][timeIndex] = {};
               }
 
-              timesFormatted.forEach((time, timeIndex) => {
-                const hour = moment(time, "HH:mm").format("HH");
-                const mm = moment(time, "HH:mm").format("mm");
-
-                const minutesArray = userSelections[datePath][hour];
-                // console.log("minutesArray: ", minutesArray);
-                if (minutesArray) {
-                  savedTimes[dateIndex][timeIndex] = {};
-                  minutesArray.forEach((minuteObj) => {
-                    if (minuteObj && minuteObj.minute !== undefined) {
-                      const minuteInt = parseInt(minuteObj.minute, 10);
-                      const buttonIndex = minuteInt / 10;
-                      savedTimes[dateIndex][timeIndex][buttonIndex] = {
-                        userCount: minuteObj.count || 0,
-                        userList: minuteObj.users || [],
-                      };
-                    }
-                  });
-                }
-              });
-            }
+              if (minutesArray.length > 0) {
+                minutesArray.forEach((minuteObj) => {
+                  if (minuteObj && minuteObj.minute !== undefined) {
+                    const minuteInt = parseInt(minuteObj.minute, 10);
+                    const buttonIndex = minuteInt / 10;
+                    savedTimes[dateIndex][timeIndex][buttonIndex] = {
+                      userCount: minuteObj.count || 0,
+                      userList: minuteObj.users || [],
+                    };
+                  }
+                });
+              }
+            });
           });
-          // console.log("최종 savedTimes:", savedTimes);
+
           setSelectedTimes(savedTimes);
         }
       } catch (error) {
@@ -334,13 +302,10 @@ const EventCalendar = () => {
     // 올바른 user 객체(즉, user && user.name가 존재하는 객체)만 필터링
     nowUserList = nowUserList.filter((user) => user && user.name);
     setHoverUserList(nowUserList);
-    // console.log("timeIndex: ", timeIndex);
-    // console.log("nowUserList: ",nowUserList);
   };
   // 참여자 목록을 저장하는 함수
   const handleMouseEnter = (userList) => {
     setHoverUserList(userList);
-    console.log("userList ft 314 line", userList);
   };
   // hover 벗어날 때 nowUserList 초기화
   const handleTimeslotLeave = () => {
@@ -367,20 +332,9 @@ const EventCalendar = () => {
   const handleSaveClick = () => {
     // 필요한 로직 처리 후 페이지 이동
     //  navigate(`/getAppointment?appointmentId=${appointmentId}`);
-    handleAppointmentData(responseData, appointmentId, userName);
-  };
-
-  const handleAppointmentData = (responseData, appointmentId, userName) => {
-    initializeFromResponse(responseData);
-
-    // appointmentStore에 userName 설정
-    const { setUserName } = useAppointmentStore.getState();
-    setUserName(userName);
-
-    // userStore에도 사용자 정보 업데이트 (호환성 유지)
-    setUserInfo(userName, false);
-
-    navigate("/individualCalendar");
+    navigate("/individualCalendar", {
+      state: { appointmentId, userName },
+    });
   };
 
   return (
@@ -447,7 +401,7 @@ const EventCalendar = () => {
             msOverflowStyle: "none",
           }}
         >
-          {dates?.map(({ date, key }) => (
+          {(dates || []).map(({ date, key }) => (
             <div
               key={key}
               className={`
@@ -463,13 +417,13 @@ const EventCalendar = () => {
                 ${
                   selectedDate === key
                     ? `
-                  !${colorVariants({ color: "gray-900" })} 
-                  font-[600] 
-                  border-b-[0.2rem] 
-                  border-[var(--gray-900,#242424)]
-                  -mb-0.3
-                  z-20
-                `
+                    !${colorVariants({ color: "gray-900" })} 
+                    font-[600] 
+                    border-b-[0.2rem] 
+                    border-[var(--gray-900,#242424)]
+                    -mb-0.3
+                    z-20
+                  `
                     : ``
                 }
 
@@ -519,7 +473,7 @@ const EventCalendar = () => {
               <div className="ml-[0.2rem] w-[1.1rem]">분</div>
             </div>
           </div>
-          {times?.map((time, timeIndex) => (
+          {(times || []).map((time, timeIndex) => (
             <div
               key={timeIndex}
               className="flex items-center"
@@ -528,17 +482,17 @@ const EventCalendar = () => {
             >
               <div
                 className={`
-                  ${typographyVariants({ variant: "d3-rg" })}
-                  text-[var(--gray-800,#444)]
-                  h-[2.8rem] 
-                  w-[3.6rem] 
-                  text-center 
-                  mr-[0.6rem] 
-                  flex 
-                  items-center 
-                  justify-center 
-                  whitespace-nowrap                
-                `}
+                ${typographyVariants({ variant: "d3-rg" })}
+                text-[var(--gray-800,#444)]
+                h-[2.8rem] 
+                w-[3.6rem] 
+                text-center 
+                mr-[0.6rem] 
+                flex 
+                items-center 
+                justify-center 
+                whitespace-nowrap                
+              `}
               >
                 {moment(time, "HH:mm").format("HH시")}
               </div>
@@ -552,6 +506,7 @@ const EventCalendar = () => {
                   // 색상 클래스 결정
                   let colorClass = "";
                   if (
+                    TotalUsers > 0 &&
                     userCount / TotalUsers > 0 &&
                     userCount / TotalUsers <= 0.3
                   ) {
@@ -559,6 +514,7 @@ const EventCalendar = () => {
                       bg: "blue-50",
                     })} border-[var(--blue-100)]`;
                   } else if (
+                    TotalUsers > 0 &&
                     userCount / TotalUsers > 0.3 &&
                     userCount / TotalUsers <= 0.6
                   ) {
@@ -566,13 +522,14 @@ const EventCalendar = () => {
                       bg: "blue-100",
                     })} border-[var(--blue-200)]`;
                   } else if (
+                    TotalUsers > 0 &&
                     userCount / TotalUsers > 0.6 &&
                     userCount / TotalUsers < 0.99
                   ) {
                     colorClass = `${colorVariants({
                       bg: "blue-200",
                     })} border-[var(--blue-300)]`;
-                  } else if (userCount / TotalUsers === 1) {
+                  } else if (TotalUsers > 0 && userCount / TotalUsers === 1) {
                     colorClass = `${colorVariants({
                       bg: "magen-50",
                     })} border-[var(--magen-300)]`;
@@ -583,16 +540,13 @@ const EventCalendar = () => {
                       key={buttonIndex}
                       size={"XXS"}
                       additionalClass={`
-                        ${colorClass}
-                       
-                        items-center !transform-none
-                      `}
+                      ${colorClass}
+                     
+                      items-center !transform-none
+                    `}
                       handleMouseEnter={() => {
-                        // console.log("스슬롯: ", slot);
                         if (slot) {
                           setHoverUserList(slot?.userList || []); // slot이 없거나 userList가 undefined이면 빈 배열
-                          // console.log("slot.userList: ", slot.userList);
-                          // console.log("slot: ", slot);
                         }
                       }}
                       onMouseLeave={() => {
@@ -665,7 +619,6 @@ const EventCalendar = () => {
                       >
                         {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
                         {typeof user === "string" ? user : user?.name || ""}
-                        {/* {console.log("hoverUserList: ",hoverUserList)} */}
                       </div>
                     ))
                   : null
