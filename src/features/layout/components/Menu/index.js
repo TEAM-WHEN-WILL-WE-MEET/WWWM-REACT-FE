@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../components/Button.tsx";
+import { fetchApi } from "../../../../utils/api.ts";
+import { API_ENDPOINTS } from "../../../../config/environment.ts";
 
 import { colors, colorVariants } from "../../../../styles/color.ts";
 import { typographyVariants } from "../../../../styles/typography.ts";
@@ -21,12 +23,45 @@ export default function Menu() {
   const [showModal, setShowModal] = useState(false);
   const [showModalLogOut, setShowModalLogOut] = useState(false);
 
-  //나중에 백엔드 ver2 붙이고 서버에서 불러오기기
-  const [items, setItems] = useState([
-    { id: 1, title: "9월 동아리 정기회의", daysLeft: 7 },
-    { id: 2, title: "프로젝트 2차 회의", daysLeft: 4 },
-    { id: 3, title: "영어 스터디", daysLeft: 1 },
-  ]);
+  // API에서 받아온 약속 데이터
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 컴포넌트 마운트 시 API에서 약속 데이터 가져오기
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetchApi(API_ENDPOINTS.GET_USER_APPOINTMENTS);
+
+        if (response.success && response.object) {
+          // API 응답 데이터를 기존 UI 구조에 맞게 변환
+          const transformedItems = response.object.map((appointment) => ({
+            id: appointment.id,
+            title: appointment.name,
+            // 만료일까지 남은 일수 계산
+            daysLeft: Math.ceil(
+              (new Date(appointment.expireAt) - new Date()) /
+                (1000 * 60 * 60 * 24)
+            ),
+          }));
+          setItems(transformedItems);
+        }
+      } catch (err) {
+        console.error("약속 데이터 가져오기 실패:", err);
+        setError(err.message);
+        // 에러 시 빈 배열로 설정
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
   // 체크박스(선택) 모드 활성화 여부: 하나의 항목 클릭 시 true로 변경
@@ -118,78 +153,110 @@ export default function Menu() {
             </h1>
             {/* 공유 캘린더 리스트 */}
             <ul className="mb-[4.8rem] ">
-              {items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
-                >
-                  {/* 왼쪽 체크박스 + 타이틀 */}
-                  <div className="flex items-center cursor-pointer">
-                    {isSelectionMode && (
-                      <div className=" flex flex-col !items-end !justify-end  ">
-                        <input
-                          type="checkbox"
-                          id={`Keep-logged-in-${item.id}`}
-                          className="invite-screen-reader"
-                          checked={selectedIds.includes(item.id)}
-                          onChange={(e) => {
-                            setIsChecked(e.target.checked);
-                            setIsVisuallyChecked(e.target.checked);
-                            e.stopPropagation();
-                            handleToggleSelect(item.id);
-                          }}
-                        />
-                        <div className="invite-label-box">
-                          <label
-                            htmlFor={`Keep-logged-in-${item.id}`}
-                            className={`${typographyVariants({
-                              variant: "b2-md",
-                            })} 
-                      !text-[1.4rem]
-                      ${
-                        isVisuallyChecked || isChecked
-                          ? colorVariants({ color: "gray-900" })
-                          : colorVariants({ color: "gray-700" })
-                      }`}
-                          >
-                            <span
-                              className="invite-check-icon"
-                              aria-hidden="true"
-                            ></span>
-                          </label>
-                        </div>
-                      </div>
-                    )}
-
-                    <span
-                      className={`
-                  ml-2
-                  ${typographyVariants({ variant: "b2-md" })}
-                  !text-[1.4rem]
-                  ${colorVariants({ color: "gray-800" })}
-                  hover:bg-var[(--red-30)]
-                  cusror-pointer
-                `}
-                      onClick={() => handleToggleSelect(item.id)}
-                    >
-                      {item.title}
-                    </span>
-                  </div>
-                  <div
-                    className={` ${typographyVariants({
-                      variant: "d3-rg",
-                    })} ${colorVariants({ color: "gray-600" })}
-                             !text-[1.2rem] `}
+              {loading ? (
+                <li className="flex justify-center items-center py-[2rem]">
+                  <span
+                    className={`${typographyVariants({
+                      variant: "b2-md",
+                    })} ${colorVariants({ color: "gray-600" })} text-[1.4rem]`}
                   >
-                    <span
-                      className={` ${colorVariants({ color: "red-300" })} `}
-                    >
-                      {item.daysLeft}
-                    </span>
-                    일 후 삭제
-                  </div>
+                    로딩 중...
+                  </span>
                 </li>
-              ))}
+              ) : error ? (
+                <li className="flex justify-center items-center py-[2rem]">
+                  <span
+                    className={`${typographyVariants({
+                      variant: "b2-md",
+                    })} ${colorVariants({ color: "red-300" })} text-[1.4rem]`}
+                  >
+                    데이터를 불러오는데 실패했습니다.
+                  </span>
+                </li>
+              ) : items.length === 0 ? (
+                <li className="flex justify-center items-center py-[2rem]">
+                  <span
+                    className={`${typographyVariants({
+                      variant: "b2-md",
+                    })} ${colorVariants({ color: "gray-600" })} text-[1.4rem]`}
+                  >
+                    공유 캘린더가 없습니다.
+                  </span>
+                </li>
+              ) : (
+                items.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
+                  >
+                    {/* 왼쪽 체크박스 + 타이틀 */}
+                    <div className="flex items-center cursor-pointer">
+                      {isSelectionMode && (
+                        <div className=" flex flex-col !items-end !justify-end  ">
+                          <input
+                            type="checkbox"
+                            id={`Keep-logged-in-${item.id}`}
+                            className="invite-screen-reader"
+                            checked={selectedIds.includes(item.id)}
+                            onChange={(e) => {
+                              setIsChecked(e.target.checked);
+                              setIsVisuallyChecked(e.target.checked);
+                              e.stopPropagation();
+                              handleToggleSelect(item.id);
+                            }}
+                          />
+                          <div className="invite-label-box">
+                            <label
+                              htmlFor={`Keep-logged-in-${item.id}`}
+                              className={`${typographyVariants({
+                                variant: "b2-md",
+                              })} 
+                        !text-[1.4rem]
+                        ${
+                          isVisuallyChecked || isChecked
+                            ? colorVariants({ color: "gray-900" })
+                            : colorVariants({ color: "gray-700" })
+                        }`}
+                            >
+                              <span
+                                className="invite-check-icon"
+                                aria-hidden="true"
+                              ></span>
+                            </label>
+                          </div>
+                        </div>
+                      )}
+
+                      <span
+                        className={`
+                    ml-2
+                    ${typographyVariants({ variant: "b2-md" })}
+                    !text-[1.4rem]
+                    ${colorVariants({ color: "gray-800" })}
+                    hover:bg-var[(--red-30)]
+                    cusror-pointer
+                  `}
+                        onClick={() => handleToggleSelect(item.id)}
+                      >
+                        {item.title}
+                      </span>
+                    </div>
+                    <div
+                      className={` ${typographyVariants({
+                        variant: "d3-rg",
+                      })} ${colorVariants({ color: "gray-600" })}
+                               !text-[1.2rem] `}
+                    >
+                      <span
+                        className={` ${colorVariants({ color: "red-300" })} `}
+                      >
+                        {item.daysLeft}
+                      </span>
+                      일 후 삭제
+                    </div>
+                  </li>
+                ))
+              )}
               {isSelectionMode && selectedIds.length > 0 && (
                 <>
                   <div
