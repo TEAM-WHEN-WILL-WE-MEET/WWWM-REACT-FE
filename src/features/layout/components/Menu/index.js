@@ -76,6 +76,57 @@ export default function Menu() {
     }
   };
 
+  // 캘린더 제목 클릭 시 이벤트 캘린더로 이동
+  const handleTitleClick = (appointmentId) => {
+    if (isSelectionMode) {
+      // 선택 모드일 때는 선택/해제 기능
+      handleToggleSelect(appointmentId);
+    } else {
+      // 선택 모드가 아닐 때는 EventCalendar로 이동
+      navigate("/eventCalendar", {
+        state: {
+          appointmentId: appointmentId,
+          userName: "사용자", // 실제 사용자 이름으로 대체 필요
+        },
+      });
+    }
+  };
+
+  // 제목 길게 누르기로 선택 모드 활성화
+  const handleTitleLongPress = (appointmentId) => {
+    if (!isSelectionMode) {
+      setIsSelectionMode(true);
+      setSelectedIds([appointmentId]);
+    }
+  };
+
+  // 터치 이벤트 상태 관리
+  const [touchTimer, setTouchTimer] = useState(null);
+  const [longPressTriggered, setLongPressTriggered] = useState(false);
+
+  const handleTouchStart = (appointmentId) => {
+    setLongPressTriggered(false);
+    const timer = setTimeout(() => {
+      setLongPressTriggered(true);
+      handleTitleLongPress(appointmentId);
+    }, 500); // 0.5초 길게 누르기
+    setTouchTimer(timer);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchTimer) {
+      clearTimeout(touchTimer);
+      setTouchTimer(null);
+    }
+  };
+
+  const handleClickWithLongPress = (appointmentId) => {
+    if (!longPressTriggered) {
+      handleTitleClick(appointmentId);
+    }
+    setLongPressTriggered(false);
+  };
+
   // 3) 리스트 아이템을 클릭(혹은 체크박스 클릭)할 때, 해당 id를 추가/제거
   const handleItemClick = (id) => {
     if (selectedIds.includes(id)) {
@@ -190,7 +241,7 @@ export default function Menu() {
                     className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
                   >
                     {/* 왼쪽 체크박스 + 타이틀 */}
-                    <div className="flex items-center cursor-pointer">
+                    <div className="flex items-center">
                       {isSelectionMode && (
                         <div className=" flex flex-col !items-end !justify-end  ">
                           <input
@@ -233,10 +284,20 @@ export default function Menu() {
                     ${typographyVariants({ variant: "b2-md" })}
                     !text-[1.4rem]
                     ${colorVariants({ color: "gray-800" })}
-                    hover:bg-var[(--red-30)]
-                    cusror-pointer
+                    hover:bg-gray-100
+                    cursor-pointer
+                    select-none
                   `}
-                        onClick={() => handleToggleSelect(item.id)}
+                        onClick={() => handleClickWithLongPress(item.id)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          handleTitleLongPress(item.id);
+                        }}
+                        onTouchStart={() => handleTouchStart(item.id)}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={() => handleTouchStart(item.id)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
                       >
                         {item.title}
                       </span>
