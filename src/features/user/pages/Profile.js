@@ -15,7 +15,7 @@ const Profile = () => {
   useEffect(() => {
     // 토큰이 있는지 확인
     const token = localStorage.getItem("authToken");
-    
+
     if (!token) {
       console.log("토큰이 없음 - 로그인 페이지로 리다이렉트");
       navigate("/login");
@@ -95,113 +95,87 @@ const Profile = () => {
           )}
 
           {/* 사용자 정보 카드 */}
-          {userId && (
-            <div className="bg-white border border-[var(--gray-200)] rounded-[1.2rem] p-[2rem] mb-[3rem] shadow-sm">
-              <div className="flex flex-col gap-[2rem]">
-                {/* 프로필 아이콘 */}
-                <div className="flex justify-center mb-[1rem]">
-                  <div className="w-[8rem] h-[8rem] bg-[var(--blue-100)] rounded-full flex items-center justify-center">
-                    <img
-                      src="/User.svg"
-                      alt="프로필"
-                      className="w-[4rem] h-[4rem]"
-                    />
+          <div className="bg-white border border-[var(--gray-200)] rounded-[1.2rem] p-[2rem] mb-[3rem] shadow-sm">
+            <div className="flex flex-col gap-[2rem]">
+              {/* 프로필 아이콘 */}
+              <div className="flex justify-center mb-[1rem]">
+                <div className="w-[8rem] h-[8rem] bg-[var(--blue-100)] rounded-full flex items-center justify-center">
+                  <img
+                    src="/User.svg"
+                    alt="프로필"
+                    className="w-[4rem] h-[4rem]"
+                  />
+                </div>
+              </div>
+
+              {/* 사용자 정보 */}
+              <div className="space-y-[1.6rem]">
+                <div>
+                  <label
+                    className={cn(
+                      typographyVariants({ variant: "d1-sb" }),
+                      colorVariants({ color: "gray-600" }),
+                      "block mb-[0.8rem]"
+                    )}
+                  >
+                    이름
+                  </label>
+                  <div
+                    className={cn(
+                      "w-full px-[1.2rem] py-[1.6rem] bg-[var(--gray-50)] border border-[var(--gray-200)] rounded-[0.8rem]",
+                      typographyVariants({ variant: "b2-md" }),
+                      colorVariants({ color: "gray-900" })
+                    )}
+                  >
+                    {name}
                   </div>
                 </div>
 
-                {/* 사용자 정보 */}
-                <div className="space-y-[1.6rem]">
-                  <div>
-                    <label
-                      className={cn(
-                        typographyVariants({ variant: "d1-sb" }),
-                        colorVariants({ color: "gray-600" }),
-                        "block mb-[0.8rem]"
-                      )}
-                    >
-                      이름
-                    </label>
-                    <div
-                      className={cn(
-                        "w-full px-[1.2rem] py-[1.6rem] bg-[var(--gray-50)] border border-[var(--gray-200)] rounded-[0.8rem]",
-                        typographyVariants({ variant: "b2-md" }),
-                        colorVariants({ color: "gray-900" })
-                      )}
-                    >
-                      {name}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      className={cn(
-                        typographyVariants({ variant: "d1-sb" }),
-                        colorVariants({ color: "gray-600" }),
-                        "block mb-[0.8rem]"
-                      )}
-                    >
-                      이메일
-                    </label>
-                    <div
-                      className={cn(
-                        "w-full px-[1.2rem] py-[1.6rem] bg-[var(--gray-50)] border border-[var(--gray-200)] rounded-[0.8rem]",
-                        typographyVariants({ variant: "b2-md" }),
-                        colorVariants({ color: "gray-900" })
-                      )}
-                    >
-                      {email}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      className={cn(
-                        typographyVariants({ variant: "d1-sb" }),
-                        colorVariants({ color: "gray-600" }),
-                        "block mb-[0.8rem]"
-                      )}
-                    >
-                      사용자 ID
-                    </label>
-                    <div
-                      className={cn(
-                        "w-full px-[1.2rem] py-[1.6rem] bg-[var(--gray-50)] border border-[var(--gray-200)] rounded-[0.8rem]",
-                        typographyVariants({ variant: "b2-md" }),
-                        colorVariants({ color: "gray-700" }),
-                        "font-mono text-sm"
-                      )}
-                    >
-                      {userId}
-                    </div>
+                <div>
+                  <label
+                    className={cn(
+                      typographyVariants({ variant: "d1-sb" }),
+                      colorVariants({ color: "gray-600" }),
+                      "block mb-[0.8rem]"
+                    )}
+                  >
+                    이메일
+                  </label>
+                  <div
+                    className={cn(
+                      "w-full px-[1.2rem] py-[1.6rem] bg-[var(--gray-50)] border border-[var(--gray-200)] rounded-[0.8rem]",
+                      typographyVariants({ variant: "b2-md" }),
+                      colorVariants({ color: "gray-900" })
+                    )}
+                  >
+                    {email}
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
           {/* 액션 버튼들 */}
-          <div className="space-y-[1.2rem]">
-            <Button
-              label="정보 새로고침"
-              size="XL"
-              onClick={fetchMyInfo}
-              additionalClass={cn(
-                "w-full",
-                colorVariants({ bg: "blue-400" }),
-                "!text-[var(--white)]"
-              )}
-            />
+          <Button
+            label="정보 새로고침"
+            size="XL"
+            onClick={fetchMyInfo}
+            additionalClass={cn(
+              "w-full",
+              colorVariants({ bg: "blue-400" }),
+              "!text-[var(--white)]"
+            )}
+          />
 
-            <Button
-              label="로그아웃"
-              size="XL"
-              onClick={handleLogout}
-              additionalClass={cn(
-                "w-full",
-                "bg-[var(--gray-100)] !text-[var(--gray-700)] border border-[var(--gray-300)]"
-              )}
-            />
-          </div>
+          <Button
+            label="로그아웃"
+            size="XL"
+            onClick={handleLogout}
+            additionalClass={cn(
+              "w-full",
+              "bg-[var(--gray-100)] !text-[var(--gray-700)] border border-[var(--gray-300)]"
+            )}
+          />
         </div>
 
         {/* 하단 여백 */}
