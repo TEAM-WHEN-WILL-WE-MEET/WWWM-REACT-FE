@@ -54,68 +54,26 @@ const Register = () => {
         name: name,
       };
 
-      // 기존 로그인 방식 (이메일 필드에 사용자 이름을 넣는 방식)
-      const loginStyleData = {
-        email: name,
-        password: password,
-      };
-
       console.log("회원가입 요청 정보:");
       console.log("BASE_URL:", BASE_URL);
       console.log("Full URL:", `${BASE_URL}/users/auth/register`);
       console.log("Request body:", requestData);
 
-      // 여러 가능한 엔드포인트 시도
-      const possibleEndpoints = [
-        `/users/auth/register`,
-        `/users/auth/signup`,
-        `/users/register`,
-        `/auth/register`,
-        `/auth/signup`,
-      ];
+      // 회원가입 API 호출
+      const endpoint = `/users/auth/signup`;
 
-      let response;
-      let usedEndpoint;
+      console.log(`회원가입 API 호출: ${BASE_URL}${endpoint}`);
+      console.log(`사용하는 데이터:`, requestData);
 
-      const dataFormats = [requestData, loginStyleData];
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
 
-      for (const endpoint of possibleEndpoints) {
-        for (const dataFormat of dataFormats) {
-          try {
-            console.log(`시도 중인 엔드포인트: ${BASE_URL}${endpoint}`);
-            console.log(`사용하는 데이터 형식:`, dataFormat);
-
-            response = await fetch(`${BASE_URL}${endpoint}`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(dataFormat),
-            });
-
-            usedEndpoint = endpoint;
-            console.log(`${endpoint} 응답 상태:`, response.status);
-
-            // 404가 아니고 500도 아니면 (정상적인 응답이면) 이 응답을 사용
-            if (response.status !== 404 && response.status !== 500) {
-              break;
-            }
-          } catch (error) {
-            console.log(`${endpoint} 오류:`, error);
-            continue;
-          }
-        }
-
-        // 성공적인 응답을 받았으면 루프 종료
-        if (response && response.status !== 404 && response.status !== 500) {
-          break;
-        }
-      }
-
-      console.log(`최종 사용된 엔드포인트: ${usedEndpoint}`);
-      console.log("최종 응답 상태:", response.status);
-
-      console.log("Response status:", response.status);
+      console.log(`API 응답 상태:`, response.status);
       console.log("Response headers:", response.headers);
 
       if (!response.ok) {
@@ -125,13 +83,19 @@ const Register = () => {
 
       if (response.status === 201 || response.status === 200) {
         setResponseMessage(
-          "회원가입이 완료되었습니다! 로그인 페이지로 이동합니다."
+          `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
         );
 
-        // 성공 시 로그인 페이지로 이동
+        // 로그인 페이지로 이동할 때 회원가입 정보를 state로 전달
         setTimeout(() => {
-          navigate("/login");
-        }, 1500);
+          navigate("/login", {
+            state: {
+              registeredName: name,
+              registeredEmail: email,
+              message: `회원가입한 이름(${name}) 또는 이메일(${email})로 로그인하세요.`,
+            },
+          });
+        }, 2000);
       } else if (response.status === 409) {
         setError(true);
         setResponseMessage("이미 등록된 이메일입니다.");
