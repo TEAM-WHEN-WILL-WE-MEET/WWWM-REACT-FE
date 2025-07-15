@@ -8,7 +8,7 @@ export const API_CONFIG = {
 } as const;
 
 export const API_ENDPOINTS = {
-  CREATE_APPOINTMENT: "/appointment/createAppointment",
+  CREATE_APPOINTMENT: "/appointments",
   GET_APPOINTMENT: (id: string) => `/appointments/${id}`,
   UPDATE_APPOINTMENT: (id: string) => `/appointments/${id}`,
   DELETE_APPOINTMENT: (id: string) => `/appointments/${id}`,
