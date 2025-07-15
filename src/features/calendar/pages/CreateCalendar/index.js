@@ -13,7 +13,13 @@ const CreateCalendar = () => {
   const handleCalendarCreation = async () => {
     try {
       const appointmentId = await createCalendar();
-      navigate(`/getAppointment?appointmentId=${appointmentId}`);
+      console.log("Calendar created successfully:", appointmentId);
+      navigate("/eventCalendar", { 
+        state: { 
+          appointmentId: appointmentId,
+          userName: "생성자" // 필요에 따라 실제 사용자 이름으로 변경
+        }
+      });
     } catch (error) {
       console.error("Failed to create calendar:", error);
       // 에러는 이미 store에서 처리되므로 여기서는 로깅만

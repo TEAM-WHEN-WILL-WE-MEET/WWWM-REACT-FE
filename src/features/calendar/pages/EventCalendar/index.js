@@ -15,6 +15,8 @@ import Loading from "../../../../components/Loading";
 import { useAppointmentStore } from "../../../../store/appointmentStore";
 import { useCalendarStore } from "../../../../store/calendarStore";
 import { useUserStore } from "../../../../store/userStore";
+import { fetchApi } from "../../../../utils/api";
+import { API_ENDPOINTS } from "../../../../config/environment";
 
 const EventCalendar = () => {
   // const { responseData, appointmentId, userSchedule } = location.state;
@@ -150,13 +152,16 @@ const EventCalendar = () => {
       try {
         if (!appointmentId) {
           console.error("appointmentId가 없습니다");
+          setLoading(false);
           return;
         }
 
-        const appointmentResponse = await fetch(
-          `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
+        const responseData = await fetchApi(
+          API_ENDPOINTS.GET_APPOINTMENT(appointmentId),
+          {
+            method: "GET",
+          }
         );
-        const responseData = await appointmentResponse.json();
 
         // console.log("[TEST] responseData의 스케줄: ", responseData.object.schedules[0].times);
         if (!responseData || !responseData.object) {

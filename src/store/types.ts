@@ -46,6 +46,24 @@ export interface CreateAppointmentResponse {
   success: boolean;
 }
 
+// 사용자 캘린더 목록 응답 타입 정의
+export interface UserAppointmentItem {
+  id: string;
+  createdAt: string;
+  expireAt: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  timeZone: string;
+}
+
+export interface UserAppointmentsResponse {
+  status: "OK";
+  msg: string;
+  object: UserAppointmentItem[];
+  success: boolean;
+}
+
 export interface DateInfo {
   date: string;
   key: number;
