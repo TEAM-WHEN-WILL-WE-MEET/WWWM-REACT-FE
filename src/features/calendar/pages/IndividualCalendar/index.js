@@ -29,6 +29,7 @@ const IndividualCalendar = () => {
   const [localDates, setLocalDates] = useState([]);
   const [localTimes, setLocalTimes] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const dragStartRef = useRef(null);
   const isDraggingRef = useRef(false);
@@ -50,8 +51,8 @@ const IndividualCalendar = () => {
 
   const {
     responseData,
-    appointmentId,
-    userName,
+    appointmentId: storeAppointmentId,
+    userName: storeUserName,
     eventName,
     dates,
     times,
@@ -62,6 +63,10 @@ const IndividualCalendar = () => {
     updateScheduleV2,
     resetStore,
   } = useAppointmentStore();
+
+  // location.state에서 appointmentId와 userName을 가져옵니다
+  const appointmentId = location.state?.appointmentId || storeAppointmentId;
+  const userName = location.state?.userName || storeUserName;
 
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
@@ -335,8 +340,10 @@ const IndividualCalendar = () => {
       if (appointmentId) {
         // 데이터가 있으면 초기 설정 진행
         if (responseData && dates?.length > 0 && times?.length > 0) {
-          console.log("appointmentId가 있음, 기존 데이터 로드 완료");
           initializeUserSchedule();
+        } else {
+          // 데이터가 없으면 API를 호출해서 데이터 로드
+          await loadAppointmentData(appointmentId);
         }
         return;
       }
@@ -345,15 +352,8 @@ const IndividualCalendar = () => {
       try {
         setLoading(true);
 
-        console.log("=== individualCalendar 초기화 시작 ===");
-        console.log(
-          "현재 localStorage authToken:",
-          localStorage.getItem("authToken")?.substring(0, 50) + "..."
-        );
-
         // Store 초기화 (이전 사용자 데이터 제거)
         resetStore();
-        console.log("appointmentStore 리셋 완료");
 
         // 로컬 state도 초기화
         setUserAppointments([]);
@@ -363,19 +363,12 @@ const IndividualCalendar = () => {
         setIsVisuallyChecked(false);
         setIsChecked(false);
         setBulkTimesArray([]);
-        console.log("로컬 state 초기화 완료");
 
         // 사용자 정보 가져오기
         await fetchMyInfo();
         const currentUser = useUserStore.getState();
-        console.log("사용자 정보 로드 완료:", {
-          userId: currentUser.userId,
-          name: currentUser.name,
-          email: currentUser.email,
-        });
 
         // 사용자 캘린더 목록 가져오기
-        console.log("GET_USER_APPOINTMENTS API 호출 시작...");
         const response = await fetchApi(API_ENDPOINTS.GET_USER_APPOINTMENTS, {
           method: "GET",
           headers: {
@@ -383,35 +376,18 @@ const IndividualCalendar = () => {
             Pragma: "no-cache",
           },
         });
-        console.log("GET_USER_APPOINTMENTS API 응답:", {
-          success: response.success,
-          objectLength: response.object?.length,
-          appointments: response.object?.map((apt) => ({
-            id: apt.id,
-            name: apt.name,
-            createdAt: apt.createdAt,
-          })),
-        });
 
         if (response.success && response.object && response.object.length > 0) {
           setUserAppointments(response.object);
 
           // 첫 번째 캘린더로 초기화
           const firstAppointment = response.object[0];
-          console.log("첫 번째 캘린더 선택:", {
-            id: firstAppointment.id,
-            name: firstAppointment.name,
-            createdAt: firstAppointment.createdAt,
-          });
 
           await loadAppointmentData(firstAppointment.id);
-          console.log("첫 번째 캘린더 로드 완료");
         } else {
-          console.log("사용자 캘린더가 없음, 홈으로 리다이렉트");
           navigate("/");
         }
       } catch (error) {
-        console.error("사용자 캘린더 목록 가져오기 실패:", error);
         navigate("/");
       } finally {
         setLoading(false);
@@ -423,13 +399,6 @@ const IndividualCalendar = () => {
 
   // dates와 times 변경 감지 및 로컬 state 동기화
   useEffect(() => {
-    console.log("dates 또는 times 변경 감지:", {
-      datesLength: dates?.length,
-      timesLength: times?.length,
-      dates: dates,
-      times: times,
-    });
-
     // 로컬 state 동기화
     if (dates && dates.length > 0) {
       setLocalDates(dates);
@@ -455,16 +424,6 @@ const IndividualCalendar = () => {
         // 사용자 이름 설정
         setUserName(getCurrentUserName());
 
-        console.log("캘린더 데이터 로드 완료:", responseData.object.name);
-
-        // 데이터 로드 후 store 상태 확인
-        const updatedStore = useAppointmentStore.getState();
-        console.log("데이터 로드 후 store 상태:", {
-          dates: updatedStore.dates,
-          times: updatedStore.times,
-          eventName: updatedStore.eventName,
-        });
-
         // 사용자 스케줄 초기화 (responseData를 직접 전달)
         initializeUserScheduleWithData(responseData);
 
@@ -481,7 +440,7 @@ const IndividualCalendar = () => {
         setForceUpdate((prev) => prev + 1);
       }
     } catch (error) {
-      console.error("캘린더 데이터 로드 실패:", error);
+      // 에러 처리
     }
   };
 
@@ -505,6 +464,39 @@ const IndividualCalendar = () => {
     }
   };
 
+  // JWT 토큰에서 사용자 ID 추출하는 함수
+  const extractUserIdFromToken = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return null;
+
+    try {
+      // Bearer 토큰에서 실제 토큰 부분만 추출
+      const tokenPart = token.startsWith("Bearer ") ? token.slice(7) : token;
+
+      // JWT는 header.payload.signature 형태
+      const parts = tokenPart.split(".");
+      if (parts.length !== 3) return null;
+
+      // payload 부분 디코딩
+      const payload = parts[1];
+      const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64.padEnd(
+        base64.length + ((4 - (base64.length % 4)) % 4),
+        "="
+      );
+
+      const decoded = JSON.parse(atob(padded));
+
+      // 다양한 필드에서 사용자 ID 찾기
+      return (
+        decoded.sub || decoded.userId || decoded.id || decoded.user_id || null
+      );
+    } catch (error) {
+      console.error("JWT 토큰 디코딩 실패:", error);
+      return null;
+    }
+  };
+
   // responseData를 직접 받아서 사용자 스케줄 초기화
   const initializeUserScheduleWithData = (responseData) => {
     if (!responseData) return;
@@ -512,70 +504,73 @@ const IndividualCalendar = () => {
     moment.locale("ko");
     const schedules = responseData.object.schedules;
     if (!schedules) {
-      console.error("schedules 비어있음");
       return;
     }
-
-    console.log(
-      "이거슨 individualCalendar 로드할때 appointment자체의 스케줄",
-      schedules
-    );
 
     // 현재 로그인한 사용자 정보 가져오기
     const currentUser = useUserStore.getState();
     const currentUserName = getCurrentUserName();
-    const currentUserId = currentUser.userId;
+    const currentUserId = currentUser.userId || extractUserIdFromToken();
 
-    console.log("현재 사용자 정보:", {
-      name: currentUserName,
-      userId: currentUserId,
-      storeUserName: userName,
-    });
+    console.log("=== 사용자 정보 디버깅 ===");
+    console.log("currentUser:", currentUser);
+    console.log("currentUserName:", currentUserName);
+    console.log("currentUserId (store):", currentUser.userId);
+    console.log("currentUserId (token):", extractUserIdFromToken());
+    console.log("currentUserId (final):", currentUserId);
 
     // schedules에서 현재 사용자가 선택한 timeslot 찾기
     const userSelectedTimes = {};
     const { dates: storeDates, times: storeTimes } =
       useAppointmentStore.getState();
 
-    console.log("스케줄 분석 시작:", {
-      schedulesCount: schedules.length,
-      storeDatesCount: storeDates.length,
-      storeTimesCount: storeTimes.length,
-    });
-
     // 각 날짜별로 처리
     schedules.forEach((schedule, scheduleIndex) => {
       const scheduleDate = moment
         .tz(schedule.date, "Asia/Seoul")
         .format("YYYY-MM-DD");
-      console.log(`날짜 ${scheduleDate} (인덱스: ${scheduleIndex}) 처리 중...`);
 
       if (schedule.times && schedule.times.length > 0) {
-        console.log(`해당 날짜의 시간 슬롯 개수: ${schedule.times.length}`);
-
         // 해당 날짜의 모든 시간 슬롯 확인
         schedule.times.forEach((timeSlot, timeSlotIndex) => {
           const timeString = timeSlot.time;
           const users = timeSlot.users || [];
 
           // 현재 사용자가 이 시간대에 참여했는지 확인
+          console.log("=== 시간슬롯 확인 ===");
+          console.log("timeString:", timeString);
+          console.log("users:", users);
+          console.log(
+            "users 타입:",
+            users.map((u) => typeof u)
+          );
+
           const isUserParticipated = users.some((user) => {
+            console.log(
+              "비교 중 - user:",
+              user,
+              "currentUserId:",
+              currentUserId,
+              "currentUserName:",
+              currentUserName
+            );
             // 사용자 ID로 비교하거나 이름으로 비교
             if (typeof user === "string") {
-              return user === currentUserId || user === currentUserName;
+              const match = user === currentUserId || user === currentUserName;
+              console.log("문자열 비교 결과:", match);
+              return match;
             } else if (user && typeof user === "object") {
-              return user.id === currentUserId || user.name === currentUserName;
+              const match =
+                user.id === currentUserId || user.name === currentUserName;
+              console.log("객체 비교 결과:", match);
+              return match;
             }
             return false;
           });
 
-          if (isUserParticipated) {
-            console.log(`사용자가 참여한 시간 발견: ${timeString}`, {
-              users: users,
-              scheduleIndex: scheduleIndex,
-              timeSlotIndex: timeSlotIndex,
-            });
+          console.log("isUserParticipated:", isUserParticipated);
 
+          if (isUserParticipated) {
             // 시간을 파싱해서 시간과 분 추출
             const timeMoment = moment.tz(timeString, "Asia/Seoul");
             const hour = timeMoment.format("HH");
@@ -591,10 +586,6 @@ const IndividualCalendar = () => {
               // 분을 버튼 인덱스로 변환 (10분 단위)
               const buttonIndex = Math.floor(parseInt(minute) / 10);
 
-              console.log(
-                `매핑 완료: 날짜인덱스=${scheduleIndex}, 시간인덱스=${timeIndex}, 버튼인덱스=${buttonIndex}`
-              );
-
               // userSelectedTimes 객체에 추가
               if (!userSelectedTimes[scheduleIndex]) {
                 userSelectedTimes[scheduleIndex] = {};
@@ -603,21 +594,16 @@ const IndividualCalendar = () => {
                 userSelectedTimes[scheduleIndex][timeIndex] = {};
               }
               userSelectedTimes[scheduleIndex][timeIndex][buttonIndex] = true;
-            } else {
-              console.warn(`시간 인덱스를 찾을 수 없음: ${hour}:${minute}`);
             }
           }
         });
       }
     });
 
-    console.log("사용자 선택된 시간들:", userSelectedTimes);
-
     // selectedTimes state 업데이트
     const { setSelectedTimes } = useAppointmentStore.getState();
     if (typeof setSelectedTimes === "function") {
       setSelectedTimes(userSelectedTimes);
-      console.log("selectedTimes 업데이트 완료");
 
       // 현재 선택된 날짜의 모든 시간이 선택되었는지 확인
       const currentSelectedDate = useAppointmentStore.getState().selectedDate;
@@ -633,8 +619,9 @@ const IndividualCalendar = () => {
 
       setIsVisuallyChecked(allTimesSelected);
       setIsChecked(allTimesSelected);
-    } else {
-      console.error("setSelectedTimes function not available");
+
+      // 강제 리렌더링을 위한 업데이트
+      setForceUpdate((prev) => prev + 1);
     }
   };
 
@@ -644,14 +631,8 @@ const IndividualCalendar = () => {
     moment.locale("ko");
     const schedules = responseData.object.schedules;
     if (!schedules) {
-      console.error("schedules 비어있음");
       return;
     }
-
-    console.log(
-      "이거슨 individualCalendar 로드할때 appointment자체의 스케줄",
-      schedules
-    );
 
     // 재로그인 case
     if (responseData.firstLogin === false) {
@@ -673,7 +654,6 @@ const IndividualCalendar = () => {
         {}
       );
 
-      console.log("정리된 사용자 선택입니다~:", userSelections);
       const savedTimes = {};
 
       const { dates: storeDates, times: storeTimes } =
@@ -700,8 +680,6 @@ const IndividualCalendar = () => {
       const { setSelectedTimes } = useAppointmentStore.getState();
       if (typeof setSelectedTimes === "function") {
         setSelectedTimes(savedTimes);
-      } else {
-        console.error("setSelectedTimes function not available");
       }
 
       const allTimesSelected = storeTimes.every((_, timeIndex) => {
@@ -711,6 +689,9 @@ const IndividualCalendar = () => {
       });
 
       setIsVisuallyChecked(allTimesSelected);
+
+      // 강제 리렌더링을 위한 업데이트
+      setForceUpdate((prev) => prev + 1);
     }
   };
 
@@ -787,49 +768,31 @@ const IndividualCalendar = () => {
     // 모든 시간들을 합치고 중복 제거
     const allTimes = [...new Set([...allSelectedTimes, ...bulkTimes])];
 
-    console.log("저장 버튼 클릭 - 시간 수집 결과:", {
-      현재선택된시간들: allSelectedTimes,
-      bulkTimesArray길이: bulkTimesArray.length,
-      bulkTimes: bulkTimes,
-      최종전송할시간들: allTimes,
-      총개수: allTimes.length,
-    });
-
     if (allTimes.length === 0) {
-      console.log("선택된 시간이 없어서 바로 이동");
       // 선택된 시간이 없으면 바로 이동
-      navigate(`/getAppointment?appointmentId=${currentAppointmentId}`);
+      navigate(`/eventCalendar?appointmentId=${currentAppointmentId}`);
       return;
     }
 
     const selectedDateInfo = dates[selectedDate];
     if (!selectedDateInfo) {
-      console.error("선택된 날짜 정보가 없습니다.");
       return;
     }
 
     try {
       setLoading(true);
 
-      console.log("백엔드 v2 API 요청:", {
-        scheduleId: selectedDateInfo.id,
-        times: allTimes,
-        appointmentId: currentAppointmentId,
-      });
-
       await updateScheduleV2(
         selectedDateInfo.id,
         allTimes,
         currentAppointmentId
       );
-      console.log("백엔드 v2 API 요청 성공");
 
       // bulkTimesArray 초기화
       setBulkTimesArray([]);
 
-      navigate(`/getAppointment?appointmentId=${currentAppointmentId}`);
+      navigate(`/eventCalendar?appointmentId=${currentAppointmentId}`);
     } catch (error) {
-      console.error("백엔드 v2 API 요청 실패:", error);
       alert("서버 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -839,7 +802,6 @@ const IndividualCalendar = () => {
   //모든 시간 가능 버튼
   const handleAllTimeChange = async (e) => {
     const isChecked = e.target.checked; // 체크박스 체크 여부
-    console.log("체크박스 상태 변경:", isChecked);
 
     const newSelectedTimes = { ...selectedTimes };
     if (!newSelectedTimes[selectedDate]) {
@@ -876,22 +838,7 @@ const IndividualCalendar = () => {
 
     const selectedDateInfo = dates[selectedDate];
     if (!selectedDateInfo) {
-      console.error("선택된 날짜 정보가 없습니다.");
       return;
-    }
-
-    console.log("전체시간 가능 버튼 클릭시, 백엔드 v2 API 요청:", {
-      scheduleId: selectedDateInfo.id,
-      times: timesArray,
-      appointmentId: appointmentId,
-    });
-
-    // 모든 시간대에 대해 백엔드 v2 API 요청 (저장 버튼과 무관하게 바로 호출)
-    try {
-      await updateScheduleV2(selectedDateInfo.id, timesArray, appointmentId);
-      console.log("전체시간 가능 백엔드 v2 API 요청 성공");
-    } catch (error) {
-      console.error("전체 시간 백엔드 v2 API 요청 중 오류:", error);
     }
 
     // 전체 시간 선택/해제에 따른 bulkTimesArray 설정
@@ -921,11 +868,6 @@ const IndividualCalendar = () => {
         }
       });
       setBulkTimesArray(newBulkTimes);
-      console.log(
-        "전체 시간 선택 - bulkTimesArray 설정:",
-        newBulkTimes.length,
-        "개"
-      );
     } else {
       // 선택 해제인 경우 해당 날짜의 모든 timeblock 제거
       const store = useAppointmentStore.getState();
@@ -938,7 +880,6 @@ const IndividualCalendar = () => {
             !item.time.startsWith(currentDates[currentSelectedDate].date)
         )
       );
-      console.log("전체 시간 해제 - bulkTimesArray에서 해당 날짜 제거");
     }
   };
 
@@ -954,13 +895,6 @@ const IndividualCalendar = () => {
     const isSelected =
       currentSelectedTimes[currentSelectedDate]?.[timeIndex]?.[buttonIndex];
 
-    console.log("timeslot 클릭:", {
-      timeIndex,
-      buttonIndex,
-      isSelected: isSelected ? "이미 선택됨" : "선택되지 않음",
-      currentSelectedDate,
-    });
-
     // UI 상태 업데이트 (토글)
     updateTimeSlot(timeIndex, buttonIndex, !isSelected, false, false);
 
@@ -973,28 +907,11 @@ const IndividualCalendar = () => {
     const kstMoment = moment.tz(dateTime, "Asia/Seoul");
     const sendTimeString = kstMoment.format("YYYY-MM-DDTHH:mm:ss");
 
-    console.log("bulkTimesArray에 추가할 시간:", {
-      sendTimeString,
-      isSelected: isSelected ? "이미 선택됨" : "새로 선택",
-      action: "서버에서 토글 처리됨",
-    });
-
     // 항상 bulkTimesArray에 추가 (서버에서 토글 처리)
-    setBulkTimesArray((prev) => {
-      const newArray = [
-        ...prev,
-        { time: sendTimeString, users: [currentUserName] },
-      ];
-      console.log("bulkTimesArray 업데이트:", {
-        이전길이: prev.length,
-        새로운길이: newArray.length,
-        추가된시간: sendTimeString,
-        전체배열: newArray.map((item) => item.time),
-      });
-      return newArray;
-    });
-
-    console.log("timeslot 클릭 처리 완료");
+    setBulkTimesArray((prev) => [
+      ...prev,
+      { time: sendTimeString, users: [currentUserName] },
+    ]);
   };
 
   // timeslot의 상태를 강제로 newValue(선택/해제)로 업데이트하는 함수 (드래그 전용)
@@ -1041,11 +958,6 @@ const IndividualCalendar = () => {
         ...prev,
         { time: sendTimeString, users: [store.userName] },
       ]);
-
-      console.log("드래그 timeslot - bulkTimesArray에 추가:", {
-        timeslot: sendTimeString,
-        newValue: newValue ? "선택" : "해제",
-      });
     }
   };
 
@@ -1079,9 +991,13 @@ const IndividualCalendar = () => {
           >
             <img
               className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in active:scale-95"
-              alt="홈으로 돌아가기"
+              alt="이전 페이지로 돌아가기"
               src="backward.svg"
-              onClick={() => navigate("/")}
+              onClick={() =>
+                navigate(
+                  `/getAppointment?appointmentId=${userAppointments[selectedAppointmentIndex]?.id}`
+                )
+              }
             />
             <div
               className={`
@@ -1126,20 +1042,7 @@ const IndividualCalendar = () => {
           </div>
 
           {/* 기존 캘린더 UI가 여기에 렌더링됩니다 */}
-          {(() => {
-            console.log("렌더링 조건 확인:", {
-              datesLength: dates?.length,
-              timesLength: times?.length,
-              localDatesLength: localDates?.length,
-              localTimesLength: localTimes?.length,
-              dates: dates,
-              times: times,
-              localDates: localDates,
-              localTimes: localTimes,
-              forceUpdate: forceUpdate,
-            });
-            return localDates?.length > 0 && localTimes?.length > 0;
-          })() && (
+          {localDates?.length > 0 && localTimes?.length > 0 && (
             <>
               <div
                 className={`
@@ -1333,9 +1236,11 @@ const IndividualCalendar = () => {
         >
           <img
             className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in active:scale-95"
-            alt="재로그인하러 돌아가기"
+            alt="이전 페이지로 돌아가기"
             src="backward.svg"
-            onClick={() => navigate(-1)}
+            onClick={() =>
+              navigate(`/getAppointment?appointmentId=${appointmentId}`)
+            }
           />
           <div
             className={`

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
 
 import "moment/locale/ko";
@@ -14,6 +14,8 @@ import { Helmet } from "react-helmet-async";
 import Loading from "../../../../components/Loading";
 import { fetchApi } from "../../../../utils/api";
 import { API_ENDPOINTS } from "../../../../config/environment";
+import { useAppointmentStore } from "../../../../store/appointmentStore";
+import { useUserStore } from "../../../../store/userStore";
 
 const EventCalendar = () => {
   // const { responseData, appointmentId, userSchedule } = location.state;
@@ -29,6 +31,7 @@ const EventCalendar = () => {
       ? process.env.REACT_APP_WWWM_BE_ENDPOINT
       : process.env.REACT_APP_WWWM_BE_DEV_EP;
   const [loading, setLoading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   //공유 key
   const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
@@ -41,11 +44,18 @@ const EventCalendar = () => {
   const [selectedTimes, setSelectedTimes] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [TotalUsers, setTotalUsers] = useState("");
 
+  // appointmentStore 초기화
+  const { resetStore } = useAppointmentStore();
+  const { name: currentUserName } = useUserStore();
+
   const state = location.state || {};
-  const appointmentId = state.appointmentId;
-  const userName = state.userName;
+  // 쿼리 파라미터에서 appointmentId를 먼저 확인하고, 없으면 state에서 가져옴
+  const appointmentId =
+    searchParams.get("appointmentId") || state.appointmentId;
+  const userName = state.userName || currentUserName;
   const responseData = state.responseData;
   // console.log("userName:: ",userName);
   const [userList, setUserList] = useState("");
@@ -57,6 +67,13 @@ const EventCalendar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const minuteSlot = [10, 20, 30, 40, 50];
+
+  // EventCalendar 마운트 시 appointmentStore 초기화 및 강제 새로고침 트리거
+  useEffect(() => {
+    // appointmentStore 초기화로 IndividualCalendar의 캐시 상태 제거
+    resetStore();
+    setRefreshTrigger((prev) => prev + 1);
+  }, [resetStore]);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -129,7 +146,6 @@ const EventCalendar = () => {
       setLoading(true); // 요청 시작 전에 로딩 상태 true
       try {
         if (!appointmentId) {
-          console.error("appointmentId가 없습니다");
           setLoading(false);
           return;
         }
@@ -138,11 +154,15 @@ const EventCalendar = () => {
           API_ENDPOINTS.GET_APPOINTMENT(appointmentId),
           {
             method: "GET",
+            headers: {
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
           }
         );
 
         if (!responseData || !responseData.object) {
-          console.error("응답 데이터가 올바르지 않습니다");
           setLoading(false);
           return;
         }
@@ -154,7 +174,6 @@ const EventCalendar = () => {
           const schedules = responseData.object.schedules;
 
           if (!schedules || schedules.length === 0) {
-            console.error("schedules가 비어있음");
             setLoading(false);
             return;
           }
@@ -169,18 +188,12 @@ const EventCalendar = () => {
             return { date, key: index, id: schedule.id };
           });
 
-                    const startTimeString = responseData.object.startTime;
+          const startTimeString = responseData.object.startTime;
           const endTimeString = responseData.object.endTime;
-          
-          console.log("=== 시간 데이터 생성 디버깅 ===");
-          console.log("startTimeString:", startTimeString);
-          console.log("endTimeString:", endTimeString);
-          
+
           // 시간만 포함된 문자열을 파싱 (HH:mm:ss 형태)
           const startTimeH = moment(startTimeString, "HH:mm:ss").format("HH");
           const endTimeHM = moment(endTimeString, "HH:mm:ss").format("HH");
-          
-          console.log("파싱된 시간:", { startTimeH, endTimeHM });
 
           // startTime과 endTime 사이의 모든 시간대를 생성
           const timeSet = new Set();
@@ -192,8 +205,6 @@ const EventCalendar = () => {
             timeSet.add(hour.toString().padStart(2, "0"));
           }
 
-          console.log("생성된 timeSet:", timeSet);
-
           const timesArray = Array.from(timeSet).sort((a, b) => {
             return moment(a, "HH").diff(moment(b, "HH"));
           });
@@ -201,8 +212,6 @@ const EventCalendar = () => {
           const timesFormatted = timesArray.map((timeHM) =>
             moment(timeHM, "HH").format("HH:mm")
           );
-
-          console.log("최종 timesFormatted:", timesFormatted);
 
           setDates(datesArray);
           setTimes(timesFormatted);
@@ -279,13 +288,13 @@ const EventCalendar = () => {
           setSelectedTimes(savedTimes);
         }
       } catch (error) {
-        console.error(error);
+        console.error("EventCalendar 데이터 로딩 실패:", error);
       } finally {
         setLoading(false); // 요청 끝나면 로딩끄기
       }
     };
     fetchData();
-  }, [appointmentId]);
+  }, [appointmentId, refreshTrigger]);
 
   // 해당 timeslot hover 시 nowUserList(참여자 목록) 생성
   const handleTimeslotHover = (timeIndex) => {
