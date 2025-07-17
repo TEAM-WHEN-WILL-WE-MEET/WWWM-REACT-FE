@@ -13,6 +13,8 @@ export const API_ENDPOINTS = {
   GET_APPOINTMENT: (id: string) => `/appointments/${id}`,
   UPDATE_APPOINTMENT: (id: string) => `/appointments/${id}`,
   DELETE_APPOINTMENT: (id: string) => `/appointments/${id}`,
+  UPDATE_SCHEDULE: (appointmentId: string) =>
+    `/appointments/${appointmentId}/schedules`,
 };
 
 export const DEFAULT_HEADERS = {

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { AppointmentResponse, ScheduleUpdatePayload } from "./types";
 import moment from "moment-timezone";
+import { fetchApi } from "../utils/api";
+import { API_ENDPOINTS } from "../config/environment";
 
 interface AppointmentState {
   responseData: any;
@@ -28,6 +30,11 @@ interface AppointmentState {
     times: Record<number, Record<number, Record<number, boolean>>>
   ) => void;
   updateSchedule: (scheduleData: ScheduleUpdatePayload) => Promise<void>;
+  updateScheduleV2: (
+    scheduleId: string,
+    times: string[],
+    appointmentId: string
+  ) => Promise<void>;
 
   // Complex actions
   initializeFromResponse: (responseData: any) => void;
@@ -125,6 +132,50 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       schedules: [],
     }),
 
+  // 새로운 백엔드 v2 API 명세에 맞춘 함수
+  updateScheduleV2: async (
+    scheduleId: string,
+    times: string[],
+    appointmentId: string
+  ) => {
+    try {
+      const response = await fetchApi(
+        API_ENDPOINTS.UPDATE_SCHEDULE(appointmentId),
+        {
+          method: "PATCH",
+          body: {
+            scheduleId: parseInt(scheduleId),
+            times: times,
+          },
+        }
+      );
+
+      console.log("Schedule v2 update response:", response);
+
+      if (response.success && response.status === "OK") {
+        console.log("Schedule v2 update successful:", response.msg);
+
+        // 성공 시 새로운 약속 데이터를 가져와서 store 업데이트
+        const updatedAppointment = await fetchApi(
+          API_ENDPOINTS.GET_APPOINTMENT(appointmentId)
+        );
+        if (updatedAppointment && updatedAppointment.object) {
+          set((state) => ({
+            ...state,
+            responseData: updatedAppointment,
+            schedules: updatedAppointment.object.schedules,
+          }));
+        }
+      } else {
+        throw new Error(response.msg || "Schedule update failed");
+      }
+    } catch (error) {
+      console.error("Failed to update schedule v2:", error);
+      throw error;
+    }
+  },
+
+  // 기존 updateSchedule 함수 유지 (호환성을 위해)
   updateSchedule: async (scheduleData: ScheduleUpdatePayload) => {
     try {
       const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
