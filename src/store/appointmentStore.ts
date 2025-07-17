@@ -76,13 +76,7 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       id: schedule.id,
     }));
 
-    const startTimeH = moment
-      .tz(responseData.object.startTime, "Asia/Seoul")
-      .format("HH");
-    const endTimeHM = moment
-      .tz(responseData.object.endTime, "Asia/Seoul")
-      .format("HH");
-
+    // 실제 스케줄 데이터에서 시간 범위를 추출
     const timeSet = new Set();
     if (schedules[0]?.times) {
       schedules[0].times.forEach((timeSlot: any) => {
@@ -90,11 +84,7 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
           moment.tz(timeSlot.time, "Asia/Seoul").format("HH"),
           10
         );
-        const startTimeHNum = parseInt(startTimeH, 10);
-        const endTimeHNum = parseInt(endTimeHM, 10);
-        if (timeHM >= startTimeHNum && timeHM <= endTimeHNum - 1) {
-          timeSet.add(timeHM);
-        }
+        timeSet.add(timeHM);
       });
     }
 

@@ -12,6 +12,8 @@ import { useAppointmentStore } from "../../../../store/appointmentStore";
 import { useCalendarStore } from "../../../../store/calendarStore";
 import { useUserStore } from "../../../../store/userStore";
 import Loading from "../../../../components/Loading";
+import { fetchApi } from "../../../../utils/api";
+import { API_ENDPOINTS } from "../../../../config/environment";
 
 // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
 const BASE_URL =
@@ -21,6 +23,11 @@ const BASE_URL =
 
 const IndividualCalendar = () => {
   const [loading, setLoading] = useState(false);
+  const [userAppointments, setUserAppointments] = useState([]);
+  const [selectedAppointmentIndex, setSelectedAppointmentIndex] = useState(0);
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const [localDates, setLocalDates] = useState([]);
+  const [localTimes, setLocalTimes] = useState([]);
   const navigate = useNavigate();
 
   const dragStartRef = useRef(null);
@@ -302,31 +309,222 @@ const IndividualCalendar = () => {
     }
   };
 
+  const { fetchMyInfo, name: currentUserName, userId } = useUserStore();
+
+  // 현재 사용자 이름 가져오기 헬퍼 함수
+  const getCurrentUserName = () => {
+    return currentUserName || userName || "Unknown User";
+  };
+
   // Store 데이터 확인 및 초기화
   useEffect(() => {
-    console.log("Store 상태 확인:", {
-      appointmentId,
-      eventName,
-      dates: dates?.length,
-      times: times?.length,
-      userName,
-      responseData: !!responseData,
+    const initializeData = async () => {
+      console.log("Store 상태 확인:", {
+        appointmentId,
+        eventName,
+        dates: dates?.length,
+        times: times?.length,
+        userName,
+        currentUserName,
+        responseData: !!responseData,
+      });
+
+      // appointmentId가 있으면 기존 로직 실행
+      if (appointmentId) {
+        // 데이터가 있으면 초기 설정 진행
+        if (responseData && dates?.length > 0 && times?.length > 0) {
+          console.log("appointmentId가 있음, 기존 데이터 로드 완료");
+          initializeUserSchedule();
+        }
+        return;
+      }
+
+      // appointmentId가 없으면 사용자 캘린더 목록 가져오기
+      try {
+        setLoading(true);
+
+        // 사용자 정보 가져오기
+        await fetchMyInfo();
+
+        // 사용자 캘린더 목록 가져오기
+        const response = await fetchApi(API_ENDPOINTS.GET_USER_APPOINTMENTS);
+
+        if (response.success && response.object && response.object.length > 0) {
+          setUserAppointments(response.object);
+
+          // 첫 번째 캘린더로 초기화
+          const firstAppointment = response.object[0];
+          console.log("첫 번째 캘린더 로드 시작:", firstAppointment);
+          await loadAppointmentData(firstAppointment.id);
+          console.log("첫 번째 캘린더 로드 완료");
+        } else {
+          console.log("사용자 캘린더가 없음, 홈으로 리다이렉트");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("사용자 캘린더 목록 가져오기 실패:", error);
+        navigate("/");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeData();
+  }, [appointmentId, responseData, dates, times, navigate, fetchMyInfo]);
+
+  // dates와 times 변경 감지 및 로컬 state 동기화
+  useEffect(() => {
+    console.log("dates 또는 times 변경 감지:", {
+      datesLength: dates?.length,
+      timesLength: times?.length,
+      dates: dates,
+      times: times,
     });
 
-    // appointmentId가 없으면 홈으로 리다이렉트
-    if (!appointmentId) {
-      console.log("appointmentId가 없어서 홈으로 리다이렉트");
-      navigate("/");
+    // 로컬 state 동기화
+    if (dates && dates.length > 0) {
+      setLocalDates(dates);
+    }
+    if (times && times.length > 0) {
+      setLocalTimes(times);
+    }
+  }, [dates, times]);
+
+  // 특정 캘린더 데이터 로드
+  const loadAppointmentData = async (appointmentId) => {
+    try {
+      const responseData = await fetchApi(
+        API_ENDPOINTS.GET_APPOINTMENT(appointmentId)
+      );
+
+      if (responseData && responseData.object) {
+        // appointmentStore에 데이터 설정
+        const { initializeFromResponse, setUserName } =
+          useAppointmentStore.getState();
+        initializeFromResponse(responseData);
+
+        // 사용자 이름 설정
+        setUserName(getCurrentUserName());
+
+        console.log("캘린더 데이터 로드 완료:", responseData.object.name);
+
+        // 데이터 로드 후 store 상태 확인
+        const updatedStore = useAppointmentStore.getState();
+        console.log("데이터 로드 후 store 상태:", {
+          dates: updatedStore.dates,
+          times: updatedStore.times,
+          eventName: updatedStore.eventName,
+        });
+
+        // 사용자 스케줄 초기화 (responseData를 직접 전달)
+        initializeUserScheduleWithData(responseData);
+
+        // 로컬 state 강제 업데이트
+        const finalStore = useAppointmentStore.getState();
+        if (finalStore.dates && finalStore.dates.length > 0) {
+          setLocalDates(finalStore.dates);
+        }
+        if (finalStore.times && finalStore.times.length > 0) {
+          setLocalTimes(finalStore.times);
+        }
+
+        // 강제 렌더링 트리거
+        setForceUpdate((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("캘린더 데이터 로드 실패:", error);
+    }
+  };
+
+  // 캘린더 선택 변경 핸들러
+  const handleAppointmentChange = async (index) => {
+    setSelectedAppointmentIndex(index);
+    const selectedAppointment = userAppointments[index];
+    if (selectedAppointment) {
+      setLoading(true);
+      await loadAppointmentData(selectedAppointment.id);
+      setLoading(false);
+      // 강제 렌더링 트리거
+      setForceUpdate((prev) => prev + 1);
+    }
+  };
+
+  // responseData를 직접 받아서 사용자 스케줄 초기화
+  const initializeUserScheduleWithData = (responseData) => {
+    if (!responseData) return;
+
+    moment.locale("ko");
+    const schedules = responseData.object.schedules;
+    if (!schedules) {
+      console.error("schedules 비어있음");
       return;
     }
 
-    // 데이터가 있으면 초기 설정 진행
-    if (responseData && dates?.length > 0 && times?.length > 0) {
-      console.log("데이터 로드 완료, 초기 설정 진행");
-      // 기존 초기화 로직 실행
-      initializeUserSchedule();
+    console.log(
+      "이거슨 individualCalendar 로드할때 appointment자체의 스케줄",
+      schedules
+    );
+
+    // 재로그인 case
+    if (responseData.firstLogin === false) {
+      const userSelections = responseData.userSchedule.reduce(
+        (acc, daySchedule) => {
+          daySchedule.times.forEach((slot) => {
+            const slotDate = moment
+              .tz(slot.time, "Asia/Seoul")
+              .format("YYYY-MM-DD");
+            const slotHour = moment.tz(slot.time, "Asia/Seoul").format("HH");
+            const slotMinute = moment.tz(slot.time, "Asia/Seoul").format("mm");
+            if (!acc[slotDate]) acc[slotDate] = {};
+            if (!acc[slotDate][slotHour]) acc[slotDate][slotHour] = [];
+
+            acc[slotDate][slotHour].push(parseInt(slotMinute));
+          });
+          return acc;
+        },
+        {}
+      );
+
+      console.log("정리된 사용자 선택입니다~:", userSelections);
+      const savedTimes = {};
+
+      const { dates: storeDates, times: storeTimes } =
+        useAppointmentStore.getState();
+      storeDates.forEach((dateInfo, dateIndex) => {
+        const datePath = dateInfo.date;
+        if (userSelections[datePath]) {
+          if (!savedTimes[dateIndex]) savedTimes[dateIndex] = {};
+
+          storeTimes.forEach((time, timeIndex) => {
+            const hour = moment(time, "HH:mm").format("HH");
+            const minutes = userSelections[datePath][hour];
+            if (minutes) {
+              savedTimes[dateIndex][timeIndex] = {};
+              minutes.forEach((minute) => {
+                const buttonIndex = minute / 10;
+                savedTimes[dateIndex][timeIndex][buttonIndex] = true;
+              });
+            }
+          });
+        }
+      });
+
+      const { setSelectedTimes } = useAppointmentStore.getState();
+      if (typeof setSelectedTimes === "function") {
+        setSelectedTimes(savedTimes);
+      } else {
+        console.error("setSelectedTimes function not available");
+      }
+
+      const allTimesSelected = storeTimes.every((_, timeIndex) => {
+        return [...Array(6)].every((_, buttonIndex) => {
+          return savedTimes[0]?.[timeIndex]?.[buttonIndex] === true;
+        });
+      });
+
+      setIsVisuallyChecked(allTimesSelected);
     }
-  }, [appointmentId, responseData, dates, times, navigate]);
+  };
 
   const initializeUserSchedule = () => {
     if (!responseData) return;
@@ -420,7 +618,14 @@ const IndividualCalendar = () => {
 
   // 저장 버튼 클릭 시: 누적된 상태를 기반으로 서버 업데이트 후 페이지 이동
   const handleSaveClick = async () => {
-    if (!appointmentId) {
+    // 현재 appointmentId 가져오기 (기존 방식 또는 새로운 사용자 캘린더 모드)
+    const currentAppointmentId =
+      appointmentId ||
+      (userAppointments.length > 0
+        ? userAppointments[selectedAppointmentIndex].id
+        : null);
+
+    if (!currentAppointmentId) {
       navigate("/");
       return;
     }
@@ -429,7 +634,7 @@ const IndividualCalendar = () => {
 
     if (bulkTimesArray.length === 0) {
       // 클릭한 timeslot이 없으면 바로 이동
-      navigate(`/getAppointment?appointmentId=${appointmentId}`);
+      navigate(`/getAppointment?appointmentId=${currentAppointmentId}`);
       return;
     }
 
@@ -445,7 +650,7 @@ const IndividualCalendar = () => {
       id: selectedDateInfo.id,
       date: formattedDate,
       times: bulkTimesArray,
-      appointmentId: appointmentId,
+      appointmentId: currentAppointmentId,
     };
 
     console.log("배치 처리 서버 요청:", payload);
@@ -454,7 +659,7 @@ const IndividualCalendar = () => {
       setLoading(true);
       await updateSchedule(payload);
       console.log("배치 처리 서버 요청 성공");
-      navigate(`/getAppointment?appointmentId=${appointmentId}`);
+      navigate(`/getAppointment?appointmentId=${currentAppointmentId}`);
     } catch (error) {
       console.error("배치 처리 서버 요청 실패:", error);
       alert("서버 오류가 발생했습니다.");
@@ -709,7 +914,263 @@ const IndividualCalendar = () => {
   }
 
   // 데이터가 없으면 로딩 상태 표시
-  if (!appointmentId || !dates || dates.length === 0) {
+  if (!appointmentId && userAppointments.length === 0) {
+    return <Loading />;
+  }
+
+  // appointmentId가 없고 사용자 캘린더는 있는 경우
+  if (!appointmentId && userAppointments.length > 0) {
+    return (
+      <>
+        <Helmet>
+          <title>언제볼까? - 내 캘린더</title>
+          <meta
+            name="description"
+            content="언제볼까? 서비스와 함께, 실시간으로 모두의 가능한 시간을 한눈에 확인해보세요"
+          />
+        </Helmet>
+        <div
+          className={`h-auto flex flex-col ${colorVariants({ bg: "gray-50" })}`}
+        >
+          <div
+            className={`flex ${colorVariants({
+              bg: "white",
+            })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}
+          >
+            <img
+              className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in active:scale-95"
+              alt="홈으로 돌아가기"
+              src="backward.svg"
+              onClick={() => navigate("/")}
+            />
+            <div
+              className={`
+                ${typographyVariants({ variant: "h1-sb" })} 
+                overflow-hidden 
+                text-center 
+                truncate
+              `}
+            >
+              내 캘린더
+            </div>
+          </div>
+
+          {/* 캘린더 선택 드롭다운 */}
+          <div
+            className={`flex flex-col px-[2rem] pt-[2rem] ${colorVariants({
+              bg: "white",
+            })}`}
+          >
+            <div
+              className={`${typographyVariants({
+                variant: "b1-sb",
+              })} mb-[1rem]`}
+            >
+              참여중인 캘린더
+            </div>
+            <select
+              value={selectedAppointmentIndex}
+              onChange={(e) =>
+                handleAppointmentChange(parseInt(e.target.value))
+              }
+              className={`w-full p-[1rem] border border-gray-300 rounded-md ${typographyVariants(
+                { variant: "b1-rg" }
+              )}`}
+            >
+              {userAppointments.map((appointment, index) => (
+                <option key={appointment.id} value={index}>
+                  {appointment.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 기존 캘린더 UI가 여기에 렌더링됩니다 */}
+          {(() => {
+            console.log("렌더링 조건 확인:", {
+              datesLength: dates?.length,
+              timesLength: times?.length,
+              localDatesLength: localDates?.length,
+              localTimesLength: localTimes?.length,
+              dates: dates,
+              times: times,
+              localDates: localDates,
+              localTimes: localTimes,
+              forceUpdate: forceUpdate,
+            });
+            return localDates?.length > 0 && localTimes?.length > 0;
+          })() && (
+            <>
+              <div
+                className={`
+                  flex 
+                  !justify-start
+                  !overflow-x-auto 
+                  px-0 
+                  py-[1rem] 
+                  pb-0
+                  whitespace-nowrap 
+                  scrollbar-hide 
+                  ![&::-webkit-scrollbar]:hidden
+                  hover:cursor-pointer
+                  ${colorVariants({ bg: "white" })}
+                  !min-h-[4rem]
+                  border-b-[0.1rem] 
+                  border-[var(--gray-500,#A8A8A8)]  
+                  z-0  
+                `}
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+                aria-label="날짜 탭"
+              >
+                {localDates?.map(({ date, key }) => (
+                  <div
+                    key={key}
+                    className={`
+                       ${typographyVariants({ variant: "b1-sb" })} 
+                       ${
+                         selectedDate === key
+                           ? `
+                         !${colorVariants({ color: "gray-900" })} 
+                         font-[600] 
+                         border-b-[0.2rem] 
+                         border-[var(--gray-900,#242424)]
+                         -mb-0.3
+                         z-20
+                       `
+                           : ``
+                       }
+                       tracking-[-0.35px]
+                       p-[0.9rem]
+                       w-[7.4rem]
+                       text-center
+                       flex-shrink-0
+                       flex-grow-0
+                       basis-[25%] 
+                     `}
+                    onClick={() => setSelectedDate(key)}
+                  >
+                    {moment(date, "YYYY-MM-DD").format("M/D(ddd)")}
+                  </div>
+                ))}
+              </div>
+
+              {/* 나머지 기존 UI */}
+              <div
+                className={`flex pt-[2rem] mb-[3.6rem] flex-col items-center ${colorVariants(
+                  { bg: "gray-50" }
+                )}`}
+              >
+                <div
+                  className={`w-[27rem] ml-[4rem] flex items-center justify-end`}
+                >
+                  <div
+                    className={`
+                    ${typographyVariants({ variant: "d3-rg" })} 
+                    ${colorVariants({ color: "gray-700" })}
+                    flex items-center 
+                    !text-[1.2rem]
+                    gap-[1.8rem]
+                    pb-[0.4rem]
+                    w-[23.7rem]
+                  `}
+                  >
+                    {minuteSlot.map((num, index) => (
+                      <div
+                        key={index}
+                        className="flex !w-[2.8rem] p-auto !justify-center !items-center"
+                      >
+                        {num}
+                      </div>
+                    ))}
+                    <div className="ml-[0.2rem] w-[1.1rem]">분</div>
+                  </div>
+                </div>
+                {localTimes?.map((time, timeIndex) => (
+                  <div key={timeIndex} className="flex items-center">
+                    <div
+                      className={`
+                       ${typographyVariants({ variant: "d3-rg" })}
+                       text-[var(--gray-800,#444)]
+                       h-[2.8rem] 
+                       w-[3.6rem] 
+                       text-center 
+                       mr-[0.6rem] 
+                       flex 
+                       items-center 
+                       justify-center 
+                       whitespace-nowrap
+                     `}
+                    >
+                      {moment(time, "HH:mm").format("HH시")}
+                    </div>
+                    <div className="grid grid-cols-6 gap-0 !h-[2.8rem]">
+                      {[...Array(6)].map((_, buttonIndex) => (
+                        <Button
+                          key={buttonIndex}
+                          size={"XXS"}
+                          data-time-index={timeIndex}
+                          data-button-index={buttonIndex}
+                          additionalClass={` 
+                            ${
+                              selectedTimes[selectedDate]?.[timeIndex]?.[
+                                buttonIndex
+                              ]
+                                ? "!border-[var(--blue-200)] bg-[var(--blue-50)]"
+                                : ""
+                            } 
+                            items-center !transform-none
+                          `}
+                          onMouseDown={(e) =>
+                            handleButtonMouseDown(timeIndex, buttonIndex, e)
+                          }
+                          onMouseEnter={(e) =>
+                            handleButtonMouseEnter(timeIndex, buttonIndex, e)
+                          }
+                          onTouchStart={(e) =>
+                            handleTouchStart(timeIndex, buttonIndex, e)
+                          }
+                          onTouchMove={handleTouchMove}
+                          onTouchEnd={handleTouchEnd}
+                          style={{ touchAction: "none" }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-center mb-[1.4rem]">
+                <input
+                  type="checkbox"
+                  id="all-time"
+                  className="screen-reader"
+                  checked={isVisuallyChecked || isChecked}
+                  onChange={(e) => {
+                    setIsChecked(e.target.checked);
+                    setIsVisuallyChecked(e.target.checked);
+                    handleAllTimeChange(e);
+                  }}
+                />
+              </div>
+              <div className="flex !justify-center">
+                <Button
+                  label="내 참여시간 저장"
+                  size={"L"}
+                  onClick={handleSaveClick}
+                  additionalClass="items-center !transform-none mb-[1.2rem]"
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  // 기존 appointmentId가 있는 경우의 렌더링
+  if (!dates || dates.length === 0) {
     return <Loading />;
   }
 

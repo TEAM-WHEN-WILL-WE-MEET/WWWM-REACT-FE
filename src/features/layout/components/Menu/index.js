@@ -183,7 +183,7 @@ export default function Menu() {
             <img
               src="/icon_X_noBg.svg"
               alt="달력 페이지로 돌아가기"
-              onClick={() => navigate("/MonthView")}
+              onClick={() => navigate("/")}
             />
           </button>
         </div>
