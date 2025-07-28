@@ -98,15 +98,15 @@ const Register = () => {
         name: name,
       };
 
-      console.log("회원가입 요청 정보:");
-      console.log("BASE_URL:", BASE_URL);
-      console.log("Full URL:", `${BASE_URL}/users/auth/register`);
-      console.log("Request body:", requestData);
+      // console.log("회원가입 요청 정보:");
+      // console.log("BASE_URL:", BASE_URL);
+      // console.log("Full URL:", `${BASE_URL}/users/auth/register`);
+      // console.log("Request body:", requestData);
 
       const endpoint = `/users/auth/signup`;
 
-      console.log(`회원가입 API 호출: ${BASE_URL}${endpoint}`);
-      console.log(`사용하는 데이터:`, requestData);
+      // console.log(`회원가입 API 호출: ${BASE_URL}${endpoint}`);
+      // console.log(`사용하는 데이터:`, requestData);
 
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
@@ -116,8 +116,8 @@ const Register = () => {
         body: JSON.stringify(requestData),
       });
 
-      console.log(`API 응답 상태:`, response.status);
-      console.log("Response headers:", response.headers);
+      // console.log(`API 응답 상태:`, response.status);
+      // console.log("Response headers:", response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -125,20 +125,20 @@ const Register = () => {
       }
 
       if (response.status === 201 || response.status === 200) {
-        setResponseMessage(
-          `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
-        );
+        // setResponseMessage(
+        //   `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
+        // );
 
         setTimeout(() => {
           navigate("/login", {
             state: {
               registeredName: name,
               registeredEmail: email,
-              message: `회원가입한 이름(${name}) 또는 이메일(${email})로 로그인하세요.`,
+              // message: `회원가입한 이름(${name}) 또는 이메일(${email})로 로그인하세요.`,
             },
           });
-        }, 2000);
-      } else if (response.status === 409) {
+        }, 200);
+      }else if (response.status === 409) {
         setError(true);
         setResponseMessage("이미 등록된 이메일입니다.");
       } else if (response.status === 400) {
