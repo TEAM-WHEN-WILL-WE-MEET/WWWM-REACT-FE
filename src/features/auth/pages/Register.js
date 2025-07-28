@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { typographyVariants } from "../../../styles/typography.ts";
@@ -6,6 +6,7 @@ import { colorVariants } from "../../../styles/color.ts";
 import { cn } from "../../../utils/cn";
 import { Button } from "../../../components/Button.tsx";
 import Loading from "../../../components/Loading";
+import "../styles/Register.css";
 
 const Register = () => {
   const BASE_URL =
@@ -16,29 +17,73 @@ const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [emailId, setEmailId] = useState("");
+  const [emailDomain, setEmailDomain] = useState("gmail.com");
+  const [showDomainDropdown, setShowDomainDropdown] = useState(false);
+  const [customDomain, setCustomDomain] = useState(false);
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
 
+  // 비밀번호 관련 상태 추가 (컴포넌트 최상단 state 선언부에 추가)
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
+
+  const domainOptions = [
+    { value: "gmail.com", label: "gmail.com" },
+    { value: "naver.com", label: "naver.com" },
+    { value: "custom", label: "직접 입력" },
+  ];
+
   const isFormValid =
     name.trim().length > 0 &&
-    email.trim().length > 0 &&
-    password.trim().length > 0 &&
-    confirmPassword.trim().length > 0 &&
-    password === confirmPassword;
+    emailId.trim().length > 0 &&
+    (customDomain
+      ? emailDomain.includes("@")
+      : emailDomain.trim().length > 0) &&
+    password.trim().length > 0;
+
+  // 비밀번호 유효성 검사 함수 추가 (handleSubmit 함수 위에 추가)
+  const validatePassword = (value) => {
+    if (value.length < 4) {
+      setPasswordError("비밀번호는 최소 4자 이상이어야 합니다.");
+      setIsPasswordValid(false);
+    } else if (value.length > 12) {
+      setPasswordError("비밀번호는 최대 12자까지 가능합니다.");
+      setIsPasswordValid(false);
+    } else {
+      setPasswordError("");
+      setIsPasswordValid(true);
+    }
+  };
+
+  // password onChange 핸들러 수정
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
+  };
+
+  const handleDomainSelect = (domain) => {
+    if (domain === "custom") {
+      setCustomDomain(true);
+      setEmailDomain("");
+    } else {
+      setCustomDomain(false);
+      setEmailDomain(domain);
+    }
+    setShowDomainDropdown(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid) {
       setError(true);
-      if (password !== confirmPassword) {
-        setResponseMessage("비밀번호가 일치하지 않습니다.");
-      } else {
-        setResponseMessage("모든 필드를 입력해주세요.");
-      }
+      setResponseMessage("모든 필드를 입력해주세요.");
       return;
     }
 
@@ -47,7 +92,6 @@ const Register = () => {
     setResponseMessage("");
 
     try {
-      // 기존 로그인 방식과 동일한 구조도 시도
       const requestData = {
         email: email,
         password: password,
@@ -59,7 +103,6 @@ const Register = () => {
       console.log("Full URL:", `${BASE_URL}/users/auth/register`);
       console.log("Request body:", requestData);
 
-      // 회원가입 API 호출
       const endpoint = `/users/auth/signup`;
 
       console.log(`회원가입 API 호출: ${BASE_URL}${endpoint}`);
@@ -86,7 +129,6 @@ const Register = () => {
           `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
         );
 
-        // 로그인 페이지로 이동할 때 회원가입 정보를 state로 전달
         setTimeout(() => {
           navigate("/login", {
             state: {
@@ -127,7 +169,7 @@ const Register = () => {
 
   const inputClasses = (isEmpty, hasError) =>
     cn(
-      "flex w-96 h-16 px-5 py-4",
+      "flex h-16 px-5 py-4",
       "items-center flex-shrink-0 rounded-lg",
       "border border-gray-300",
       typographyVariants({ variant: "b2-md" }),
@@ -147,14 +189,14 @@ const Register = () => {
         <meta name="description" content="언제볼까? 서비스에 회원가입하세요." />
       </Helmet>
 
-      <div className="flex items-center justify-center min-h-screen bg-[var(--white)] px-4">
-        <div className="flex flex-col items-center w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen bg-[var(--white)] ">
+        <div className="flex flex-col items-center w-full  h-full ">
           {/* 로고 */}
           <div className="mb-8">
             <img
               src="/wwmtLogo.svg"
               alt="언제볼까? 로고"
-              className="w-16 h-16 cursor-pointer"
+              className="w-[2.2rem] h-[2.4rem] cursor-pointer"
               onClick={() => navigate("/")}
             />
           </div>
@@ -164,147 +206,255 @@ const Register = () => {
             className={cn(
               typographyVariants({ variant: "h1-sb" }),
               colorVariants({ color: "gray-900" }),
-              "text-[2.4rem] mb-8 text-center"
+              "text-[2rem] mb-[4rem] text-center"
             )}
           >
-            회원가입
+            새로운 계정 만들기
           </h1>
 
           {/* 회원가입 폼 */}
-          <form onSubmit={handleSubmit} className="w-full space-y-4">
-            <div>
-              <label
-                htmlFor="name"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                이름
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className={inputClasses(
-                  name.length === 0,
-                  error && name.length === 0
-                )}
-                placeholder="이름을 입력하세요"
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="email"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                이메일
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={inputClasses(
-                  email.length === 0,
-                  error && email.length === 0
-                )}
-                placeholder="이메일을 입력하세요"
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                비밀번호
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={inputClasses(
-                  password.length === 0,
-                  error && password.length === 0
-                )}
-                placeholder="비밀번호를 입력하세요"
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                비밀번호 확인
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inputClasses(
-                  confirmPassword.length === 0,
-                  error &&
-                    (confirmPassword.length === 0 ||
-                      password !== confirmPassword)
-                )}
-                placeholder="비밀번호를 다시 입력하세요"
-                required
-              />
-            </div>
-
-            {/* 에러 메시지 */}
-            {responseMessage && (
-              <div
-                className={cn(
-                  "text-center p-3 rounded-md",
-                  error
-                    ? "bg-red-50 text-red-600"
-                    : "bg-green-50 text-green-600"
-                )}
-              >
-                <p className={typographyVariants({ variant: "b2-md" })}>
-                  {responseMessage}
-                </p>
-                {error && (
-                  <button
-                    onClick={() => navigate("/login")}
+          <form onSubmit={handleSubmit} className="w-auto ">
+            {/* email / PW /name */}
+            <div className="w-full flex flex-col items-end justify-center !space-y-[2rem]  ">
+              {/* 이메일 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="email"
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
+                  )}
+                ></label>
+                <div className="flex w-full  items-center justify-center">
+                  <div className="relative flex-shrink-0">
+                    <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <div className="flex flex-2 items-center">
+                    <input
+                      id="emailId"
+                      type="text"
+                      value={emailId}
+                      onChange={(e) => setEmailId(e.target.value)}
+                      className={cn(
+                        inputClasses(
+                          emailId.length === 0,
+                          error && emailId.length === 0
+                        ),
+                        "w-full max-w-[14.4rem] pl-[1.6rem] pr-[0.5rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                        typographyVariants({ variant: "h3-md" }),
+                        colorVariants({ color: "gray-700" }),
+                        "placeholder:text-[var(--gray-500)]"
+                      )}
+                      placeholder="이메일"
+                      required
+                    />
+                  </div>
+                  <span className="mx-4 text-[2rem] text-gray-500 flex-shrink-0">
+                    @
+                  </span>
+                  <div className="relative flex-1 max-w-[14.4rem] z-30">
+                    {customDomain ? (
+                      <input
+                        type="text"
+                        value={emailDomain}
+                        onChange={(e) => setEmailDomain(e.target.value)}
+                        className={cn(
+                          inputClasses(
+                            emailDomain.length === 0,
+                            error && emailDomain.length === 0
+                          ),
+                          "w-full border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                        )}
+                        placeholder="도메인 입력"
+                      />
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowDomainDropdown(!showDomainDropdown)
+                          }
+                          className={cn(
+                            "w-full h-16 px-5 py-4 flex items-center justify-between",
+                            "bg-white border-b border-gray-300 ",
+                            typographyVariants({ variant: "b2-md" })
+                          )}
+                        >
+                          {emailDomain}
+                          <img
+                            src="/dropdwonarrow.svg"
+                            alt="도메인 선택"
+                            className={cn(
+                              "w-[1.2rem] h-[0.6rem] transition-transform",
+                              showDomainDropdown && "transform rotate-180"
+                            )}
+                          />
+                        </button>
+                        {showDomainDropdown && (
+                          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            {domainOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => handleDomainSelect(option.value)}
+                                className={cn(
+                                  "w-full px-5 py-3 text-left hover:bg-gray-50",
+                                  typographyVariants({ variant: "b2-md" })
+                                )}
+                              >
+                                {option.value === "custom"
+                                  ? option.label
+                                  : `${option.label}`}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* 비밀번호 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="password"
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
+                  )}
+                ></label>
+                <div className="flex w-full  items-center justify-center">
+                  <div className="relative">
+                    <span className=" absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <div className="relative flex-2 !w-[32rem]">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={handlePasswordChange}
+                      className={cn(
+                        inputClasses(
+                          password.length === 0,
+                          error && password.length === 0
+                        ),
+                        "flex-1 w-[32rem] pl-[1.6rem] pr-[3rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                        typographyVariants({ variant: "h3-md" }),
+                        colorVariants({ color: "gray-700" }),
+                        "placeholder:text-[var(--gray-500)]"
+                      )}
+                      placeholder="비밀번호 (4~12자)"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute z-10 right-2 top-1/2 -translate-y-1/2  flex items-center justify-center"
+                    >
+                      <img
+                        src={
+                          showPassword
+                            ? "/icon-view-open.svg"
+                            : "/icon-view.svg"
+                        }
+                        alt={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                        className="w-[2.4rem] h-[2.4rem]"
+                      />
+                    </button>
+                  </div>
+                </div>
+                {passwordError && (
+                  <div
                     className={cn(
-                      "mt-2 text-sm underline hover:no-underline",
-                      "text-blue-600 hover:text-blue-800"
+                      typographyVariants({ variant: "d3-rg" }),
+                      colorVariants({ color: "red-300" }),
+                      " left-[30rem] absolute z-20 mt-[5rem]"
                     )}
                   >
-                    기존 계정으로 로그인하기
-                  </button>
+                    {passwordError}
+                  </div>
                 )}
               </div>
-            )}
+              {/* 이름 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="name"
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
+                  )}
+                ></label>
+                <div className="flex gap-2 items-center !w-full justify-center">
+                  <div className="relative">
+                    <span className=" absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={cn(
+                      inputClasses(
+                        name.length === 0,
+                        error && name.length === 0
+                      ),
+                      " !w-[32rem] pl-[1.6rem] pr-[0.5rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                      typographyVariants({ variant: "h3-md" }),
+                      colorVariants({ color: "gray-700" }),
+                      "placeholder:text-[var(--gray-500)]"
+                    )}
+                    placeholder="이름을 입력하세요"
+                    required
+                  />
+                </div>
+              </div>
 
-            {/* 회원가입 버튼 */}
+              {/* 에러 메시지 */}
+              {responseMessage && (
+                <div
+                  className={cn(
+                    "text-center p-3 rounded-md",
+                    error
+                      ? "bg-red-50 text-red-600"
+                      : "bg-green-50 text-green-600"
+                  )}
+                >
+                  <p className={typographyVariants({ variant: "b2-md" })}>
+                    {responseMessage}
+                  </p>
+                </div>
+              )}
+            </div>
+               {/* 로그인 유지하기 체크박스 */}
+              <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
+                <label className="register-checkbox-container">
+                  <input type="checkbox" className="register-checkbox" />
+                  <span className="register-checkmark"></span>
+                  <span
+                    className={cn(
+                      typographyVariants({ variant: "b2-md" }),
+                      colorVariants({ color: "gray-700" }), 
+                    )
+                  
+                  }
+                  >
+                    로그인 유지하기
+                  </span>
+                </label>
+              </div>
+            {/* 카카오톡으로 연결 */}
             <Button
               type="submit"
-              size="XL"
+              size="L"
               disabled={!isFormValid || loading}
               additionalClass={cn(
                 "w-full mt-6",
@@ -312,24 +462,35 @@ const Register = () => {
                 "!text-[var(--white)]"
               )}
             >
-              {loading ? "회원가입 중..." : "회원가입"}
+              {loading ? "카카오톡으로 연결중..." : "카카오톡으로 연결"}
             </Button>
+
+            {/* 회원가입 버튼 */}
+            <button
+              type="submit"
+              disabled={!isPasswordValid || loading}
+              className={cn(
+                "w-full py-[1.2rem] rounded-[0.8rem] mt-[1.2rem]",
+                isPasswordValid
+                  ? "bg-[var(--blue-500)] text-white"
+                  : "bg-[var(--gray-300)] text-[var(--gray-500)]"
+              )}
+            >
+              {loading ? "회원가입 중..." : "계정 만들기"}
+            </button>
           </form>
 
           {/* 하단 링크 */}
-          <div className="mt-6 text-center">
+          <div className="mt-[3rem] text-center">
             <p className={typographyVariants({ variant: "b2-md" })}>
-              <span className={colorVariants({ color: "gray-600" })}>
-                이미 계정이 있으신가요?{" "}
-              </span>
               <button
                 onClick={() => navigate("/login")}
                 className={cn(
-                  colorVariants({ color: "blue-400" }),
-                  "underline hover:no-underline"
+                  colorVariants({ color: "gray-700" }),
+                  "hover:no-underline"
                 )}
               >
-                로그인
+                기존 계정으로 로그인
               </button>
             </p>
           </div>
