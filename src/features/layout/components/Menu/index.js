@@ -179,12 +179,14 @@ export default function Menu() {
 
       <div className="flex  w-full justify-between  items  bg-[var(--white)] flex-col ">
         <div className="justify-end flex p-[0.8rem] pb-0 pt-[1.2rem]">
-          <button onClick={closeSidebar} className={`items-end p-[1.2rem]`}>
-            <img
-              src="/icon_X_noBg.svg"
-              alt="달력 페이지로 돌아가기"
-              onClick={() => navigate("/")}
-            />
+          <button
+            onClick={() => {
+              closeSidebar();
+              navigate("/");
+            }}
+            className={`items-end p-[1.2rem]`}
+          >
+            <img src="/icon_X_noBg.svg" alt="달력 페이지로 돌아가기" />
           </button>
         </div>
         <div className="flex flex-col px-[2.4rem]  ">
