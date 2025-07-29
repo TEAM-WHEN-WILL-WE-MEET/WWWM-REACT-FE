@@ -6,6 +6,7 @@ import { colorVariants } from "../../../styles/color.ts";
 import { cn } from "../../../utils/cn";
 import { Button } from "../../../components/Button.tsx";
 import Loading from "../../../components/Loading";
+import "../styles/Register.css";
 
 const Login = () => {
   const BASE_URL =
@@ -16,43 +17,87 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [emailId, setEmailId] = useState("");
+  const [emailDomain, setEmailDomain] = useState("gmail.com");
+  const [showDomainDropdown, setShowDomainDropdown] = useState(false);
+  const [customDomain, setCustomDomain] = useState(false);
   const [password, setPassword] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
   const [registrationInfo, setRegistrationInfo] = useState(null);
 
+  const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
+
+  const domainOptions = [
+    { value: "gmail.com", label: "gmail.com" },
+    { value: "naver.com", label: "naver.com" },
+    { value: "custom", label: "직접 입력" },
+  ];
+
   // 회원가입에서 넘어온 정보 처리
   useEffect(() => {
-    if (location.state?.registeredName && location.state?.registeredEmail) {
+    if (location.state?.registeredEmail) {
       setRegistrationInfo({
-        name: location.state.registeredName,
         email: location.state.registeredEmail,
         message: location.state.message,
       });
-      // 회원가입한 정보를 기본값으로 설정
-      setName(location.state.registeredName);
-      setEmail(location.state.registeredEmail);
+      // 회원가입한 이메일을 파싱해서 설정
+      const registeredEmail = location.state.registeredEmail;
+      if (registeredEmail.includes("@")) {
+        const [id, domain] = registeredEmail.split("@");
+        setEmailId(id);
+        if (domain === "gmail.com" || domain === "naver.com") {
+          setEmailDomain(domain);
+          setCustomDomain(false);
+        } else {
+          setEmailDomain(`@${domain}`);
+          setCustomDomain(true);
+        }
+      }
     }
   }, [location.state]);
 
   const isFormValid =
-    name.trim().length > 0 &&
-    email.trim().length > 0 &&
+    emailId.trim().length > 0 &&
+    (customDomain
+      ? emailDomain.includes("@")
+      : emailDomain.trim().length > 0) &&
     password.trim().length > 0;
+
+  // 이메일 ID 핸들러
+  const handleEmailIdChange = (e) => {
+    const value = e.target.value;
+    setEmailId(value);
+  };
+
+  // 이메일 도메인 핸들러
+  const handleEmailDomainChange = (e) => {
+    const value = e.target.value;
+    setEmailDomain(value);
+  };
+
+  const handleDomainSelect = (domain) => {
+    if (domain === "custom") {
+      setCustomDomain(true);
+      setEmailDomain("");
+    } else {
+      setCustomDomain(false);
+      setEmailDomain(domain);
+    }
+    setShowDomainDropdown(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid) {
       setError(true);
-      setResponseMessage("이름, 이메일, 비밀번호를 모두 입력해주세요.");
+      setResponseMessage("이메일, 비밀번호를 모두 입력해주세요.");
       return;
     }
 
     // 추가 검증
-    if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
+    if (emailId.trim() === "" || password.trim() === "") {
       setError(true);
       setResponseMessage("모든 필드를 입력해주세요.");
       return;
@@ -63,9 +108,8 @@ const Login = () => {
     setResponseMessage("");
 
     try {
-      // 로그인 요청 데이터 구성
+      // 로그인 요청 데이터 구성 (name 제거)
       const data = {
-        name: name,
         email: email,
         password: password,
       };
@@ -73,7 +117,6 @@ const Login = () => {
       console.log("==== 로그인 요청 정보 ====");
       console.log("BASE_URL:", BASE_URL);
       console.log("Request data:", data);
-      console.log("Name value:", name);
       console.log("Email value:", email);
       console.log("Password value:", password);
 
@@ -121,7 +164,7 @@ const Login = () => {
         }
       } else if (response.status === 401) {
         let errorMessage =
-          "등록되지 않은 정보이거나 이름, 이메일, 비밀번호가 일치하지 않습니다.";
+          "등록되지 않은 정보이거나 이메일, 비밀번호가 일치하지 않습니다.";
 
         // 서버 응답에서 더 구체적인 오류 메시지 확인
         if (responseBody && responseBody.error) {
@@ -143,9 +186,7 @@ const Login = () => {
           errorMessage = responseBody.message;
         } else {
           // 입력 값 검증
-          if (name.trim().length < 2) {
-            errorMessage = "이름은 2글자 이상 입력해주세요.";
-          } else if (email.trim().length < 5 || !email.includes("@")) {
+          if (email.trim().length < 5 || !email.includes("@")) {
             errorMessage = "올바른 이메일 주소를 입력해주세요.";
           } else if (password.length < 2) {
             errorMessage = "비밀번호는 2글자 이상 입력해주세요.";
@@ -180,7 +221,7 @@ const Login = () => {
 
   const inputClasses = (isEmpty, hasError) =>
     cn(
-      "flex w-96 h-16 px-5 py-4",
+      "flex h-16 px-5 py-4",
       "items-center flex-shrink-0 rounded-lg",
       "border border-gray-300",
       typographyVariants({ variant: "b2-md" }),
@@ -200,14 +241,14 @@ const Login = () => {
         <meta name="description" content="언제볼까? 서비스에 로그인하세요." />
       </Helmet>
 
-      <div className="flex items-center justify-center min-h-screen bg-[var(--white)] px-4">
-        <div className="flex flex-col items-center w-full max-w-md">
+      <div className="flex items-center justify-center min-h-screen bg-[var(--white)] ">
+        <div className="flex flex-col items-center w-full  h-full ">
           {/* 로고 */}
           <div className="mb-8">
             <img
               src="/wwmtLogo.svg"
               alt="언제볼까? 로고"
-              className="w-16 h-16 cursor-pointer"
+              className="w-[2.2rem] h-[2.4rem] cursor-pointer"
               onClick={() => navigate("/")}
             />
           </div>
@@ -217,14 +258,13 @@ const Login = () => {
             className={cn(
               typographyVariants({ variant: "h1-sb" }),
               colorVariants({ color: "gray-900" }),
-              "text-[2.4rem] mb-4 text-center"
+              "text-[2rem] mb-[4rem] text-center"
             )}
           >
             로그인
           </h1>
 
-          {/* 회원가입 완료 안내 */}
-          {registrationInfo && (
+          {/* {registrationInfo && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p
                 className={cn(
@@ -240,7 +280,7 @@ const Login = () => {
                   "text-green-600 text-center mt-1"
                 )}
               >
-                이름: <strong>{registrationInfo.name}</strong> | 이메일:{" "}
+                이메일:{" "}
                 <strong>{registrationInfo.email}</strong>
               </p>
               <p
@@ -249,127 +289,214 @@ const Login = () => {
                   "text-green-600 text-center mt-1"
                 )}
               >
-                ↓ 회원가입한 이름으로 로그인하세요 ↓
+                ↓ 회원가입한 이메일로 로그인하세요 ↓
               </p>
             </div>
-          )}
+          )} */}
 
           {/* 로그인 폼 */}
-          <form onSubmit={handleSubmit} className="w-full space-y-4">
-            <div>
-              <label
-                htmlFor="name"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                이름{" "}
-                {registrationInfo && (
-                  <span className="text-gray-500">(회원가입한 이름)</span>
-                )}
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className={inputClasses(
-                  name.length === 0,
-                  error && name.length === 0
-                )}
-                placeholder={
-                  registrationInfo
-                    ? `회원가입한 이름: ${registrationInfo.name}`
-                    : "회원가입한 이름을 입력하세요"
-                }
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="email"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                이메일{" "}
-                {registrationInfo && (
-                  <span className="text-gray-500">(회원가입한 이메일)</span>
-                )}
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={inputClasses(
-                  email.length === 0,
-                  error && email.length === 0
-                )}
-                placeholder={
-                  registrationInfo
-                    ? `회원가입한 이메일: ${registrationInfo.email}`
-                    : "회원가입한 이메일을 입력하세요"
-                }
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-700" }),
-                  "block mb-2"
-                )}
-              >
-                비밀번호
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={inputClasses(
-                  password.length === 0,
-                  error && password.length === 0
-                )}
-                placeholder="비밀번호를 입력하세요"
-                required
-              />
-            </div>
-
-            {/* 에러 메시지 */}
-            {responseMessage && (
-              <div
-                className={cn(
-                  "text-center p-3 rounded-md",
-                  error
-                    ? "bg-red-50 text-red-600"
-                    : "bg-green-50 text-green-600"
-                )}
-              >
-                <p className={typographyVariants({ variant: "b2-md" })}>
-                  {responseMessage}
-                </p>
+          <form onSubmit={handleSubmit} className="w-auto " noValidate>
+            {/* email / PW */}
+            <div className="w-full flex flex-col items-end justify-center !space-y-[2rem]  ">
+              {/* 이메일 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="email"
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
+                  )}
+                ></label>
+                <div className="flex w-full  items-center justify-center">
+                  <div className="relative flex-shrink-0">
+                    <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <div className="flex flex-2 items-center">
+                    <input
+                      id="emailId"
+                      type="text"
+                      value={emailId}
+                      onChange={handleEmailIdChange}
+                      className={cn(
+                        inputClasses(
+                          emailId.length === 0,
+                          error && emailId.length === 0
+                        ),
+                        "w-full max-w-[14.4rem] pl-[1.6rem] pr-[0.5rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                        typographyVariants({ variant: "h3-md" }),
+                        colorVariants({ color: "gray-700" }),
+                        "placeholder:text-[var(--gray-500)]"
+                      )}
+                      placeholder="이메일"
+                      required
+                    />
+                  </div>
+                  <span className="mx-4 text-[2rem] text-gray-500 flex-shrink-0">
+                    @
+                  </span>
+                  <div className="relative flex-1 max-w-[14.4rem] z-30">
+                    {customDomain ? (
+                      <input
+                        type="text"
+                        value={emailDomain}
+                        onChange={handleEmailDomainChange}
+                        className={cn(
+                          inputClasses(
+                            emailDomain.length === 0,
+                            error && emailDomain.length === 0
+                          ),
+                          "w-full border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                        )}
+                        placeholder="도메인 입력"
+                      />
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowDomainDropdown(!showDomainDropdown)
+                          }
+                          className={cn(
+                            "w-full h-16 px-5 py-4 flex items-center justify-between",
+                            "bg-white border-b border-gray-300 ",
+                            typographyVariants({ variant: "b2-md" })
+                          )}
+                        >
+                          {emailDomain}
+                          <img
+                            src="/dropdwonarrow.svg"
+                            alt="도메인 선택"
+                            className={cn(
+                              "w-[1.2rem] h-[0.6rem] transition-transform",
+                              showDomainDropdown && "transform rotate-180"
+                            )}
+                          />
+                        </button>
+                        {showDomainDropdown && (
+                          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            {domainOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => handleDomainSelect(option.value)}
+                                className={cn(
+                                  "w-full px-5 py-3 text-left hover:bg-gray-50",
+                                  typographyVariants({ variant: "b2-md" })
+                                )}
+                              >
+                                {option.value === "custom"
+                                  ? option.label
+                                  : `${option.label}`}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* 비밀번호 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="password"
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
+                  )}
+                ></label>
+                <div className="flex w-full  items-center justify-center">
+                  <div className="relative">
+                    <span className=" absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <div className="relative flex-2 !w-[32rem]">
+                    <input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className={cn(
+                        inputClasses(
+                          password.length === 0,
+                          error && password.length === 0
+                        ),
+                        "flex-1 w-[32rem] pl-[1.6rem] pr-[3rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                        typographyVariants({ variant: "h3-md" }),
+                        colorVariants({ color: "gray-700" }),
+                        "placeholder:text-[var(--gray-500)]"
+                      )}
+                      placeholder="비밀번호를 입력하세요"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 에러 메시지 */}
+              {responseMessage && (
+                <div
+                  className={cn(
+                    "text-center  whitespace-nowrap  overflow-x-auto",
+                    error ? colorVariants({ color: "red-300" }) : " "
+                  )}
+                  style={{ whiteSpace: "nowrap" }}
+                >
+                  <span className={typographyVariants({ variant: "b2-md" })}>
+                    {responseMessage}
+                  </span>
+                </div>
+              )}
+            </div>
+            {/* 로그인 유지하기 체크박스 */}
+            <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
+              <label className="register-checkbox-container">
+                <input type="checkbox" className="register-checkbox" />
+                <span className="register-checkmark"></span>
+                <span
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" })
+                  )}
+                >
+                  로그인 유지하기
+                </span>
+              </label>
+            </div>
+            {/* 카카오톡으로 연결 */}
+            <Button
+              type="button"
+              size="L"
+              additionalClass={cn(
+                "mt-6 flex items-center justify-center gap-2",
+                colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
+                "!text-[var(--kakao-black)]"
+              )}
+            >
+              <img
+                src="/arcticons_kakaotalk.svg"
+                alt="카카오톡 아이콘"
+                className="w-[1.6rem] h-[1.6rem]"
+              />
+              카카오톡으로 연결
+            </Button>
 
             {/* 로그인 버튼 */}
             <Button
               type="submit"
-              size="XL"
+              size="L"
               disabled={!isFormValid || loading}
               additionalClass={cn(
-                "w-full mt-6",
-                colorVariants({ bg: "blue-400" }),
-                "!text-[var(--white)]"
+                "rounded-[0.8rem] mt-[1.2rem]",
+                isFormValid
+                  ? "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]"
+                  : "bg-[var(--gray-100)] border border-[var(--gray-500)] text-[var(--gray-900)]"
               )}
             >
               {loading ? "로그인 중..." : "로그인"}
@@ -377,7 +504,7 @@ const Login = () => {
           </form>
 
           {/* 하단 링크 */}
-          <div className="mt-6 text-center">
+          <div className="mt-[3rem] text-center">
             <p className={typographyVariants({ variant: "b2-md" })}>
               <span className={colorVariants({ color: "gray-600" })}>
                 계정이 없으신가요?{" "}
@@ -385,8 +512,8 @@ const Login = () => {
               <button
                 onClick={() => navigate("/register")}
                 className={cn(
-                  colorVariants({ color: "blue-400" }),
-                  "underline hover:no-underline"
+                  colorVariants({ color: "gray-700" }),
+                  "hover:no-underline"
                 )}
               >
                 회원가입
