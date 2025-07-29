@@ -531,7 +531,7 @@ const Register = () => {
                 onClick={() => navigate("/login")}
                 className={cn(
                   colorVariants({ color: "gray-700" }),
-                  "hover:no-underline"
+                  "hover:no-underline  !text-[1.2rem]"
                 )}
               >
                 기존 계정으로 로그인

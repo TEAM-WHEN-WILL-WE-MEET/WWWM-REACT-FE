@@ -510,8 +510,12 @@ const Login = () => {
           </form>
 
           {/* 하단 링크 */}
-          <div className="mt-[3rem] text-center">
-            <div className={typographyVariants({ variant: "b2-md" })}>
+            <div
+              className={cn(
+                typographyVariants({ variant: "b2-md" }),
+                "mt-[3rem] flex !flex-col !gap-[2rem] w-full h-full !text-[1.2rem]"
+              )}
+            >
               <button
                 onClick={() => navigate("/register")}
                 className={cn(
@@ -532,7 +536,6 @@ const Login = () => {
               </button>
             </div>
           </div>
-        </div>
       </div>
     </>
   );
