@@ -112,7 +112,7 @@ const Login = () => {
       const data = {
         email: email,
         password: password,
-        name: "dd"
+        name: "dd",
       };
 
       console.log("==== 로그인 요청 정보 ====");
@@ -159,9 +159,9 @@ const Login = () => {
 
           setResponseMessage("로그인이 정상적으로 완료되었습니다!");
 
-          // 프로필 페이지로 리다이렉트
+          // 메뉴 페이지로 리다이렉트
           setTimeout(() => {
-            navigate("/profile");
+            navigate("/menu");
           }, 1000);
         } else {
           console.error("응답 데이터 형식이 예상과 다릅니다:", responseBody);
@@ -512,7 +512,6 @@ const Login = () => {
           {/* 하단 링크 */}
           <div className="mt-[3rem] text-center">
             <div className={typographyVariants({ variant: "b2-md" })}>
-
               <button
                 onClick={() => navigate("/register")}
                 className={cn(

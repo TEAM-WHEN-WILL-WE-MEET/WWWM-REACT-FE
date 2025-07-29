@@ -146,8 +146,8 @@ export default function Menu() {
   };
 
   const handleProfileClick = () => {
-    console.log("개인정보 수정 버튼 클릭됨 - 프로필 페이지로 이동");
-    navigate("/profile");
+    console.log("개인정보 수정 버튼 클릭됨 - 개인정보 수정 페이지로 이동");
+    navigate("/profile/edit");
   };
 
   const handleLogOut = () => {

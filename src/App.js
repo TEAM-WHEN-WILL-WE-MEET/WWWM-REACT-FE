@@ -10,7 +10,7 @@ import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedi
 import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
 import LandingPage from "./components/LandingPage";
 import Menu from "./features/layout/components/Menu";
-import Profile from "./features/user/pages/Profile";
+
 import EditProfile from "./features/user/pages/EditProfile";
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
@@ -26,7 +26,7 @@ function App() {
           <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
           <Route path="/invite" element={<Invite />} />
           <Route path="/menu" element={<Menu />} />
-          <Route path="/profile" element={<Profile />} />
+
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

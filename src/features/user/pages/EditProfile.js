@@ -26,6 +26,7 @@ const EditProfile = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [noChangesError, setNoChangesError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // 토큰이 있는지 확인
@@ -55,8 +56,8 @@ const EditProfile = () => {
     }
   }, [name, email]);
 
-  const handleBackToProfile = () => {
-    navigate("/profile");
+  const handleBackToMenu = () => {
+    navigate("/menu");
   };
 
   const handleInputChange = (field, value) => {
@@ -100,7 +101,7 @@ const EditProfile = () => {
     if (changedFields.password !== undefined) {
       if (!changedFields.password.trim()) {
         newErrors.password = "비밀번호를 입력해주세요.";
-      } 
+      }
     }
 
     setErrors(newErrors);
@@ -115,10 +116,10 @@ const EditProfile = () => {
       changedFields.name = formData.name;
     }
 
-    // 이메일 변경 확인
-    if (formData.email !== originalData.email) {
-      changedFields.email = formData.email;
-    }
+    // 이메일 변경 확인 (이메일은 더 이상 수정하지 않으므로 제거)
+    // if (formData.email !== originalData.email) {
+    //   changedFields.email = formData.email;
+    // }
 
     // 비밀번호 변경 확인 (빈 문자열이 아닌 경우)
     if (formData.password.trim()) {
@@ -179,9 +180,9 @@ const EditProfile = () => {
       const responseData = await response.json();
 
       if (response.status === 200 && responseData.success) {
-        // 성공 시 사용자 정보 새로고침 후 프로필 페이지로 이동
+        // 성공 시 사용자 정보 새로고침 후 메뉴 페이지로 이동
         await fetchMyInfo();
-        navigate("/profile");
+        navigate("/menu");
       } else {
         // 실패 시 에러 메시지 표시
         setErrors({
@@ -198,6 +199,18 @@ const EditProfile = () => {
     }
   };
 
+  // 로그인 UI와 동일한 inputClasses 함수
+  const inputClasses = (isEmpty, hasError) =>
+    cn(
+      "flex h-16 px-5 py-4",
+      "items-center flex-shrink-0 rounded-lg",
+      "border border-gray-300",
+      typographyVariants({ variant: "b2-md" }),
+      {
+        "outline outline-1 outline-red-500 outline-offset-0": hasError,
+      }
+    );
+
   if (isLoading) {
     return <Loading />;
   }
@@ -205,219 +218,216 @@ const EditProfile = () => {
   return (
     <>
       <Helmet>
-        <title>내 정보 수정 - 언제볼까?</title>
+        <title>개인정보 수정 - 언제볼까?</title>
         <meta
           name="description"
-          content="언제볼까? 서비스의 내 정보 수정 페이지입니다."
+          content="언제볼까? 서비스의 개인정보 수정 페이지입니다."
         />
       </Helmet>
 
-      <div className="flex px-[2rem] justify-between items-center min-h-[100vh] bg-[var(--white)] flex-col">
-        <div className="flex flex-col justify-center w-full max-w-[40rem]">
+      <div className="flex justify-center min-h-screen bg-[var(--white)]">
+        <div className="flex flex-col items-center w-full h-full">
           {/* 헤더 */}
-          <div className="flex items-center justify-between mt-[2rem] mb-[3rem]">
+          <div className="flex items-center justify-between mt-[1.8rem] mb-[3.6rem] w-full max-w-[40rem] px-[2rem]">
             <img
               src="/btn_Back.svg"
               className="hover:cursor-pointer w-[2.4rem] h-[2.4rem]"
               alt="뒤로가기"
-              onClick={handleBackToProfile}
+              onClick={handleBackToMenu}
             />
             <h1
               className={cn(
-                typographyVariants({ variant: "h2-sb" }),
+                typographyVariants({ variant: "h1-sb" }),
                 colorVariants({ color: "gray-900" }),
-                "text-center"
+                "text-[2rem] text-center"
               )}
             >
-              내 정보 수정
+              개인정보 수정
             </h1>
-            <div className="w-[2.4rem]"></div> {/* 중앙 정렬을 위한 빈 공간 */}
+            <div className="w-[2.4rem]"></div>
           </div>
 
-          {/* 에러 상태 */}
-          {error && (
-            <div className="mb-[2rem] p-[1.6rem] bg-red-50 border border-red-200 rounded-lg">
-              <p
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "red-500" })
-                )}
-              >
-                {error}
-              </p>
-            </div>
-          )}
-
           {/* 폼 */}
-          <form onSubmit={handleSubmit} className="space-y-[2rem]">
-            {/* 이름 필드 */}
-            <div>
-              <label
-                className={cn(
-                  typographyVariants({ variant: "d1-sb" }),
-                  colorVariants({ color: "gray-600" }),
-                  "block mb-[0.8rem]"
-                )}
-              >
-                이름
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                className={cn(
-                  "w-full px-[1.2rem] py-[1.6rem] bg-[var(--white)] border rounded-[0.8rem] focus:outline-none focus:ring-2 focus:ring-[var(--blue-500)]",
-                  errors.name ? "border-red-500" : "border-[var(--gray-300)]",
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-900" })
-                )}
-                placeholder="이름을 입력하세요"
-              />
-              {errors.name && (
-                <p
+          <form onSubmit={handleSubmit} className="w-auto" noValidate>
+            <div className="w-full  flex flex-col items-end justify-center !space-y-[2rem]">
+              {/* 이메일 필드 (수정 불가) */}
+              <div className="flex flex-col items-start w-full pl-0">
+                <label
+                  htmlFor="email"
                   className={cn(
                     typographyVariants({ variant: "d2-md" }),
-                    colorVariants({ color: "red-500" }),
-                    "mt-[0.4rem]"
+                    colorVariants({ color: "gray-600" }),
+                    "block mb-[0.6rem] pl-0"
                   )}
                 >
-                  {errors.name}
-                </p>
-              )}
-            </div>
-
-            {/* 이메일 필드 */}
-            <div>
-              <label
-                className={cn(
-                  typographyVariants({ variant: "d1-sb" }),
-                  colorVariants({ color: "gray-600" }),
-                  "block mb-[0.8rem]"
-                )}
-              >
-                이메일
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className={cn(
-                  "w-full px-[1.2rem] py-[1.6rem] bg-[var(--white)] border rounded-[0.8rem] focus:outline-none focus:ring-2 focus:ring-[var(--blue-500)]",
-                  errors.email ? "border-red-500" : "border-[var(--gray-300)]",
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-900" })
-                )}
-                placeholder="이메일을 입력하세요"
-              />
-              {errors.email && (
-                <p
+                  연결된 계정
+                </label>
+                <div className="flex w-full items-center justify-center">
+                  <div className="relative flex-2 !w-[32rem]">
+                    <div
+                      className={cn(
+                        "flex-1 w-[32rem] pl-[0.8rem] pr-[3rem] py-[1.2rem] !bg-[var(--gray-100)] rounded-[0.4rem] !text-[1.4rem]",
+                        typographyVariants({ variant: "b3-rg" }),
+                        colorVariants({ color: "gray-600" })
+                      )}
+                    >
+                      {formData.email}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* 이름 필드 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="name"
                   className={cn(
-                    typographyVariants({ variant: "d2-md" }),
-                    colorVariants({ color: "red-500" }),
-                    "mt-[0.4rem]"
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
                   )}
-                >
-                  {errors.email}
-                </p>
-              )}
-            </div>
+                ></label>
+                <div className="flex w-full items-center justify-center">
+                  <div className="relative">
+                    <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <div className="relative flex-2 !w-[32rem]">
+                    <input
+                      id="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      className={cn(
+                        inputClasses(
+                          formData.name.length === 0,
+                          errors.name && formData.name.length === 0
+                        ),
+                        "flex-1 w-[32rem] pl-[1.6rem] pr-[3rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                        typographyVariants({ variant: "h3-md" }),
+                        colorVariants({ color: "gray-700" }),
+                        "placeholder:text-[var(--gray-500)]"
+                      )}
+                      placeholder="새 이름을 입력하세요 (선택사항)"
+                      
+                    />
+                  </div>
+                </div>
+                {errors.name && (
+                  <div className="text-center whitespace-nowrap overflow-x-auto mt-2">
+                    <span
+                      className={cn(
+                        typographyVariants({ variant: "b2-md" }),
+                        colorVariants({ color: "red-300" })
+                      )}
+                    >
+                      {errors.name}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-            {/* 비밀번호 필드 */}
-            <div>
-              <label
-                className={cn(
-                  typographyVariants({ variant: "d1-sb" }),
-                  colorVariants({ color: "gray-600" }),
-                  "block mb-[0.8rem]"
-                )}
-              >
-                비밀번호
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                className={cn(
-                  "w-full px-[1.2rem] py-[1.6rem] bg-[var(--white)] border rounded-[0.8rem] focus:outline-none focus:ring-2 focus:ring-[var(--blue-500)]",
-                  errors.password
-                    ? "border-red-500"
-                    : "border-[var(--gray-300)]",
-                  typographyVariants({ variant: "b2-md" }),
-                  colorVariants({ color: "gray-900" })
-                )}
-                placeholder="새 비밀번호를 입력하세요 (변경하지 않으려면 비워두세요)"
-              />
-              {errors.password && (
-                <p
+           
+
+              {/* 비밀번호 필드 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="password"
                   className={cn(
-                    typographyVariants({ variant: "d2-md" }),
-                    colorVariants({ color: "red-500" }),
-                    "mt-[0.4rem]"
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
                   )}
-                >
-                  {errors.password}
-                </p>
-              )}
-            </div>
-
-            {/* 버튼들 */}
-            <div className="pt-[1rem]">
-              <Button
-                label={isSubmitting ? "저장 중..." : "저장"}
-                size="XL"
-                type="submit"
-                disabled={isSubmitting}
-                additionalClass={cn(
-                  "w-full mb-[1.2rem]",
-                  colorVariants({ bg: "blue-500" }),
-                  "!text-[var(--white)]",
-                  isSubmitting && "opacity-50 cursor-not-allowed"
+                ></label>
+                <div className="flex w-full items-center justify-center">
+                  <div className="relative">
+                    <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <div className="relative flex-2 !w-[32rem]">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) =>
+                        handleInputChange("password", e.target.value)
+                      }
+                      className={cn(
+                        inputClasses(
+                          formData.password.length === 0,
+                          errors.password && formData.password.length === 0
+                        ),
+                        "flex-1 w-[32rem] pl-[1.6rem] pr-[5rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                        typographyVariants({ variant: "h3-md" }),
+                        colorVariants({ color: "gray-700" }),
+                        "placeholder:text-[var(--gray-500)]"
+                      )}
+                      placeholder="새 비밀번호를 입력하세요 (선택사항)"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute z-10 right-2 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                    >
+                      <img
+                        src={
+                          showPassword
+                            ? "/icon-view-open.svg"
+                            : "/icon-view.svg"
+                        }
+                        alt={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                        className="w-[2.4rem] h-[2.4rem]"
+                      />
+                    </button>
+                  </div>
+                </div>
+                {errors.password && (
+                  <div className="text-center whitespace-nowrap overflow-x-auto mt-2">
+                    <span
+                      className={cn(
+                        typographyVariants({ variant: "b2-md" }),
+                        colorVariants({ color: "red-300" })
+                      )}
+                    >
+                      {errors.password}
+                    </span>
+                  </div>
                 )}
-              />
+              </div>
 
-              {/* 변경사항 없음 경고 메시지 */}
-              {noChangesError && (
-                <div className="mb-[1.2rem] p-[1.2rem] bg-orange-50 border border-orange-200 rounded-lg">
-                  <p
+              {/* 일반 에러 메시지 */}
+              {(noChangesError || errors.submit) && (
+                <div className="text-center whitespace-nowrap overflow-x-auto">
+                  <span
                     className={cn(
                       typographyVariants({ variant: "b2-md" }),
-                      colorVariants({ color: "orange-600" })
+                      colorVariants({ color: "red-300" })
                     )}
                   >
-                    {noChangesError}
-                  </p>
+                    {noChangesError || errors.submit}
+                  </span>
                 </div>
               )}
-
-              {/* 제출 에러 메시지 */}
-              {errors.submit && (
-                <div className="mb-[1.2rem] p-[1.6rem] bg-red-50 border border-red-200 rounded-lg">
-                  <p
-                    className={cn(
-                      typographyVariants({ variant: "b2-md" }),
-                      colorVariants({ color: "red-500" })
-                    )}
-                  >
-                    {errors.submit}
-                  </p>
-                </div>
-              )}
-
-              <Button
-                label="취소"
-                size="XL"
-                onClick={handleBackToProfile}
-                additionalClass={cn(
-                  "w-full",
-                  "bg-[var(--gray-100)] !text-[var(--gray-700)] border border-[var(--gray-300)]"
-                )}
-              />
             </div>
+
+            {/* 저장 버튼 */}
+            <Button
+              type="submit"
+              size="L"
+              disabled={isSubmitting}
+              additionalClass={cn(
+                "rounded-[0.8rem] mt-[6.4rem]",
+                "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]",
+                isSubmitting && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              {isSubmitting ? "저장 중..." : "저장하기"}
+            </Button>
           </form>
         </div>
-
-        {/* 하단 여백 */}
-        <div className="mb-[2rem]"></div>
       </div>
     </>
   );
