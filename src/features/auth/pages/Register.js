@@ -493,11 +493,16 @@ const Register = () => {
                 !(isPasswordValid && isEmailValid && isNameValid) || loading
               }
               additionalClass={cn(
-                "w-full mt-6",
-                colorVariants({ bg: "blue-400" }),
-                "!text-[var(--white)]"
+                "mt-6 flex items-center justify-center gap-2",
+                colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
+                "!text-[var(--kakao-black)]"
               )}
             >
+              <img
+                src="/arcticons_kakaotalk.svg"
+                alt="카카오톡 아이콘"
+                className="w-[1.6rem] h-[1.6rem]"
+              />
               {loading ? "카카오톡으로 연결중..." : "카카오톡으로 연결"}
             </Button>
 
@@ -509,7 +514,7 @@ const Register = () => {
                 !(isPasswordValid && isEmailValid && isNameValid) || loading
               }
               additionalClass={cn(
-                "w-full py-[1.2rem] rounded-[0.8rem] mt-[1.2rem]",
+                "rounded-[0.8rem] mt-[1.2rem]",
                 isPasswordValid && isEmailValid && isNameValid
                   ? "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]"
                   : "bg-[var(--gray-100)] border border-[var(--gray-500)] text-[var(--gray-900)]"
