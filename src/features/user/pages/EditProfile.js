@@ -398,21 +398,22 @@ const EditProfile = () => {
                 )}
               </div>
 
-              {/* 일반 에러 메시지 */}
-              {(noChangesError || errors.submit) && (
-                <div className="text-center whitespace-nowrap overflow-x-auto">
+              
+            </div>
+            {/* 일반 에러 메시지 */}
+            {(noChangesError || errors.submit) && (
+                <div className="text-center  absolute z-[9999] whitespace-nowrap overflow-x-auto">
                   <span
                     className={cn(
                       typographyVariants({ variant: "b2-md" }),
-                      colorVariants({ color: "red-300" })
+                      colorVariants({ color: "red-300" }),
+                      "!text-[1.2rem]   justify-start flex z-[9999]"
                     )}
                   >
                     {noChangesError || errors.submit}
                   </span>
                 </div>
               )}
-            </div>
-
             {/* 저장 버튼 */}
             <Button
               type="submit"
@@ -427,6 +428,7 @@ const EditProfile = () => {
               {isSubmitting ? "저장 중..." : "저장하기"}
             </Button>
           </form>
+          
         </div>
       </div>
     </>

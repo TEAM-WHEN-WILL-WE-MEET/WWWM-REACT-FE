@@ -157,7 +157,7 @@ const Login = () => {
           // 토큰 저장
           localStorage.setItem("authToken", token);
 
-          setResponseMessage("로그인이 정상적으로 완료되었습니다!");
+          setResponseMessage("로그인 성공!");
 
           // 메뉴 페이지로 리다이렉트
           setTimeout(() => {
@@ -269,36 +269,6 @@ const Login = () => {
           >
             로그인
           </h1>
-
-          {/* 회원가입 완료 안내 */}
-          {registrationInfo && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p
-                className={cn(
-                  typographyVariants({ variant: "b2-md" }),
-                  "text-green-700 text-center"
-                )}
-              >
-                🎉 회원가입이 완료되었습니다!
-              </p>
-              <p
-                className={cn(
-                  typographyVariants({ variant: "d1-md" }),
-                  "text-green-600 text-center mt-1"
-                )}
-              >
-                이메일: <strong>{registrationInfo.email}</strong>
-              </p>
-              <p
-                className={cn(
-                  typographyVariants({ variant: "d2-md" }),
-                  "text-green-600 text-center mt-1"
-                )}
-              >
-                ↓ 회원가입한 이메일로 로그인하세요 ↓
-              </p>
-            </div>
-          )}
 
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="w-auto " noValidate>
