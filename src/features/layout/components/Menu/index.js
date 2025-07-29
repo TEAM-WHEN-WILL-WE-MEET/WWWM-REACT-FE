@@ -6,12 +6,14 @@ import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../components/Button.tsx";
 import { fetchApi } from "../../../../utils/api.ts";
 import { API_ENDPOINTS } from "../../../../config/environment.ts";
+import { useUserStore } from "../../../../store/userStore";
 
 import { colors, colorVariants } from "../../../../styles/color.ts";
 import { typographyVariants } from "../../../../styles/typography.ts";
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(true);
+  const { clearUser } = useUserStore();
 
   const closeSidebar = () => setIsOpen(false);
   const navigate = useNavigate();
@@ -151,7 +153,11 @@ export default function Menu() {
   };
 
   const handleLogOut = () => {
-    setShowModalLogOut(false);
+    // 로그아웃 처리
+    localStorage.removeItem("authToken"); // 토큰 삭제
+    clearUser(); // 유저 스토어 초기화
+    setShowModalLogOut(false); // 모달 닫기
+    navigate("/"); // 홈으로 이동
   };
 
   // 모달에서 '삭제' 버튼 클릭 → 선택된 아이템들을 삭제 처리
