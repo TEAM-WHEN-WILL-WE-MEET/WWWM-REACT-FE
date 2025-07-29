@@ -112,6 +112,7 @@ const Login = () => {
       const data = {
         email: email,
         password: password,
+        name: "dd"
       };
 
       console.log("==== 로그인 요청 정보 ====");
@@ -120,7 +121,12 @@ const Login = () => {
       console.log("Email value:", email);
       console.log("Password value:", password);
 
-      const response = await fetch(`${BASE_URL}/users/auth/login`, {
+      const endpoint = `/users/auth/login`;
+
+      console.log(`로그인 API 호출: ${BASE_URL}${endpoint}`);
+      console.log(`사용하는 데이터:`, data);
+
+      const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -264,7 +270,8 @@ const Login = () => {
             로그인
           </h1>
 
-          {/* {registrationInfo && (
+          {/* 회원가입 완료 안내 */}
+          {registrationInfo && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <p
                 className={cn(
@@ -280,8 +287,7 @@ const Login = () => {
                   "text-green-600 text-center mt-1"
                 )}
               >
-                이메일:{" "}
-                <strong>{registrationInfo.email}</strong>
+                이메일: <strong>{registrationInfo.email}</strong>
               </p>
               <p
                 className={cn(
@@ -292,7 +298,7 @@ const Login = () => {
                 ↓ 회원가입한 이메일로 로그인하세요 ↓
               </p>
             </div>
-          )} */}
+          )}
 
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="w-auto " noValidate>
@@ -505,10 +511,8 @@ const Login = () => {
 
           {/* 하단 링크 */}
           <div className="mt-[3rem] text-center">
-            <p className={typographyVariants({ variant: "b2-md" })}>
-              <span className={colorVariants({ color: "gray-600" })}>
-                계정이 없으신가요?{" "}
-              </span>
+            <div className={typographyVariants({ variant: "b2-md" })}>
+
               <button
                 onClick={() => navigate("/register")}
                 className={cn(
@@ -516,9 +520,18 @@ const Login = () => {
                   "hover:no-underline"
                 )}
               >
-                회원가입
+                새 계정 만들기
               </button>
-            </p>
+              <button
+                onClick={() => navigate("/")}
+                className={cn(
+                  colorVariants({ color: "gray-700" }),
+                  "hover:no-underline"
+                )}
+              >
+                비밀번호 찾기
+              </button>
+            </div>
           </div>
         </div>
       </div>
