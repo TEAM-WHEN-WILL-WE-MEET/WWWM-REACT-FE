@@ -161,11 +161,57 @@ export default function Menu() {
   };
 
   // 모달에서 '삭제' 버튼 클릭 → 선택된 아이템들을 삭제 처리
-  const handleConfirmDelete = () => {
-    setItems(items.filter((item) => !selectedIds.includes(item.id)));
-    setSelectedIds([]); // 선택 상태 초기화
-    setShowModal(false);
-    setIsSelectionMode(false); // 선택 모드 해제
+  const handleConfirmDelete = async () => {
+    try {
+      // 선택된 모든 약속에 대해 삭제 API 호출
+      const deletePromises = selectedIds.map(async (appointmentId) => {
+        try {
+          const response = await fetchApi(
+            API_ENDPOINTS.DELETE_APPOINTMENT(appointmentId),
+            {
+              method: "DELETE",
+            }
+          );
+          
+          if (response.success) {
+            return { id: appointmentId, success: true };
+          } else {
+            console.error(`약속 ${appointmentId} 삭제 실패:`, response.msg);
+            return { id: appointmentId, success: false, error: response.msg };
+          }
+        } catch (error) {
+          console.error(`약속 ${appointmentId} 삭제 중 오류:`, error);
+          return { id: appointmentId, success: false, error: error.message };
+        }
+      });
+
+      const results = await Promise.all(deletePromises);
+      
+      // 성공한 항목들만 로컬 state에서 제거
+      const successfullyDeleted = results
+        .filter(result => result.success)
+        .map(result => result.id);
+      
+      const failedDeletes = results.filter(result => !result.success);
+      
+      if (successfullyDeleted.length > 0) {
+        setItems(items.filter((item) => !successfullyDeleted.includes(item.id)));
+      }
+      
+      // 실패한 항목이 있으면 알림
+      if (failedDeletes.length > 0) {
+        const failedCount = failedDeletes.length;
+        const totalCount = selectedIds.length;
+        alert(`${totalCount}개 중 ${failedCount}개 항목의 삭제에 실패했습니다.`);
+      }
+      
+      setSelectedIds([]); // 선택 상태 초기화
+      setShowModal(false);
+      setIsSelectionMode(false); // 선택 모드 해제
+    } catch (error) {
+      console.error("약속 삭제 중 예상치 못한 오류:", error);
+      alert("약속 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   // 모달에서 '취소' 버튼 클릭
