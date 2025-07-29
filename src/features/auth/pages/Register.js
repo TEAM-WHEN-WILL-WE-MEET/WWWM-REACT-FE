@@ -29,6 +29,8 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isNameValid, setIsNameValid] = useState(false);
 
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
@@ -67,13 +69,43 @@ const Register = () => {
     validatePassword(value);
   };
 
+  // 이메일 ID 핸들러
+  const handleEmailIdChange = (e) => {
+    const value = e.target.value;
+    setEmailId(value);
+    const isValid =
+      value.trim().length > 0 &&
+      (customDomain
+        ? emailDomain.includes(".")
+        : emailDomain.trim().length > 0);
+    setIsEmailValid(isValid);
+  };
+
+  // 이메일 도메인 핸들러
+  const handleEmailDomainChange = (e) => {
+    const value = e.target.value;
+    setEmailDomain(value);
+    const isValid =
+      emailId.trim().length > 0 &&
+      (customDomain ? value.includes(".") : value.trim().length > 0);
+    setIsEmailValid(isValid);
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setName(value);
+    setIsNameValid(value.trim().length > 0);
+  };
+
   const handleDomainSelect = (domain) => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
+      setIsEmailValid(false);
     } else {
       setCustomDomain(false);
       setEmailDomain(domain);
+      setIsEmailValid(emailId.trim().length > 0);
     }
     setShowDomainDropdown(false);
   };
@@ -138,7 +170,7 @@ const Register = () => {
             },
           });
         }, 200);
-      }else if (response.status === 409) {
+      } else if (response.status === 409) {
         setError(true);
         setResponseMessage("이미 등록된 이메일입니다.");
       } else if (response.status === 400) {
@@ -213,7 +245,7 @@ const Register = () => {
           </h1>
 
           {/* 회원가입 폼 */}
-          <form onSubmit={handleSubmit} className="w-auto ">
+          <form onSubmit={handleSubmit} className="w-auto " noValidate>
             {/* email / PW /name */}
             <div className="w-full flex flex-col items-end justify-center !space-y-[2rem]  ">
               {/* 이메일 */}
@@ -237,7 +269,7 @@ const Register = () => {
                       id="emailId"
                       type="text"
                       value={emailId}
-                      onChange={(e) => setEmailId(e.target.value)}
+                      onChange={handleEmailIdChange}
                       className={cn(
                         inputClasses(
                           emailId.length === 0,
@@ -260,7 +292,7 @@ const Register = () => {
                       <input
                         type="text"
                         value={emailDomain}
-                        onChange={(e) => setEmailDomain(e.target.value)}
+                        onChange={handleEmailDomainChange}
                         className={cn(
                           inputClasses(
                             emailDomain.length === 0,
@@ -369,17 +401,22 @@ const Register = () => {
                     </button>
                   </div>
                 </div>
-                {passwordError && (
-                  <div
-                    className={cn(
-                      typographyVariants({ variant: "d3-rg" }),
-                      colorVariants({ color: "red-300" }),
-                      " left-[30rem] absolute z-20 mt-[5rem]"
-                    )}
-                  >
-                    {passwordError}
-                  </div>
-                )}
+                <div
+                  className="w-[32rem]  relative"
+                  // style={{ minHeight: "2rem" }}
+                >
+                  {passwordError && (
+                    <div
+                      className={cn(
+                        typographyVariants({ variant: "d3-rg" }),
+                        colorVariants({ color: "red-300" }),
+                        "absolute left-0 top-3 w-full text-left whitespace-nowrap z-[999]"
+                      )}
+                    >
+                      {passwordError}
+                    </div>
+                  )}
+                </div>
               </div>
               {/* 이름 */}
               <div className="flex flex-col items-end w-full">
@@ -401,7 +438,7 @@ const Register = () => {
                     id="name"
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={handleNameChange}
                     className={cn(
                       inputClasses(
                         name.length === 0,
@@ -422,40 +459,39 @@ const Register = () => {
               {responseMessage && (
                 <div
                   className={cn(
-                    "text-center p-3 rounded-md",
-                    error
-                      ? "bg-red-50 text-red-600"
-                      : "bg-green-50 text-green-600"
+                    "text-center  whitespace-nowrap  overflow-x-auto",
+                    error ? colorVariants({ color: "red-300" }) : " "
                   )}
+                  style={{ whiteSpace: "nowrap" }}
                 >
-                  <p className={typographyVariants({ variant: "b2-md" })}>
+                  <span className={typographyVariants({ variant: "b2-md" })}>
                     {responseMessage}
-                  </p>
+                  </span>
                 </div>
               )}
             </div>
-               {/* 로그인 유지하기 체크박스 */}
-              <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
-                <label className="register-checkbox-container">
-                  <input type="checkbox" className="register-checkbox" />
-                  <span className="register-checkmark"></span>
-                  <span
-                    className={cn(
-                      typographyVariants({ variant: "b2-md" }),
-                      colorVariants({ color: "gray-700" }), 
-                    )
-                  
-                  }
-                  >
-                    로그인 유지하기
-                  </span>
-                </label>
-              </div>
+            {/* 로그인 유지하기 체크박스 */}
+            <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
+              <label className="register-checkbox-container">
+                <input type="checkbox" className="register-checkbox" />
+                <span className="register-checkmark"></span>
+                <span
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" })
+                  )}
+                >
+                  로그인 유지하기
+                </span>
+              </label>
+            </div>
             {/* 카카오톡으로 연결 */}
             <Button
               type="submit"
               size="L"
-              disabled={!isFormValid || loading}
+              disabled={
+                !(isPasswordValid && isEmailValid && isNameValid) || loading
+              }
               additionalClass={cn(
                 "w-full mt-6",
                 colorVariants({ bg: "blue-400" }),
@@ -466,18 +502,21 @@ const Register = () => {
             </Button>
 
             {/* 회원가입 버튼 */}
-            <button
+            <Button
               type="submit"
-              disabled={!isPasswordValid || loading}
-              className={cn(
+              size="L"
+              disabled={
+                !(isPasswordValid && isEmailValid && isNameValid) || loading
+              }
+              additionalClass={cn(
                 "w-full py-[1.2rem] rounded-[0.8rem] mt-[1.2rem]",
-                isPasswordValid
-                  ? "bg-[var(--blue-500)] text-white"
-                  : "bg-[var(--gray-300)] text-[var(--gray-500)]"
+                isPasswordValid && isEmailValid && isNameValid
+                  ? "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]"
+                  : "bg-[var(--gray-100)] border border-[var(--gray-500)] text-[var(--gray-900)]"
               )}
             >
               {loading ? "회원가입 중..." : "계정 만들기"}
-            </button>
+            </Button>
           </form>
 
           {/* 하단 링크 */}
