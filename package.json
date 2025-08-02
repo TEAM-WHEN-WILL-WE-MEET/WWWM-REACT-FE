@@ -14,6 +14,7 @@
     "class-variance-authority": "^0.7.1",
     "cli-width": "^4.1.0",
     "clsx": "^2.1.1",
+    "commander": "^14.0.0",
     "configstore": "^7.0.0",
     "constants-browserify": "^1.0.0",
     "crypto-browserify": "^3.12.1",
