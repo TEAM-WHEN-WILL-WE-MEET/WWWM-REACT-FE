@@ -25,6 +25,26 @@ const Invite = () => {
   const appointmentId = queryParams.get("appointmentId");
   const navigate = useNavigate();
 
+  // 인증 체크 및 리다이렉트
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.log("토큰이 없어 로그인 페이지로 리다이렉트");
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      return;
+    } else {
+      // 토큰이 있으면 개인 캘린더로 바로 이동
+      console.log("토큰이 있어 개인 캘린더로 리다이렉트");
+      navigate("/individualCalendar", {
+        state: { 
+          appointmentId: appointmentId,
+          userName: "참여자"
+        }
+      });
+      return;
+    }
+  }, [navigate, location.pathname, location.search, appointmentId]);
+
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 

@@ -72,7 +72,7 @@ const Section1 = ({navigate }) => (
         <Button 
           label="새 약속 만들기"
           size="participate" 
-          onClick={() => navigate('/MonthView')}
+          onClick={() => navigate('/login')}
           additionalClass="hover:opacity-80 text-[1.6rem] w-[14.2rem] h-[4.8rem]"
           aria-role="button"
           aria-label="새 약속 만들기 버튼"

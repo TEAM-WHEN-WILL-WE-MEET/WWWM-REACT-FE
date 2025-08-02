@@ -28,6 +28,14 @@ const GetAppointmentRedirect = () => {
         return;
       }
 
+      // 인증 체크: 토큰이 없으면 로그인 페이지로 리다이렉트
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.log("토큰이 없어 로그인 페이지로 리다이렉트");
+        navigate(`/login?redirect=/getAppointment?appointmentId=${appointmentId}`);
+        return;
+      }
+
       try {
         console.log("=== GetAppointmentRedirect 시작 ===");
         console.log("appointmentId:", appointmentId);

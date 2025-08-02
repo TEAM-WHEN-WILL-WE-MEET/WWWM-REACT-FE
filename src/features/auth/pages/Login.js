@@ -16,6 +16,7 @@ const Login = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const [loading, setLoading] = useState(false);
   const [emailId, setEmailId] = useState("");
   const [emailDomain, setEmailDomain] = useState("gmail.com");
@@ -159,9 +160,27 @@ const Login = () => {
 
           setResponseMessage("로그인 성공!");
 
-          // 메뉴 페이지로 리다이렉트
+          // 리다이렉트 URL이 있고 invite 페이지면 개인 캘린더로, 아니면 원래 URL 또는 MonthView로 이동
+          const redirectUrl = searchParams.get("redirect");
           setTimeout(() => {
-            navigate("/menu");
+            if (redirectUrl) {
+              const decodedUrl = decodeURIComponent(redirectUrl);
+              // invite 페이지에서 온 경우 개인 캘린더로 이동
+              if (decodedUrl.includes("/invite?appointmentId=")) {
+                const urlParams = new URLSearchParams(decodedUrl.split('?')[1]);
+                const appointmentId = urlParams.get("appointmentId");
+                navigate("/individualCalendar", {
+                  state: { 
+                    appointmentId: appointmentId,
+                    userName: "참여자"
+                  }
+                });
+              } else {
+                navigate(decodedUrl);
+              }
+            } else {
+              navigate("/MonthView");
+            }
           }, 1000);
         } else {
           console.error("응답 데이터 형식이 예상과 다릅니다:", responseBody);
