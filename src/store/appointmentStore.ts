@@ -32,7 +32,8 @@ interface AppointmentState {
   updateSchedule: (scheduleData: ScheduleUpdatePayload) => Promise<void>;
   updateScheduleV2: (
     scheduleId: string,
-    times: string[],
+    timesToEnable: string[],
+    timesToDisable: string[],
     appointmentId: string
   ) => Promise<void>;
 
@@ -132,49 +133,6 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       schedules: [],
     }),
 
-  // 새로운 백엔드 v2 API 명세에 맞춘 함수
-  updateScheduleV2: async (
-    scheduleId: string,
-    times: string[],
-    appointmentId: string
-  ) => {
-    try {
-      const response = await fetchApi(
-        API_ENDPOINTS.UPDATE_SCHEDULE(appointmentId),
-        {
-          method: "PATCH",
-          body: {
-            scheduleId: parseInt(scheduleId),
-            times: times,
-          },
-        }
-      );
-
-      console.log("Schedule v2 update response:", response);
-
-      if (response.success && response.status === "OK") {
-        console.log("Schedule v2 update successful:", response.msg);
-
-        // 성공 시 새로운 약속 데이터를 가져와서 store 업데이트
-        const updatedAppointment = await fetchApi(
-          API_ENDPOINTS.GET_APPOINTMENT(appointmentId)
-        );
-        if (updatedAppointment && updatedAppointment.object) {
-          set((state) => ({
-            ...state,
-            responseData: updatedAppointment,
-            schedules: updatedAppointment.object.schedules,
-          }));
-        }
-      } else {
-        throw new Error(response.msg || "Schedule update failed");
-      }
-    } catch (error) {
-      console.error("Failed to update schedule v2:", error);
-      throw error;
-    }
-  },
-
   // 기존 updateSchedule 함수 유지 (호환성을 위해)
   updateSchedule: async (scheduleData: ScheduleUpdatePayload) => {
     try {
@@ -200,6 +158,83 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       }));
     } catch (error) {
       console.error("Failed to update schedule:", error);
+      throw error;
+    }
+  },
+
+  // 수정된 v2 API - 두 개의 분리된 API 요청으로 timeslot 토글
+  updateScheduleV2: async (
+    scheduleId: string,
+    timesToEnable: string[],
+    timesToDisable: string[],
+    appointmentId: string
+  ) => {
+    try {
+      const results = [];
+
+      // 기존에 선택된 것들을 끄는 API 요청 (enabled: false)
+      if (timesToDisable.length > 0) {
+        const disableResponse = await fetchApi(
+          API_ENDPOINTS.TOGGLE_TIMESLOTS_V2(appointmentId, scheduleId),
+          {
+            method: "PATCH",
+            body: {
+              enabled: false,
+              times: timesToDisable,
+            },
+          }
+        );
+        results.push(disableResponse);
+        // console.log("Disable timeslots response:", disableResponse);
+      }
+
+      // 기존에 선택 안된 것들을 켜는 API 요청 (enabled: true)
+      if (timesToEnable.length > 0) {
+        const enableResponse = await fetchApi(
+          API_ENDPOINTS.TOGGLE_TIMESLOTS_V2(appointmentId, scheduleId),
+          {
+            method: "PATCH",
+            body: {
+              enabled: true,
+              times: timesToEnable,
+            },
+          }
+        );
+        results.push(enableResponse);
+        // console.log("Enable timeslots response:", enableResponse);
+      }
+
+      // 모든 요청이 성공했는지 확인
+      const allSuccessful = results.every(
+        (response) => response.success && response.status === "OK"
+      );
+
+      if (allSuccessful) {
+        console.log("All schedule v2 updates successful");
+
+        // 성공 시 새로운 약속 데이터를 가져와서 store 업데이트
+        const updatedAppointment = await fetchApi(
+          API_ENDPOINTS.GET_APPOINTMENT(appointmentId)
+        );
+        if (updatedAppointment && updatedAppointment.object) {
+          set((state) => ({
+            ...state,
+            responseData: updatedAppointment,
+            schedules: updatedAppointment.object.schedules,
+          }));
+        }
+      } else {
+        const failedResults = results.filter(
+          (response) => !response.success || response.status !== "OK"
+        );
+        throw new Error(
+          `Some schedule updates failed: ${failedResults
+            .map((r) => r.msg)
+            .join(", ")}`
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update schedule v2:", error);
       throw error;
     }
   },
