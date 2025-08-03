@@ -536,38 +536,38 @@ const IndividualCalendar = () => {
           const users = timeSlot.users || [];
 
           // 현재 사용자가 이 시간대에 참여했는지 확인
-          console.log("=== 시간슬롯 확인 ===");
-          console.log("timeString:", timeString);
-          console.log("users:", users);
-          console.log(
-            "users 타입:",
-            users.map((u) => typeof u)
-          );
+          // console.log("=== 시간슬롯 확인 ===");
+          // console.log("timeString:", timeString);
+          // console.log("users:", users);
+          // console.log(
+          //   "users 타입:",
+          //   users.map((u) => typeof u)
+          // );
 
           const isUserParticipated = users.some((user) => {
-            console.log(
-              "비교 중 - user:",
-              user,
-              "currentUserId:",
-              currentUserId,
-              "currentUserName:",
-              currentUserName
-            );
+            // console.log(
+            //   "비교 중 - user:",
+            //   user,
+            //   "currentUserId:",
+            //   currentUserId,
+            //   "currentUserName:",
+            //   currentUserName
+            // );
             // 사용자 ID로 비교하거나 이름으로 비교
             if (typeof user === "string") {
               const match = user === currentUserId || user === currentUserName;
-              console.log("문자열 비교 결과:", match);
+              // console.log("문자열 비교 결과:", match);
               return match;
             } else if (user && typeof user === "object") {
               const match =
                 user.id === currentUserId || user.name === currentUserName;
-              console.log("객체 비교 결과:", match);
+              // console.log("객체 비교 결과:", match);
               return match;
             }
             return false;
           });
 
-          console.log("isUserParticipated:", isUserParticipated);
+          // console.log("isUserParticipated:", isUserParticipated);
 
           if (isUserParticipated) {
             // 시간을 파싱해서 시간과 분 추출

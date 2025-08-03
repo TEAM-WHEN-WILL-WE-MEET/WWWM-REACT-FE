@@ -27,21 +27,34 @@ const Invite = () => {
 
   // 인증 체크 및 리다이렉트
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.log("토큰이 없어 로그인 페이지로 리다이렉트");
-      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
-      return;
-    } else {
-      // 토큰이 있으면 개인 캘린더로 바로 이동
-      console.log("토큰이 있어 개인 캘린더로 리다이렉트");
-      navigate("/individualCalendar", {
-        state: { 
-          appointmentId: appointmentId,
-          userName: "참여자"
-        }
-      });
-      return;
+    const checkAuthAndRedirect = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.log("토큰이 없어 로그인 페이지로 리다이렉트");
+        navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+        return;
+      }
+
+      // 토큰이 있으면 유효성 검사 후 리다이렉트
+      console.log("토큰이 있어 유효성 검사 후 개인 캘린더로 리다이렉트");
+      const isValidToken = await validateToken(token);
+      
+      if (isValidToken) {
+        navigate("/individualCalendar", {
+          state: { 
+            appointmentId: appointmentId,
+            userName: "참여자"
+          }
+        });
+      } else {
+        // 토큰이 유효하지 않으면 삭제하고 로그인 페이지로
+        localStorage.removeItem("authToken");
+        navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      }
+    };
+
+    if (appointmentId) {
+      checkAuthAndRedirect();
     }
   }, [navigate, location.pathname, location.search, appointmentId]);
 
@@ -128,7 +141,7 @@ const Invite = () => {
   // 토큰 유효성 검사 함수
   const validateToken = async (token) => {
     try {
-      const response = await fetch(`${BASE_URL}/auth/validate`, {
+      const response = await fetch(`${BASE_URL}/users/auth/validate`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

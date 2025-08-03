@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { typographyVariants } from "../../../styles/typography.ts";
 import { colorVariants } from "../../../styles/color.ts";
@@ -15,6 +15,8 @@ const Register = () => {
       : process.env.REACT_APP_WWWM_BE_DEV_EP;
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [emailId, setEmailId] = useState("");
@@ -162,7 +164,12 @@ const Register = () => {
         // );
 
         setTimeout(() => {
-          navigate("/login", {
+          const redirectUrl = searchParams.get("redirect");
+          const loginPath = redirectUrl 
+            ? `/login?redirect=${encodeURIComponent(redirectUrl)}`
+            : "/login";
+          
+          navigate(loginPath, {
             state: {
               registeredName: name,
               registeredEmail: email,
