@@ -18,7 +18,7 @@ const KakaoCallback = () => {
   useEffect(() => {
     const handleKakaoCallback = async () => {
       try {
-        // URL에서 state와 code 파라미터 추출
+        // 리다이렉션된 URL에서 state와 code 파라미터 추출
         const searchParams = new URLSearchParams(location.search);
         const state = searchParams.get("state");
         const code = searchParams.get("code");
