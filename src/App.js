@@ -12,6 +12,7 @@ import Menu from "./features/layout/components/Menu";
 import EditProfile from "./features/user/pages/EditProfile";
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
+import KakaoCallback from "./features/auth/pages/KakaoCallback";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
           <Route path="/eventCalendar" element={<EventCalendar />} />
           <Route path="/individualCalendar" element={<IndividualCalendar />} />
         </Routes>

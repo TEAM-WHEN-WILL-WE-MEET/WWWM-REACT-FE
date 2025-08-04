@@ -88,6 +88,25 @@ const Login = () => {
     setShowDomainDropdown(false);
   };
 
+  const handleKakaoLogin = async () => {
+    // 1차 요청
+    try {
+      setLoading(true);
+      const response = await fetch(`${BASE_URL}/oauth2/authorization/google`, {
+        method: "GET",
+      });
+      
+      if (response.redirected) {
+        window.location.href = response.url;
+      }
+    } catch (error) {
+      console.error("Kakao login error:", error);
+      setError(true);
+      setResponseMessage("카카오 로그인 중 오류가 발생했습니다.");
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -468,6 +487,8 @@ const Login = () => {
             <Button
               type="button"
               size="L"
+              onClick={handleKakaoLogin}
+              disabled={loading}
               additionalClass={cn(
                 "mt-6 flex items-center justify-center gap-2",
                 colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
@@ -479,7 +500,7 @@ const Login = () => {
                 alt="카카오톡 아이콘"
                 className="w-[1.6rem] h-[1.6rem]"
               />
-              카카오톡으로 연결
+              {loading ? "연결 중..." : "카카오톡으로 연결"}
             </Button>
 
             {/* 로그인 버튼 */}
