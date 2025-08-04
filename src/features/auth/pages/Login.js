@@ -96,7 +96,9 @@ const Login = () => {
         method: "GET",
       });
       
-      if (response.redirected) {
+      //서버가 OAuth 제공자(카카오)로 리다이렉트하라는 응답을 보냈는지 확인.
+      //맞다면 해당 소셜 로그인 페이지로 강제 이동
+      if (response.redirected) { 
         window.location.href = response.url;
       }
     } catch (error) {
