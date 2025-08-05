@@ -775,7 +775,7 @@ const EventCalendar = () => {
                     onClick={KakaoShare}
                   >
                     <img
-                      src="/arcticons_kakaotalk.svg"
+                      src="/simple_kakaotalk.svg"
                       alt="카카오톡으로 캘린더 링크 공유하기"
                     />
                   </Button>
