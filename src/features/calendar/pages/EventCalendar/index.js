@@ -94,7 +94,7 @@ const EventCalendar = () => {
     setIsOpen(false);
   };
   // Share 공유 ( 클립보드 복사)
-  const shareString = `https://when-will-we-meet.com/invite?appointmentId=${appointmentId}`;
+  const shareString = `https://when-will-we-meet.com/getAppointment?appointmentId=${appointmentId}`;
   const clipboardShare = async () => {
     try {
       await navigator.clipboard.writeText(shareString);
@@ -391,7 +391,7 @@ const EventCalendar = () => {
     }
   };
 
-  // 수정 버튼 클릭 시 invite페이지로 이동
+  // 수정 버튼 클릭 시 개별 캘린더로 이동
   const handleSaveClick = () => {
     // 필요한 로직 처리 후 페이지 이동
     //  navigate(`/getAppointment?appointmentId=${appointmentId}`);
