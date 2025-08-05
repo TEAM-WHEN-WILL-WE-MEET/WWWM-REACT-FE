@@ -160,6 +160,11 @@ export default function Menu() {
     navigate("/"); // 홈으로 이동
   };
 
+  // 로그아웃 취소 처리
+  const handleCancelLogOut = () => {
+    setShowModalLogOut(false); // 모달만 닫기
+  };
+
   // 모달에서 '삭제' 버튼 클릭 → 선택된 아이템들을 삭제 처리
   const handleConfirmDelete = async () => {
     try {
@@ -501,7 +506,7 @@ export default function Menu() {
                     )}`}
                   >
                     <button
-                      onClick={handleLogOut}
+                      onClick={handleCancelLogOut}
                       className={`  ${colorVariants({
                         bg: "gray-100",
                         color: "gray-900",
