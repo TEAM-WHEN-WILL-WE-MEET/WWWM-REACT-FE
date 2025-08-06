@@ -128,16 +128,7 @@ export default function Menu() {
     }
     setLongPressTriggered(false);
   };
-
-  // 3) 리스트 아이템을 클릭(혹은 체크박스 클릭)할 때, 해당 id를 추가/제거
-  const handleItemClick = (id) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
-    } else {
-      setSelectedIds([...selectedIds, id]);
-    }
-  };
-
+  
   // 삭제하기 버튼을 누르면 모달 띄움
   const handleDeleteButtonClick = () => {
     setShowModal(true);

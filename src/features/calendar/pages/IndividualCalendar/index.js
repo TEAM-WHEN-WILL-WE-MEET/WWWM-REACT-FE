@@ -39,15 +39,9 @@ const IndividualCalendar = () => {
   const dragSelectModeRef = useRef(null);
   const hasDraggedRef = useRef(false);
 
-  const touchStartTimeRef = useRef(null);
   const lastTouchedCellRef = useRef(null);
   const currentTouchRef = useRef(null);
 
-  const processedCellsRef = useRef(new Set());
-  const scheduledUpdateRef = useRef(null);
-  const isTouchDeviceRef = useRef(false);
-  const dragStartPointRef = useRef(null);
-  const dragModeRef = useRef(null);
 
   const {
     responseData,

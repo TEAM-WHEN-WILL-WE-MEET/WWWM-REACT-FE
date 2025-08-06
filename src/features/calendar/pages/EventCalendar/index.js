@@ -251,15 +251,15 @@ const EventCalendar = () => {
           setTotalUsers(responseData.object.users.length);
           setUserList(responseData.object.users);
 
-          // 디버깅: 전체 사용자 목록 구조 확인
-          console.log(
-            "전체 사용자 목록 (responseData.object.users):",
-            responseData.object.users
-          );
-          console.log(
-            "첫 번째 사용자 객체 구조:",
-            responseData.object.users[0]
-          );
+          //  디버깅: 전체 사용자 목록 구조 확인
+          // console.log(
+          //   "전체 사용자 목록 (responseData.object.users):",
+          //   responseData.object.users
+          // );
+          // console.log(
+          //   "첫 번째 사용자 객체 구조:",
+          //   responseData.object.users[0]
+          // );
 
           const savedTimes = {};
 
@@ -287,16 +287,16 @@ const EventCalendar = () => {
                     const buttonIndex = minuteInt / 10;
 
                     // 디버깅: timeslot별 사용자 데이터 구조 확인
-                    console.log(
-                      `Timeslot [${dateIndex}][${timeIndex}][${buttonIndex}] 사용자 데이터:`,
-                      minuteObj.users
-                    );
-                    if (minuteObj.users && minuteObj.users.length > 0) {
-                      console.log(
-                        "첫 번째 timeslot 사용자 객체 구조:",
-                        minuteObj.users[0]
-                      );
-                    }
+                    // console.log(
+                    //   `Timeslot [${dateIndex}][${timeIndex}][${buttonIndex}] 사용자 데이터:`,
+                    //   minuteObj.users
+                    // );
+                    // if (minuteObj.users && minuteObj.users.length > 0) {
+                    //   console.log(
+                    //     "첫 번째 timeslot 사용자 객체 구조:",
+                    //     minuteObj.users[0]
+                    //   );
+                    // }
 
                     savedTimes[dateIndex][timeIndex][buttonIndex] = {
                       userCount: minuteObj.count || 0,
@@ -333,10 +333,10 @@ const EventCalendar = () => {
     }
 
     // 디버깅: hover 시 사용자 목록 확인
-    console.log("handleTimeslotHover - 원본 nowUserList:", nowUserList);
-    if (nowUserList.length > 0) {
-      console.log("handleTimeslotHover - 첫 번째 사용자 구조:", nowUserList[0]);
-    }
+    // console.log("handleTimeslotHover - 원본 nowUserList:", nowUserList);
+    // if (nowUserList.length > 0) {
+    //   console.log("handleTimeslotHover - 첫 번째 사용자 구조:", nowUserList[0]);
+    // }
 
     // 사용자 ID를 실제 사용자 정보와 매핑
     const mappedUserList = nowUserList.map(user => {
@@ -359,10 +359,10 @@ const EventCalendar = () => {
 
     // 올바른 user 객체(즉, user && user.name가 존재하는 객체)만 필터링
     const filteredUserList = mappedUserList.filter((user) => user && user.name);
-    console.log(
-      "handleTimeslotHover - 매핑 및 필터링 후 사용자 목록:",
-      filteredUserList
-    );
+    // console.log(
+    //   "handleTimeslotHover - 매핑 및 필터링 후 사용자 목록:",
+    //   filteredUserList
+    // );
 
     setHoverUserList(filteredUserList);
   };
@@ -391,7 +391,7 @@ const EventCalendar = () => {
     }
   };
 
-  // 수정 버튼 클릭 시 개별 캘린더로 이동
+  // 내 시간 수정 버튼 클릭 시 개별 캘린더로 이동
   const handleSaveClick = () => {
     // 필요한 로직 처리 후 페이지 이동
     //  navigate(`/getAppointment?appointmentId=${appointmentId}`);
@@ -566,36 +566,18 @@ const EventCalendar = () => {
                     selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
                   const userCount = slot?.userCount || 0;
 
-                  // 색상 클래스 결정
                   let colorClass = "";
-                  if (
-                    TotalUsers > 0 &&
-                    userCount / TotalUsers > 0 &&
-                    userCount / TotalUsers <= 0.3
-                  ) {
-                    colorClass = `${colorVariants({
-                      bg: "blue-50",
-                    })} border-[var(--blue-100)]`;
-                  } else if (
-                    TotalUsers > 0 &&
-                    userCount / TotalUsers > 0.3 &&
-                    userCount / TotalUsers <= 0.6
-                  ) {
-                    colorClass = `${colorVariants({
-                      bg: "blue-100",
-                    })} border-[var(--blue-200)]`;
-                  } else if (
-                    TotalUsers > 0 &&
-                    userCount / TotalUsers > 0.6 &&
-                    userCount / TotalUsers < 0.99
-                  ) {
-                    colorClass = `${colorVariants({
-                      bg: "blue-200",
-                    })} border-[var(--blue-300)]`;
-                  } else if (TotalUsers > 0 && userCount / TotalUsers === 1) {
-                    colorClass = `${colorVariants({
-                      bg: "magen-50",
-                    })} border-[var(--magen-300)]`;
+                  if (TotalUsers > 0 && userCount / TotalUsers > 0) {
+                    const ratio = userCount / TotalUsers;
+                    if (ratio <= 0.3) {
+                      colorClass = `${colorVariants({bg: "blue-50"})} border-[var(--blue-100)]`;
+                    } else if (ratio <= 0.6) {
+                      colorClass = `${colorVariants({bg: "blue-100"})} border-[var(--blue-200)]`;
+                    } else if (ratio < 0.99) {
+                      colorClass = `${colorVariants({bg: "blue-200"})} border-[var(--blue-300)]`;
+                    } else if (ratio === 1) {
+                      colorClass = `${colorVariants({bg: "magen-50"})} border-[var(--magen-300)]`;
+                    }
                   }
 
                   return (
@@ -610,16 +592,16 @@ const EventCalendar = () => {
                       handleMouseEnter={() => {
                         if (slot) {
                           // 디버깅: Button hover 시 slot 데이터 확인
-                          console.log("Button hover - slot 데이터:", slot);
-                          console.log(
-                            "Button hover - slot.userList:",
-                            slot?.userList
-                          );
+                          // console.log("Button hover - slot 데이터:", slot);
+                          // console.log(
+                          //   "Button hover - slot.userList:",
+                          //   slot?.userList
+                          // );
                           if (slot?.userList && slot.userList.length > 0) {
-                            console.log(
-                              "Button hover - 첫 번째 사용자 구조:",
-                              slot.userList[0]
-                            );
+                            // console.log(
+                            //   "Button hover - 첫 번째 사용자 구조:",
+                            //   slot.userList[0]
+                            // );
                           }
 
                           // 사용자 ID를 실제 사용자 정보와 매핑
