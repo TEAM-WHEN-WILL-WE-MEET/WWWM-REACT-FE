@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
 
 import "moment/locale/ko";
@@ -12,8 +12,9 @@ import { Button } from "../../../../components/Button.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import Loading from "../../../../components/Loading";
+import { fetchApi } from "../../../../utils/api";
+import { API_ENDPOINTS } from "../../../../config/environment";
 import { useAppointmentStore } from "../../../../store/appointmentStore";
-import { useCalendarStore } from "../../../../store/calendarStore";
 import { useUserStore } from "../../../../store/userStore";
 
 const EventCalendar = () => {
@@ -30,6 +31,7 @@ const EventCalendar = () => {
       ? process.env.REACT_APP_WWWM_BE_ENDPOINT
       : process.env.REACT_APP_WWWM_BE_DEV_EP;
   const [loading, setLoading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   //공유 key
   const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
@@ -42,11 +44,18 @@ const EventCalendar = () => {
   const [selectedTimes, setSelectedTimes] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [TotalUsers, setTotalUsers] = useState("");
 
+  // appointmentStore 초기화
+  const { resetStore } = useAppointmentStore();
+  const { name: currentUserName } = useUserStore();
+
   const state = location.state || {};
-  const appointmentId = state.appointmentId;
-  const userName = state.userName;
+  // 쿼리 파라미터에서 appointmentId를 먼저 확인하고, 없으면 state에서 가져옴
+  const appointmentId =
+    searchParams.get("appointmentId") || state.appointmentId;
+  const userName = state.userName || currentUserName;
   const responseData = state.responseData;
   // console.log("userName:: ",userName);
   const [userList, setUserList] = useState("");
@@ -59,24 +68,12 @@ const EventCalendar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const minuteSlot = [10, 20, 30, 40, 50];
 
-  // Store states
-  const {
-    appointmentId: storeAppointmentId,
-    eventName: storeEventName,
-    users: storeTotalUsers,
-    responseData: storeResponseData,
-    initializeFromResponse,
-  } = useAppointmentStore();
-
-  const {
-    selectedDate: storeSelectedDate,
-    dates: storeDates,
-    times: storeTimes,
-    selectedTimes: storeSelectedTimes,
-    setSelectedDate: setStoreSelectedDate,
-  } = useCalendarStore();
-
-  const { name: storeUserName, setUserInfo } = useUserStore();
+  // EventCalendar 마운트 시 appointmentStore 초기화 및 강제 새로고침 트리거
+  useEffect(() => {
+    // appointmentStore 초기화로 IndividualCalendar의 캐시 상태 제거
+    resetStore();
+    setRefreshTrigger((prev) => prev + 1);
+  }, [resetStore]);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -97,7 +94,7 @@ const EventCalendar = () => {
     setIsOpen(false);
   };
   // Share 공유 ( 클립보드 복사)
-  const shareString = `https://when-will-we-meet.com/invite?appointmentId=${appointmentId}`;
+  const shareString = `https://when-will-we-meet.com/getAppointment?appointmentId=${appointmentId}`;
   const clipboardShare = async () => {
     try {
       await navigator.clipboard.writeText(shareString);
@@ -149,18 +146,24 @@ const EventCalendar = () => {
       setLoading(true); // 요청 시작 전에 로딩 상태 true
       try {
         if (!appointmentId) {
-          console.error("appointmentId가 없습니다");
+          setLoading(false);
           return;
         }
 
-        const appointmentResponse = await fetch(
-          `${BASE_URL}/appointment/getAppointment?appointmentId=${appointmentId}`
+        const responseData = await fetchApi(
+          API_ENDPOINTS.GET_APPOINTMENT(appointmentId),
+          {
+            method: "GET",
+            headers: {
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          }
         );
-        const responseData = await appointmentResponse.json();
 
-        // console.log("[TEST] responseData의 스케줄: ", responseData.object.schedules[0].times);
         if (!responseData || !responseData.object) {
-          console.error("응답 데이터가 올바르지 않습니다");
+          setLoading(false);
           return;
         }
 
@@ -169,12 +172,11 @@ const EventCalendar = () => {
           setEventName(responseData.object.name);
           moment.locale("ko");
           const schedules = responseData.object.schedules;
-          if (!schedules) {
-            console.error("schedules 비어있음");
+
+          if (!schedules || schedules.length === 0) {
+            setLoading(false);
             return;
           }
-
-          // console.log("schedules 보호구역: ", schedules); //정상작동
 
           // 날짜 및 시간 데이터 설정
           const datesArray = schedules.map((schedule, index) => {
@@ -188,26 +190,20 @@ const EventCalendar = () => {
 
           const startTimeString = responseData.object.startTime;
           const endTimeString = responseData.object.endTime;
-          const startTimeH = moment
-            .tz(startTimeString, "Asia/Seoul")
-            .format("HH");
-          const endTimeHM = moment.tz(endTimeString, "Asia/Seoul").format("HH");
 
-          const scheduleTimes = schedules[0]?.times;
+          // 시간만 포함된 문자열을 파싱 (HH:mm:ss 형태)
+          const startTimeH = moment(startTimeString, "HH:mm:ss").format("HH");
+          const endTimeHM = moment(endTimeString, "HH:mm:ss").format("HH");
 
-          if (!scheduleTimes) {
-            console.error("스케줄에 times가 없습니다.");
-            return;
-          }
-
+          // startTime과 endTime 사이의 모든 시간대를 생성
           const timeSet = new Set();
-          scheduleTimes.forEach((timeSlot) => {
-            const timeString = timeSlot.time;
-            const timeHM = moment.tz(timeString, "Asia/Seoul").format("HH");
-            if (timeHM >= startTimeH && timeHM <= endTimeHM - 1) {
-              timeSet.add(timeHM);
-            }
-          });
+          for (
+            let hour = parseInt(startTimeH);
+            hour < parseInt(endTimeHM);
+            hour++
+          ) {
+            timeSet.add(hour.toString().padStart(2, "0"));
+          }
 
           const timesArray = Array.from(timeSet).sort((a, b) => {
             return moment(a, "HH").diff(moment(b, "HH"));
@@ -219,9 +215,6 @@ const EventCalendar = () => {
 
           setDates(datesArray);
           setTimes(timesFormatted);
-
-          // console.log("그냥 responseData.object: ", responseData.object);
-          // console.log("responseData.object.schedules: ", responseData.object.schedules);
 
           // 공용 스케줄 페이지 - 화면에 색 입힐 유저 몇명인지 찾는 과정
           const userSelections = responseData.object.schedules.reduce(
@@ -244,75 +237,87 @@ const EventCalendar = () => {
                   acc[slotDate][slotHour] = [];
                 }
 
-                if (slot.users.length > 0) {
-                  acc[slotDate][slotHour].push({
-                    minute: slotMinute,
-                    users: slot.users,
-                    count: slot.users.length,
-                  });
-                }
+                acc[slotDate][slotHour].push({
+                  minute: slotMinute,
+                  users: slot.users,
+                  count: slot.users.length,
+                });
               });
               return acc;
             },
             {}
           );
 
-          // console.log("userSelections입니다 ~!!: ", userSelections);
-
-          // const TotalUsers = responseData.object.users.length;
-          // console.log("responseData.object.users: ", responseData.object.users);
-          // console.log("TotalUsers: ", TotalUsers);
-
           setTotalUsers(responseData.object.users.length);
           setUserList(responseData.object.users);
+
+          //  디버깅: 전체 사용자 목록 구조 확인
+          // console.log(
+          //   "전체 사용자 목록 (responseData.object.users):",
+          //   responseData.object.users
+          // );
+          // console.log(
+          //   "첫 번째 사용자 객체 구조:",
+          //   responseData.object.users[0]
+          // );
 
           const savedTimes = {};
 
           datesArray.forEach((dateInfo, dateIndex) => {
             const datePath = dateInfo.date;
-            // console.log("처리중인 날짜:", {
-            //     datePath,
-            //     existingSelections: userSelections[datePath],
-            // });
 
-            if (userSelections[datePath]) {
-              if (!savedTimes[dateIndex]) {
-                savedTimes[dateIndex] = {};
+            if (!savedTimes[dateIndex]) {
+              savedTimes[dateIndex] = {};
+            }
+
+            timesFormatted.forEach((time, timeIndex) => {
+              const hour = moment(time, "HH:mm").format("HH");
+              const mm = moment(time, "HH:mm").format("mm");
+
+              const minutesArray = userSelections[datePath]?.[hour] || [];
+
+              if (!savedTimes[dateIndex][timeIndex]) {
+                savedTimes[dateIndex][timeIndex] = {};
               }
 
-              timesFormatted.forEach((time, timeIndex) => {
-                const hour = moment(time, "HH:mm").format("HH");
-                const mm = moment(time, "HH:mm").format("mm");
+              if (minutesArray.length > 0) {
+                minutesArray.forEach((minuteObj) => {
+                  if (minuteObj && minuteObj.minute !== undefined) {
+                    const minuteInt = parseInt(minuteObj.minute, 10);
+                    const buttonIndex = minuteInt / 10;
 
-                const minutesArray = userSelections[datePath][hour];
-                // console.log("minutesArray: ", minutesArray);
-                if (minutesArray) {
-                  savedTimes[dateIndex][timeIndex] = {};
-                  minutesArray.forEach((minuteObj) => {
-                    if (minuteObj && minuteObj.minute !== undefined) {
-                      const minuteInt = parseInt(minuteObj.minute, 10);
-                      const buttonIndex = minuteInt / 10;
-                      savedTimes[dateIndex][timeIndex][buttonIndex] = {
-                        userCount: minuteObj.count || 0,
-                        userList: minuteObj.users || [],
-                      };
-                    }
-                  });
-                }
-              });
-            }
+                    // 디버깅: timeslot별 사용자 데이터 구조 확인
+                    // console.log(
+                    //   `Timeslot [${dateIndex}][${timeIndex}][${buttonIndex}] 사용자 데이터:`,
+                    //   minuteObj.users
+                    // );
+                    // if (minuteObj.users && minuteObj.users.length > 0) {
+                    //   console.log(
+                    //     "첫 번째 timeslot 사용자 객체 구조:",
+                    //     minuteObj.users[0]
+                    //   );
+                    // }
+
+                    savedTimes[dateIndex][timeIndex][buttonIndex] = {
+                      userCount: minuteObj.count || 0,
+                      userList: minuteObj.users || [],
+                    };
+                  }
+                });
+              }
+            });
           });
-          // console.log("최종 savedTimes:", savedTimes);
+
           setSelectedTimes(savedTimes);
         }
       } catch (error) {
-        console.error(error);
+        console.error("EventCalendar 데이터 로딩 실패:", error);
       } finally {
         setLoading(false); // 요청 끝나면 로딩끄기
       }
     };
     fetchData();
-  }, [appointmentId]);
+  }, [appointmentId, refreshTrigger]);
 
   // 해당 timeslot hover 시 nowUserList(참여자 목록) 생성
   const handleTimeslotHover = (timeIndex) => {
@@ -326,16 +331,44 @@ const EventCalendar = () => {
         }
       });
     }
+
+    // 디버깅: hover 시 사용자 목록 확인
+    // console.log("handleTimeslotHover - 원본 nowUserList:", nowUserList);
+    // if (nowUserList.length > 0) {
+    //   console.log("handleTimeslotHover - 첫 번째 사용자 구조:", nowUserList[0]);
+    // }
+
+    // 사용자 ID를 실제 사용자 정보와 매핑
+    const mappedUserList = nowUserList.map(user => {
+      // user가 이미 name을 가지고 있으면 그대로 사용
+      if (user && user.name) {
+        return user;
+      }
+      
+      // user가 문자열(ID)이거나 ID만 가진 객체인 경우 전체 사용자 목록에서 찾기
+      const userId = typeof user === 'string' ? user : user?.id || user?.userId;
+      if (userId && Array.isArray(userList)) {
+        const foundUser = userList.find(u => u.id === userId || u.userId === userId);
+        if (foundUser) {
+          return foundUser;
+        }
+      }
+      
+      return user;
+    });
+
     // 올바른 user 객체(즉, user && user.name가 존재하는 객체)만 필터링
-    nowUserList = nowUserList.filter((user) => user && user.name);
-    setHoverUserList(nowUserList);
-    // console.log("timeIndex: ", timeIndex);
-    // console.log("nowUserList: ",nowUserList);
+    const filteredUserList = mappedUserList.filter((user) => user && user.name);
+    // console.log(
+    //   "handleTimeslotHover - 매핑 및 필터링 후 사용자 목록:",
+    //   filteredUserList
+    // );
+
+    setHoverUserList(filteredUserList);
   };
   // 참여자 목록을 저장하는 함수
   const handleMouseEnter = (userList) => {
     setHoverUserList(userList);
-    console.log("userList ft 314 line", userList);
   };
   // hover 벗어날 때 nowUserList 초기화
   const handleTimeslotLeave = () => {
@@ -358,24 +391,13 @@ const EventCalendar = () => {
     }
   };
 
-  // 수정 버튼 클릭 시 invite페이지로 이동
+  // 내 시간 수정 버튼 클릭 시 개별 캘린더로 이동
   const handleSaveClick = () => {
     // 필요한 로직 처리 후 페이지 이동
     //  navigate(`/getAppointment?appointmentId=${appointmentId}`);
-    handleAppointmentData(responseData, appointmentId, userName);
-  };
-
-  const handleAppointmentData = (responseData, appointmentId, userName) => {
-    initializeFromResponse(responseData);
-
-    // appointmentStore에 userName 설정
-    const { setUserName } = useAppointmentStore.getState();
-    setUserName(userName);
-
-    // userStore에도 사용자 정보 업데이트 (호환성 유지)
-    setUserInfo(userName, false);
-
-    navigate("/individualCalendar");
+    navigate("/individualCalendar", {
+      state: { appointmentId, userName },
+    });
   };
 
   return (
@@ -442,7 +464,7 @@ const EventCalendar = () => {
             msOverflowStyle: "none",
           }}
         >
-          {dates?.map(({ date, key }) => (
+          {(dates || []).map(({ date, key }) => (
             <div
               key={key}
               className={`
@@ -458,13 +480,13 @@ const EventCalendar = () => {
                 ${
                   selectedDate === key
                     ? `
-                  !${colorVariants({ color: "gray-900" })} 
-                  font-[600] 
-                  border-b-[0.2rem] 
-                  border-[var(--gray-900,#242424)]
-                  -mb-0.3
-                  z-20
-                `
+                    !${colorVariants({ color: "gray-900" })} 
+                    font-[600] 
+                    border-b-[0.2rem] 
+                    border-[var(--gray-900,#242424)]
+                    -mb-0.3
+                    z-20
+                  `
                     : ``
                 }
 
@@ -514,7 +536,7 @@ const EventCalendar = () => {
               <div className="ml-[0.2rem] w-[1.1rem]">분</div>
             </div>
           </div>
-          {times?.map((time, timeIndex) => (
+          {(times || []).map((time, timeIndex) => (
             <div
               key={timeIndex}
               className="flex items-center"
@@ -523,17 +545,17 @@ const EventCalendar = () => {
             >
               <div
                 className={`
-                  ${typographyVariants({ variant: "d3-rg" })}
-                  text-[var(--gray-800,#444)]
-                  h-[2.8rem] 
-                  w-[3.6rem] 
-                  text-center 
-                  mr-[0.6rem] 
-                  flex 
-                  items-center 
-                  justify-center 
-                  whitespace-nowrap                
-                `}
+                ${typographyVariants({ variant: "d3-rg" })}
+                text-[var(--gray-800,#444)]
+                h-[2.8rem] 
+                w-[3.6rem] 
+                text-center 
+                mr-[0.6rem] 
+                flex 
+                items-center 
+                justify-center 
+                whitespace-nowrap                
+              `}
               >
                 {moment(time, "HH:mm").format("HH시")}
               </div>
@@ -544,33 +566,18 @@ const EventCalendar = () => {
                     selectedTimes[selectedDate]?.[timeIndex]?.[buttonIndex];
                   const userCount = slot?.userCount || 0;
 
-                  // 색상 클래스 결정
                   let colorClass = "";
-                  if (
-                    userCount / TotalUsers > 0 &&
-                    userCount / TotalUsers <= 0.3
-                  ) {
-                    colorClass = `${colorVariants({
-                      bg: "blue-50",
-                    })} border-[var(--blue-100)]`;
-                  } else if (
-                    userCount / TotalUsers > 0.3 &&
-                    userCount / TotalUsers <= 0.6
-                  ) {
-                    colorClass = `${colorVariants({
-                      bg: "blue-100",
-                    })} border-[var(--blue-200)]`;
-                  } else if (
-                    userCount / TotalUsers > 0.6 &&
-                    userCount / TotalUsers < 0.99
-                  ) {
-                    colorClass = `${colorVariants({
-                      bg: "blue-200",
-                    })} border-[var(--blue-300)]`;
-                  } else if (userCount / TotalUsers === 1) {
-                    colorClass = `${colorVariants({
-                      bg: "magen-50",
-                    })} border-[var(--magen-300)]`;
+                  if (TotalUsers > 0 && userCount / TotalUsers > 0) {
+                    const ratio = userCount / TotalUsers;
+                    if (ratio <= 0.3) {
+                      colorClass = `${colorVariants({bg: "blue-50"})} border-[var(--blue-100)]`;
+                    } else if (ratio <= 0.6) {
+                      colorClass = `${colorVariants({bg: "blue-100"})} border-[var(--blue-200)]`;
+                    } else if (ratio < 0.99) {
+                      colorClass = `${colorVariants({bg: "blue-200"})} border-[var(--blue-300)]`;
+                    } else if (ratio === 1) {
+                      colorClass = `${colorVariants({bg: "magen-50"})} border-[var(--magen-300)]`;
+                    }
                   }
 
                   return (
@@ -578,16 +585,46 @@ const EventCalendar = () => {
                       key={buttonIndex}
                       size={"XXS"}
                       additionalClass={`
-                        ${colorClass}
-                       
-                        items-center !transform-none
-                      `}
+                      ${colorClass}
+                     
+                      items-center !transform-none
+                    `}
                       handleMouseEnter={() => {
-                        // console.log("스슬롯: ", slot);
                         if (slot) {
-                          setHoverUserList(slot?.userList || []); // slot이 없거나 userList가 undefined이면 빈 배열
-                          // console.log("slot.userList: ", slot.userList);
-                          // console.log("slot: ", slot);
+                          // 디버깅: Button hover 시 slot 데이터 확인
+                          // console.log("Button hover - slot 데이터:", slot);
+                          // console.log(
+                          //   "Button hover - slot.userList:",
+                          //   slot?.userList
+                          // );
+                          if (slot?.userList && slot.userList.length > 0) {
+                            // console.log(
+                            //   "Button hover - 첫 번째 사용자 구조:",
+                            //   slot.userList[0]
+                            // );
+                          }
+
+                          // 사용자 ID를 실제 사용자 정보와 매핑
+                          const rawUserList = slot?.userList || [];
+                          const mappedUserList = rawUserList.map(user => {
+                            // user가 이미 name을 가지고 있으면 그대로 사용
+                            if (user && user.name) {
+                              return user;
+                            }
+                            
+                            // user가 문자열(ID)이거나 ID만 가진 객체인 경우 전체 사용자 목록에서 찾기
+                            const userId = typeof user === 'string' ? user : user?.id || user?.userId;
+                            if (userId && Array.isArray(userList)) {
+                              const foundUser = userList.find(u => u.id === userId || u.userId === userId);
+                              if (foundUser) {
+                                return foundUser;
+                              }
+                            }
+                            
+                            return user;
+                          });
+
+                          setHoverUserList(mappedUserList);
                         }
                       }}
                       onMouseLeave={() => {
@@ -659,8 +696,14 @@ const EventCalendar = () => {
                         `}
                       >
                         {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
-                        {typeof user === "string" ? user : user?.name || ""}
-                        {/* {console.log("hoverUserList: ",hoverUserList)} */}
+                        {(() => {
+                          // 디버깅: 렌더링 시 user 객체 확인
+                          console.log("렌더링 중인 user 객체:", user);
+                          console.log("user 타입:", typeof user);
+                          console.log("user.name:", user?.name);
+                          
+                          return typeof user === "string" ? user : user?.name || "";
+                        })()}
                       </div>
                     ))
                   : null
@@ -714,7 +757,7 @@ const EventCalendar = () => {
                     onClick={KakaoShare}
                   >
                     <img
-                      src="/arcticons_kakaotalk.svg"
+                      src="/simple_kakaotalk.svg"
                       alt="카카오톡으로 캘린더 링크 공유하기"
                     />
                   </Button>

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { DateInfo, SelectedTimesMap, TimeSlotUpdate } from "./types";
+import { DateInfo, SelectedTimesMap, TimeSlotUpdate, CreateAppointmentResponse } from "./types";
 import moment from "moment-timezone";
 import { fetchApi } from "../utils/api";
 import { API_CONFIG, API_ENDPOINTS } from "../config/environment";
@@ -203,7 +203,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         .map((dateString) => ({
           date: moment
             .tz(dateString, "YYYY-MM-DD", API_CONFIG.TIMEZONE)
-            .format("YYYY-MM-DDTHH:mm:ss[Z]"),
+            .format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
       const sortedDates = [...selectedDates].sort();
@@ -216,11 +216,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
           "YYYY-MM-DD HH:mm",
           API_CONFIG.TIMEZONE
         )
-        .format("YYYY-MM-DDTHH:mm:ss[Z]");
+        .format("YYYY-MM-DDTHH:mm:ss");
 
       const endDateTime = moment
         .tz(`${latestDate} ${endTime}`, "YYYY-MM-DD HH:mm", API_CONFIG.TIMEZONE)
-        .format("YYYY-MM-DDTHH:mm:ss[Z]");
+        .format("YYYY-MM-DDTHH:mm:ss");
 
       const data = {
         name: eventName,
@@ -253,14 +253,21 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         `${API_CONFIG.BASE_URL}${API_ENDPOINTS.CREATE_APPOINTMENT}`
       );
 
-      const response = await fetchApi(API_ENDPOINTS.CREATE_APPOINTMENT, {
+      const response: CreateAppointmentResponse = await fetchApi(API_ENDPOINTS.CREATE_APPOINTMENT, {
         method: "POST",
         body: jsonData,
       });
 
       console.log("Calendar creation response:", response);
-      const appointmentId = response.object.id;
-      return appointmentId;
+      
+      // 새로운 백엔드 v2 응답 구조에 맞게 수정
+      if (response.success && response.status === "CREATED") {
+        const appointmentId = response.object.id;
+        console.log("Successfully created appointment:", appointmentId);
+        return appointmentId;
+      } else {
+        throw new Error(response.msg || "Failed to create calendar");
+      }
     } catch (error) {
       console.error("Calendar creation failed:", error);
       console.error("Error details:", {

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { AppointmentResponse, ScheduleUpdatePayload } from "./types";
 import moment from "moment-timezone";
+import { fetchApi } from "../utils/api";
+import { API_ENDPOINTS } from "../config/environment";
 
 interface AppointmentState {
   responseData: any;
@@ -28,6 +30,12 @@ interface AppointmentState {
     times: Record<number, Record<number, Record<number, boolean>>>
   ) => void;
   updateSchedule: (scheduleData: ScheduleUpdatePayload) => Promise<void>;
+  updateScheduleV2: (
+    scheduleId: string,
+    timesToEnable: string[],
+    timesToDisable: string[],
+    appointmentId: string
+  ) => Promise<void>;
 
   // Complex actions
   initializeFromResponse: (responseData: any) => void;
@@ -76,13 +84,7 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       id: schedule.id,
     }));
 
-    const startTimeH = moment
-      .tz(responseData.object.startTime, "Asia/Seoul")
-      .format("HH");
-    const endTimeHM = moment
-      .tz(responseData.object.endTime, "Asia/Seoul")
-      .format("HH");
-
+    // 실제 스케줄 데이터에서 시간 범위를 추출
     const timeSet = new Set();
     if (schedules[0]?.times) {
       schedules[0].times.forEach((timeSlot: any) => {
@@ -90,11 +92,7 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
           moment.tz(timeSlot.time, "Asia/Seoul").format("HH"),
           10
         );
-        const startTimeHNum = parseInt(startTimeH, 10);
-        const endTimeHNum = parseInt(endTimeHM, 10);
-        if (timeHM >= startTimeHNum && timeHM <= endTimeHNum - 1) {
-          timeSet.add(timeHM);
-        }
+        timeSet.add(timeHM);
       });
     }
 
@@ -135,6 +133,7 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       schedules: [],
     }),
 
+  // 기존 updateSchedule 함수 유지 (호환성을 위해)
   updateSchedule: async (scheduleData: ScheduleUpdatePayload) => {
     try {
       const response = await fetch(`${BASE_URL}/schedule/updateSchedule`, {
@@ -159,6 +158,83 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       }));
     } catch (error) {
       console.error("Failed to update schedule:", error);
+      throw error;
+    }
+  },
+
+  // 수정된 v2 API - 두 개의 분리된 API 요청으로 timeslot 토글
+  updateScheduleV2: async (
+    scheduleId: string,
+    timesToEnable: string[],
+    timesToDisable: string[],
+    appointmentId: string
+  ) => {
+    try {
+      const results = [];
+
+      // 기존에 선택된 것들을 끄는 API 요청 (enabled: false)
+      if (timesToDisable.length > 0) {
+        const disableResponse = await fetchApi(
+          API_ENDPOINTS.TOGGLE_TIMESLOTS_V2(appointmentId, scheduleId),
+          {
+            method: "PATCH",
+            body: {
+              enabled: false,
+              times: timesToDisable,
+            },
+          }
+        );
+        results.push(disableResponse);
+        // console.log("Disable timeslots response:", disableResponse);
+      }
+
+      // 기존에 선택 안된 것들을 켜는 API 요청 (enabled: true)
+      if (timesToEnable.length > 0) {
+        const enableResponse = await fetchApi(
+          API_ENDPOINTS.TOGGLE_TIMESLOTS_V2(appointmentId, scheduleId),
+          {
+            method: "PATCH",
+            body: {
+              enabled: true,
+              times: timesToEnable,
+            },
+          }
+        );
+        results.push(enableResponse);
+        // console.log("Enable timeslots response:", enableResponse);
+      }
+
+      // 모든 요청이 성공했는지 확인
+      const allSuccessful = results.every(
+        (response) => response.success && response.status === "OK"
+      );
+
+      if (allSuccessful) {
+        console.log("All schedule v2 updates successful");
+
+        // 성공 시 새로운 약속 데이터를 가져와서 store 업데이트
+        const updatedAppointment = await fetchApi(
+          API_ENDPOINTS.GET_APPOINTMENT(appointmentId)
+        );
+        if (updatedAppointment && updatedAppointment.object) {
+          set((state) => ({
+            ...state,
+            responseData: updatedAppointment,
+            schedules: updatedAppointment.object.schedules,
+          }));
+        }
+      } else {
+        const failedResults = results.filter(
+          (response) => !response.success || response.status !== "OK"
+        );
+        throw new Error(
+          `Some schedule updates failed: ${failedResults
+            .map((r) => r.msg)
+            .join(", ")}`
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update schedule v2:", error);
       throw error;
     }
   },

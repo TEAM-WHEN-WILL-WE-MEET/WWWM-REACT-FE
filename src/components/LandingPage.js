@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { Helmet } from 'react-helmet-async';
 
 //빠른 약속 시간 체크할 때, 언제 볼까?
-const Section1 = ({navigate }) => (
+const Section1 = ({navigate, handleNewAppointment }) => (
     <section
     className={`
       flex flex-col p-4
@@ -72,7 +72,7 @@ const Section1 = ({navigate }) => (
         <Button 
           label="새 약속 만들기"
           size="participate" 
-          onClick={() => navigate('/MonthView')}
+          onClick={handleNewAppointment}
           additionalClass="hover:opacity-80 text-[1.6rem] w-[14.2rem] h-[4.8rem]"
           aria-role="button"
           aria-label="새 약속 만들기 버튼"
@@ -548,6 +548,18 @@ const LandingPage = () => {
     }, []);
 
     const navigate = useNavigate();
+
+    // 새 약속 만들기 버튼 클릭 핸들러
+    const handleNewAppointment = () => {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        // 토큰이 있으면 MonthView로 이동
+        navigate('/MonthView');
+      } else {
+        // 토큰이 없으면 로그인 페이지로 이동
+        navigate('/login');
+      }
+    };
     const handleScrollToTop = useCallback(() => {
         let currentPosition = window.scrollY;
         let start = null;
@@ -581,7 +593,7 @@ const LandingPage = () => {
                       content="언제볼까? 약속 잡기 힘든 시람들이 만든, 더 많은 만남을 위한 서비스! "
                     />
                 </Helmet>
-                <Section1 navigate={navigate}/>
+                <Section1 navigate={navigate} handleNewAppointment={handleNewAppointment}/>
                 <Section2 />
                 <Section3 />
                 <Section4 />

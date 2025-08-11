@@ -1,0 +1,67 @@
+/* Register 페이지 전용 체크박스 스타일 */
+.register-checkbox-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 1.2rem;
+  font-size: 1.4rem;
+}
+
+.register-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+  /* 포커스 아웃라인 제거 */
+  outline: none;
+}
+
+/* 포커스 시 아웃라인 제거 */
+.register-checkbox:focus {
+  outline: none;
+}
+
+.register-checkmark {
+  position: relative;
+  display: inline-block;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.6rem;
+  border: 0.1rem solid var(--gray-400);
+  border-radius: 0.2rem;
+  background-color: white;
+  cursor: pointer;
+  /* 클릭 시 아웃라인 제거 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 체크표시 스타일 */
+.register-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 0.4rem;
+  top: 0.1rem;
+  width: 0.5rem;
+  height: 1rem;
+  border: solid white;
+  border-width: 0 0.2rem 0.2rem 0;
+  transform: rotate(45deg);
+}
+
+/* 체크박스가 체크되었을 때 배경색 변경 */
+.register-checkbox:checked ~ .register-checkmark {
+  background-color: var(--gray-900);
+  border-color: var(--gray-900);
+}
+
+/* 체크박스가 체크되었을 때 체크표시 보이기 */
+.register-checkbox:checked ~ .register-checkmark:after {
+  display: block;
+}
+
+/* 포커스 아웃라인 완전히 제거 */
+.register-checkbox:focus ~ .register-checkmark {
+  outline: none;
+}

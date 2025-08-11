@@ -8,10 +8,15 @@ export const API_CONFIG = {
 } as const;
 
 export const API_ENDPOINTS = {
-  CREATE_APPOINTMENT: "/appointment/createAppointment",
+  CREATE_APPOINTMENT: "/appointments",
+  GET_USER_APPOINTMENTS: "/appointments/me",
   GET_APPOINTMENT: (id: string) => `/appointments/${id}`,
   UPDATE_APPOINTMENT: (id: string) => `/appointments/${id}`,
   DELETE_APPOINTMENT: (id: string) => `/appointments/${id}`,
+  UPDATE_SCHEDULE: (appointmentId: string) =>
+    `/appointments/${appointmentId}/schedules`,
+  TOGGLE_TIMESLOTS_V2: (appointmentId: string, scheduleId: string) =>
+    `/appointments/${appointmentId}/schedules/${scheduleId}/timeslots/toggle`,
 };
 
 export const DEFAULT_HEADERS = {

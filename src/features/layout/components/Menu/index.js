@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../components/Button.tsx";
+import { fetchApi } from "../../../../utils/api.ts";
+import { API_ENDPOINTS } from "../../../../config/environment.ts";
+import { useUserStore } from "../../../../store/userStore";
 
 import { colors, colorVariants } from "../../../../styles/color.ts";
 import { typographyVariants } from "../../../../styles/typography.ts";
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(true);
-  
+  const { clearUser } = useUserStore();
+
   const closeSidebar = () => setIsOpen(false);
   const navigate = useNavigate();
   // 2) 체크박스에서 선택된 아이템의 id들을 별도로 저장
@@ -21,12 +25,45 @@ export default function Menu() {
   const [showModal, setShowModal] = useState(false);
   const [showModalLogOut, setShowModalLogOut] = useState(false);
 
-  //나중에 백엔드 ver2 붙이고 서버에서 불러오기기
-  const [items, setItems] = useState([
-    { id: 1, title: "9월 동아리 정기회의", daysLeft: 7 },
-    { id: 2, title: "프로젝트 2차 회의", daysLeft: 4 },
-    { id: 3, title: "영어 스터디", daysLeft: 1 },
-  ]);
+  // API에서 받아온 약속 데이터
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 컴포넌트 마운트 시 API에서 약속 데이터 가져오기
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetchApi(API_ENDPOINTS.GET_USER_APPOINTMENTS);
+
+        if (response.success && response.object) {
+          // API 응답 데이터를 기존 UI 구조에 맞게 변환
+          const transformedItems = response.object.map((appointment) => ({
+            id: appointment.id,
+            title: appointment.name,
+            // 만료일까지 남은 일수 계산
+            daysLeft: Math.ceil(
+              (new Date(appointment.expireAt) - new Date()) /
+                (1000 * 60 * 60 * 24)
+            ),
+          }));
+          setItems(transformedItems);
+        }
+      } catch (err) {
+        console.error("약속 데이터 가져오기 실패:", err);
+        setError(err.message);
+        // 에러 시 빈 배열로 설정
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
   const [isChecked, setIsChecked] = useState(false);
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
   // 체크박스(선택) 모드 활성화 여부: 하나의 항목 클릭 시 true로 변경
@@ -41,15 +78,57 @@ export default function Menu() {
     }
   };
 
-  // 3) 리스트 아이템을 클릭(혹은 체크박스 클릭)할 때, 해당 id를 추가/제거
-  const handleItemClick = (id) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+  // 캘린더 제목 클릭 시 이벤트 캘린더로 이동
+  const handleTitleClick = (appointmentId) => {
+    if (isSelectionMode) {
+      // 선택 모드일 때는 선택/해제 기능
+      handleToggleSelect(appointmentId);
     } else {
-      setSelectedIds([...selectedIds, id]);
+      // 선택 모드가 아닐 때는 EventCalendar로 이동
+      navigate("/eventCalendar", {
+        state: {
+          appointmentId: appointmentId,
+          userName: "사용자", // 실제 사용자 이름으로 대체 필요
+        },
+      });
     }
   };
 
+  // 제목 길게 누르기로 선택 모드 활성화
+  const handleTitleLongPress = (appointmentId) => {
+    if (!isSelectionMode) {
+      setIsSelectionMode(true);
+      setSelectedIds([appointmentId]);
+    }
+  };
+
+  // 터치 이벤트 상태 관리
+  const [touchTimer, setTouchTimer] = useState(null);
+  const [longPressTriggered, setLongPressTriggered] = useState(false);
+
+  const handleTouchStart = (appointmentId) => {
+    setLongPressTriggered(false);
+    const timer = setTimeout(() => {
+      setLongPressTriggered(true);
+      handleTitleLongPress(appointmentId);
+    }, 500); // 0.5초 길게 누르기
+    setTouchTimer(timer);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchTimer) {
+      clearTimeout(touchTimer);
+      setTouchTimer(null);
+    }
+  };
+
+  const handleClickWithLongPress = (appointmentId) => {
+    if (!longPressTriggered) {
+      handleTitleClick(appointmentId);
+    }
+    setLongPressTriggered(false);
+  };
+  
   // 삭제하기 버튼을 누르면 모달 띄움
   const handleDeleteButtonClick = () => {
     setShowModal(true);
@@ -58,16 +137,77 @@ export default function Menu() {
   const handleLogOutButtonClick = () => {
     setShowModalLogOut(true);
   };
+
+  const handleProfileClick = () => {
+    console.log("개인정보 수정 버튼 클릭됨 - 개인정보 수정 페이지로 이동");
+    navigate("/profile/edit");
+  };
+
   const handleLogOut = () => {
-    setShowModalLogOut(false);
+    // 로그아웃 처리
+    localStorage.removeItem("authToken"); // 토큰 삭제
+    clearUser(); // 유저 스토어 초기화
+    setShowModalLogOut(false); // 모달 닫기
+    navigate("/"); // 홈으로 이동
+  };
+
+  // 로그아웃 취소 처리
+  const handleCancelLogOut = () => {
+    setShowModalLogOut(false); // 모달만 닫기
   };
 
   // 모달에서 '삭제' 버튼 클릭 → 선택된 아이템들을 삭제 처리
-  const handleConfirmDelete = () => {
-    setItems(items.filter((item) => !selectedIds.includes(item.id)));
-    setSelectedIds([]); // 선택 상태 초기화
-    setShowModal(false);
-    setIsSelectionMode(false); // 선택 모드 해제
+  const handleConfirmDelete = async () => {
+    try {
+      // 선택된 모든 약속에 대해 삭제 API 호출
+      const deletePromises = selectedIds.map(async (appointmentId) => {
+        try {
+          const response = await fetchApi(
+            API_ENDPOINTS.DELETE_APPOINTMENT(appointmentId),
+            {
+              method: "DELETE",
+            }
+          );
+          
+          if (response.success) {
+            return { id: appointmentId, success: true };
+          } else {
+            console.error(`약속 ${appointmentId} 삭제 실패:`, response.msg);
+            return { id: appointmentId, success: false, error: response.msg };
+          }
+        } catch (error) {
+          console.error(`약속 ${appointmentId} 삭제 중 오류:`, error);
+          return { id: appointmentId, success: false, error: error.message };
+        }
+      });
+
+      const results = await Promise.all(deletePromises);
+      
+      // 성공한 항목들만 로컬 state에서 제거
+      const successfullyDeleted = results
+        .filter(result => result.success)
+        .map(result => result.id);
+      
+      const failedDeletes = results.filter(result => !result.success);
+      
+      if (successfullyDeleted.length > 0) {
+        setItems(items.filter((item) => !successfullyDeleted.includes(item.id)));
+      }
+      
+      // 실패한 항목이 있으면 알림
+      if (failedDeletes.length > 0) {
+        const failedCount = failedDeletes.length;
+        const totalCount = selectedIds.length;
+        alert(`${totalCount}개 중 ${failedCount}개 항목의 삭제에 실패했습니다.`);
+      }
+      
+      setSelectedIds([]); // 선택 상태 초기화
+      setShowModal(false);
+      setIsSelectionMode(false); // 선택 모드 해제
+    } catch (error) {
+      console.error("약속 삭제 중 예상치 못한 오류:", error);
+      alert("약속 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   // 모달에서 '취소' 버튼 클릭
@@ -87,12 +227,14 @@ export default function Menu() {
 
       <div className="flex  w-full justify-between  items  bg-[var(--white)] flex-col ">
         <div className="justify-end flex p-[0.8rem] pb-0 pt-[1.2rem]">
-          <button onClick={closeSidebar} className={`items-end p-[1.2rem]`}>
-            <img
-              src="/icon_X_noBg.svg"
-              alt="달력 페이지로 돌아가기"
-              onClick={() => navigate("/MonthView")}
-            />
+          <button
+            onClick={() => {
+              closeSidebar();
+              navigate("/");
+            }}
+            className={`items-end p-[1.2rem]`}
+          >
+            <img src="/icon_X_noBg.svg" alt="달력 페이지로 돌아가기" />
           </button>
         </div>
         <div className="flex flex-col px-[2.4rem]  ">
@@ -112,78 +254,120 @@ export default function Menu() {
             </h1>
             {/* 공유 캘린더 리스트 */}
             <ul className="mb-[4.8rem] ">
-              {items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
-                >
-                  {/* 왼쪽 체크박스 + 타이틀 */}
-                  <div className="flex items-center cursor-pointer">
-                    {isSelectionMode && (
-                      <div className=" flex flex-col !items-end !justify-end  ">
-                        <input
-                          type="checkbox"
-                          id={`Keep-logged-in-${item.id}`}
-                          className="invite-screen-reader"
-                          checked={selectedIds.includes(item.id)}
-                          onChange={(e) => {
-                            setIsChecked(e.target.checked);
-                            setIsVisuallyChecked(e.target.checked);
-                            e.stopPropagation();
-                            handleToggleSelect(item.id);
-                          }}
-                        />
-                        <div className="invite-label-box">
-                          <label
-                            htmlFor={`Keep-logged-in-${item.id}`}
-                            className={`${typographyVariants({
-                              variant: "b2-md",
-                            })} 
-                      !text-[1.4rem]
-                      ${
-                        isVisuallyChecked || isChecked
-                          ? colorVariants({ color: "gray-900" })
-                          : colorVariants({ color: "gray-700" })
-                      }`}
-                          >
-                            <span
-                              className="invite-check-icon"
-                              aria-hidden="true"
-                            ></span>
-                          </label>
-                        </div>
-                      </div>
-                    )}
-
-                    <span
-                      className={`
-                  ml-2
-                  ${typographyVariants({ variant: "b2-md" })}
-                  !text-[1.4rem]
-                  ${colorVariants({ color: "gray-800" })}
-                  hover:bg-var[(--red-30)]
-                  cusror-pointer
-                `}
-                      onClick={() => handleToggleSelect(item.id)}
-                    >
-                      {item.title}
-                    </span>
-                  </div>
-                  <div
-                    className={` ${typographyVariants({
-                      variant: "d3-rg",
-                    })} ${colorVariants({ color: "gray-600" })}
-                             !text-[1.2rem] `}
+              {loading ? (
+                <li className="flex justify-center items-center py-[2rem]">
+                  <span
+                    className={`${typographyVariants({
+                      variant: "b2-md",
+                    })} ${colorVariants({ color: "gray-600" })} text-[1.4rem]`}
                   >
-                    <span
-                      className={` ${colorVariants({ color: "red-300" })} `}
-                    >
-                      {item.daysLeft}
-                    </span>
-                    일 후 삭제
-                  </div>
+                    로딩 중...
+                  </span>
                 </li>
-              ))}
+              ) : error ? (
+                <li className="flex justify-center items-center py-[2rem]">
+                  <span
+                    className={`${typographyVariants({
+                      variant: "b2-md",
+                    })} ${colorVariants({ color: "red-300" })} text-[1.4rem]`}
+                  >
+                    데이터를 불러오는데 실패했습니다.
+                  </span>
+                </li>
+              ) : items.length === 0 ? (
+                <li className="flex justify-center items-center py-[2rem]">
+                  <span
+                    className={`${typographyVariants({
+                      variant: "b2-md",
+                    })} ${colorVariants({ color: "gray-600" })} text-[1.4rem]`}
+                  >
+                    공유 캘린더가 없습니다.
+                  </span>
+                </li>
+              ) : (
+                items.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
+                  >
+                    {/* 왼쪽 체크박스 + 타이틀 */}
+                    <div className="flex items-center">
+                      {isSelectionMode && (
+                        <div className=" flex flex-col !items-end !justify-end  ">
+                          <input
+                            type="checkbox"
+                            id={`Keep-logged-in-${item.id}`}
+                            className="invite-screen-reader"
+                            checked={selectedIds.includes(item.id)}
+                            onChange={(e) => {
+                              setIsChecked(e.target.checked);
+                              setIsVisuallyChecked(e.target.checked);
+                              e.stopPropagation();
+                              handleToggleSelect(item.id);
+                            }}
+                          />
+                          <div className="invite-label-box">
+                            <label
+                              htmlFor={`Keep-logged-in-${item.id}`}
+                              className={`${typographyVariants({
+                                variant: "b2-md",
+                              })} 
+                        !text-[1.4rem]
+                        ${
+                          isVisuallyChecked || isChecked
+                            ? colorVariants({ color: "gray-900" })
+                            : colorVariants({ color: "gray-700" })
+                        }`}
+                            >
+                              <span
+                                className="invite-check-icon"
+                                aria-hidden="true"
+                              ></span>
+                            </label>
+                          </div>
+                        </div>
+                      )}
+
+                      <span
+                        className={`
+                    ml-2
+                    ${typographyVariants({ variant: "b2-md" })}
+                    !text-[1.4rem]
+                    ${colorVariants({ color: "gray-800" })}
+                    hover:bg-gray-100
+                    cursor-pointer
+                    select-none
+                  `}
+                        onClick={() => handleClickWithLongPress(item.id)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          handleTitleLongPress(item.id);
+                        }}
+                        onTouchStart={() => handleTouchStart(item.id)}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={() => handleTouchStart(item.id)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
+                      >
+                        {item.title}
+                      </span>
+                    </div>
+                    <div
+                      className={` ${typographyVariants({
+                        variant: "d3-rg",
+                      })} ${colorVariants({ color: "gray-600" })}
+                               !text-[1.2rem] `}
+                    >
+                      <span
+                        className={` ${colorVariants({ color: "red-300" })} `}
+                      >
+                        {item.daysLeft}
+                      </span>
+                      일 후 삭제
+                    </div>
+                  </li>
+                ))
+              )}
               {isSelectionMode && selectedIds.length > 0 && (
                 <>
                   <div
@@ -270,7 +454,10 @@ export default function Menu() {
                 variant: "b2-md",
               })} text-[1.4rem] flex  flex-col gap-[1.2rem]`}
             >
-              <li className="flex items-center gap-x-[0.4rem] border-b border-[var(--gray-100)] pb-[0.8rem] cursor-pointer">
+              <li
+                onClick={handleProfileClick}
+                className="flex items-center gap-x-[0.4rem] border-b border-[var(--gray-100)] pb-[0.8rem] cursor-pointer"
+              >
                 <img
                   src="/User.svg"
                   alt="개인정보 수정"
@@ -310,7 +497,7 @@ export default function Menu() {
                     )}`}
                   >
                     <button
-                      onClick={handleLogOut}
+                      onClick={handleCancelLogOut}
                       className={`  ${colorVariants({
                         bg: "gray-100",
                         color: "gray-900",

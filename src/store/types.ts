@@ -1,6 +1,7 @@
 export interface User {
   name: string;
   id?: string;
+  email?: string;
 }
 
 export interface TimeSlot {
@@ -25,6 +26,42 @@ export interface AppointmentResponse {
   };
   firstLogin: boolean;
   userSchedule: Schedule[];
+}
+
+// 새로운 백엔드 v2 응답 구조 타입 정의
+export interface CreateAppointmentResponse {
+  status: "CREATED";
+  msg: string;
+  object: {
+    id: string;
+    createdAt: string;
+    expireAt: string;
+    name: string;
+    startTime: string;
+    endTime: string;
+    timeZone: string;
+    schedules: Schedule[];
+    users: User[];
+  };
+  success: boolean;
+}
+
+// 사용자 캘린더 목록 응답 타입 정의
+export interface UserAppointmentItem {
+  id: string;
+  createdAt: string;
+  expireAt: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  timeZone: string;
+}
+
+export interface UserAppointmentsResponse {
+  status: "OK";
+  msg: string;
+  object: UserAppointmentItem[];
+  success: boolean;
 }
 
 export interface DateInfo {

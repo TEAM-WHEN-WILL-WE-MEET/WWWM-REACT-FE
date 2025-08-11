@@ -64,6 +64,8 @@ export const colorVariants = cva('', {
       'blue-400': 'text-[var(--blue-400)]',
       'blue-500': 'text-[var(--blue-500)]',
       'blue-900': 'text-[var(--blue-900)]',
+      'kakao-yellow': 'text-[var(--kakao-yellow)]',
+      'kakao-black':'text-[var(--kakao-black)]',
 
     },
     bg: {
@@ -92,6 +94,8 @@ export const colorVariants = cva('', {
         'blue-400': 'bg-[var(--blue-400)]',
         'blue-500': 'bg-[var(--blue-500)]',
         'blue-900': 'bg-[var(--blue-900)]',
+        'kakao-yellow': 'bg-[var(--kakao-yellow)]',
+        'kakao-black':'bg-[var(--kakao-black)]',
   
     }
   },
