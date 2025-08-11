@@ -89,24 +89,28 @@ const Login = () => {
   };
 
   const handleKakaoLogin = async () => {
-    // 1차 요청
-    try {
-      setLoading(true);
-      const response = await fetch(`${BASE_URL}/oauth2/authorization/google`, {
-        method: "GET",
-      });
-      
-      //서버가 OAuth 제공자(카카오)로 리다이렉트하라는 응답을 보냈는지 확인.
-      //맞다면 해당 소셜 로그인 페이지로 강제 이동
-      if (response.redirected) { 
-        window.location.href = response.url;
-      }
-    } catch (error) {
-      console.error("Kakao login error:", error);
+      //
       setError(true);
-      setResponseMessage("카카오 로그인 중 오류가 발생했습니다.");
-      setLoading(false);
-    }
+      setResponseMessage("카카오 로그인은 현재 지원되지 않는 기능입니다.");
+
+    // // 1차 요청
+    // try {
+    //   setLoading(true);
+    //   const response = await fetch(`${BASE_URL}/oauth2/authorization/google`, {
+    //     method: "GET",
+    //   });
+      
+    //   //서버가 OAuth 제공자(카카오)로 리다이렉트하라는 응답을 보냈는지 확인.
+    //   //맞다면 해당 소셜 로그인 페이지로 강제 이동
+    //   if (response.redirected) { 
+    //     window.location.href = response.url;
+    //   }
+    // } catch (error) {
+    //   console.error("Kakao login error:", error);
+    //   setError(true);
+    //   setResponseMessage("카카오 로그인 중 오류가 발생했습니다.");
+    //   setLoading(false);
+    // }
   };
 
   const handleSubmit = async (e) => {
