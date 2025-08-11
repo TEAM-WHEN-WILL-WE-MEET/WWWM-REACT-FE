@@ -13,6 +13,7 @@ import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
 import KakaoCallback from "./features/auth/pages/KakaoCallback";
 
+
 // Legacy invite route redirect component
 const InviteRedirect = () => {
   const urlParams = new URLSearchParams(window.location.search);
