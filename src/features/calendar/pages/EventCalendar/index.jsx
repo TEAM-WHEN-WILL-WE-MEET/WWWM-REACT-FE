@@ -28,9 +28,9 @@ const EventCalendar = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   //공유 key
-  const KAKAO_SHARE_KEY = process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE;
+  const KAKAO_SHARE_KEY = import.meta.env.VITE_WWWM_FE_KAKAO_API_KEY_SHARE;
 
-  //정상작동 console.log(" KAKAO_SHARE_KEY: ",  process.env.REACT_APP_WWWM_FE_KAKAO_API_KEY_SHARE);
+  //정상작동 console.log(" KAKAO_SHARE_KEY: ",  import.meta.env.VITE_WWWM_FE_KAKAO_API_KEY_SHARE);
   const [dates, setDates] = useState([]);
   const [times, setTimes] = useState([]);
   const [eventName, setEventName] = useState("");

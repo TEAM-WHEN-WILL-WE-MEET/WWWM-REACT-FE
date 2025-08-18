@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { typographyVariants } from "../../../styles/typography.ts";
@@ -8,16 +8,17 @@ import { Button } from "../../../components/Button.tsx";
 import Loading from "../../../components/Loading";
 import "../styles/Register.css";
 
-const Login = () => {
+const Register = () => {
   const BASE_URL =
-    process.env.NODE_ENV === "production"
-      ? process.env.REACT_APP_WWWM_BE_ENDPOINT
-      : process.env.REACT_APP_WWWM_BE_DEV_EP;
+    import.meta.env.PROD
+      ? import.meta.env.VITE_WWWM_BE_ENDPOINT
+      : import.meta.env.VITE_WWWM_BE_DEV_EP;
 
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
   const [emailId, setEmailId] = useState("");
   const [emailDomain, setEmailDomain] = useState("gmail.com");
   const [showDomainDropdown, setShowDomainDropdown] = useState(false);
@@ -25,6 +26,13 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
+
+  // 비밀번호 관련 상태 추가 (컴포넌트 최상단 state 선언부에 추가)
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isNameValid, setIsNameValid] = useState(false);
 
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
@@ -34,91 +42,80 @@ const Login = () => {
     { value: "custom", label: "직접 입력" },
   ];
 
-  // 회원가입에서 넘어온 정보 처리
-  useEffect(() => {
-    if (location.state?.registeredEmail) {
-      // 회원가입한 이메일을 파싱해서 설정
-      const registeredEmail = location.state.registeredEmail;
-      if (registeredEmail.includes("@")) {
-        const [id, domain] = registeredEmail.split("@");
-        setEmailId(id);
-        if (domain === "gmail.com" || domain === "naver.com") {
-          setEmailDomain(domain);
-          setCustomDomain(false);
-        } else {
-          setEmailDomain(`@${domain}`);
-          setCustomDomain(true);
-        }
-      }
-    }
-  }, [location.state]);
-
   const isFormValid =
+    name.trim().length > 0 &&
     emailId.trim().length > 0 &&
     (customDomain
       ? emailDomain.includes("@")
       : emailDomain.trim().length > 0) &&
     password.trim().length > 0;
 
+  // 비밀번호 유효성 검사 함수 추가 (handleSubmit 함수 위에 추가)
+  const validatePassword = (value) => {
+    if (value.length < 4) {
+      setPasswordError("비밀번호는 최소 4자 이상이어야 합니다.");
+      setIsPasswordValid(false);
+    } else if (value.length > 12) {
+      setPasswordError("비밀번호는 최대 12자까지 가능합니다.");
+      setIsPasswordValid(false);
+    } else {
+      setPasswordError("");
+      setIsPasswordValid(true);
+    }
+  };
+
+  // password onChange 핸들러 수정
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
+  };
+
   // 이메일 ID 핸들러
   const handleEmailIdChange = (e) => {
     const value = e.target.value;
     setEmailId(value);
+    const isValid =
+      value.trim().length > 0 &&
+      (customDomain
+        ? emailDomain.includes(".")
+        : emailDomain.trim().length > 0);
+    setIsEmailValid(isValid);
   };
 
   // 이메일 도메인 핸들러
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
     setEmailDomain(value);
+    const isValid =
+      emailId.trim().length > 0 &&
+      (customDomain ? value.includes(".") : value.trim().length > 0);
+    setIsEmailValid(isValid);
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setName(value);
+    setIsNameValid(value.trim().length > 0);
   };
 
   const handleDomainSelect = (domain) => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
+      setIsEmailValid(false);
     } else {
       setCustomDomain(false);
       setEmailDomain(domain);
+      setIsEmailValid(emailId.trim().length > 0);
     }
     setShowDomainDropdown(false);
-  };
-
-  const handleKakaoLogin = async () => {
-      //
-      setError(true);
-      setResponseMessage("카카오 로그인은 현재 지원되지 않는 기능입니다.");
-
-    // // 1차 요청
-    // try {
-    //   setLoading(true);
-    //   const response = await fetch(`${BASE_URL}/oauth2/authorization/google`, {
-    //     method: "GET",
-    //   });
-      
-    //   //서버가 OAuth 제공자(카카오)로 리다이렉트하라는 응답을 보냈는지 확인.
-    //   //맞다면 해당 소셜 로그인 페이지로 강제 이동
-    //   if (response.redirected) { 
-    //     window.location.href = response.url;
-    //   }
-    // } catch (error) {
-    //   console.error("Kakao login error:", error);
-    //   setError(true);
-    //   setResponseMessage("카카오 로그인 중 오류가 발생했습니다.");
-    //   setLoading(false);
-    // }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid) {
-      setError(true);
-      setResponseMessage("이메일, 비밀번호를 모두 입력해주세요.");
-      return;
-    }
-
-    // 추가 검증
-    if (emailId.trim() === "" || password.trim() === "") {
       setError(true);
       setResponseMessage("모든 필드를 입력해주세요.");
       return;
@@ -129,127 +126,79 @@ const Login = () => {
     setResponseMessage("");
 
     try {
-      // 로그인 요청 데이터 구성 (name 제거)
-      const data = {
+      const requestData = {
         email: email,
         password: password,
-        name: "dd",
+        name: name,
       };
 
-      console.log("==== 로그인 요청 정보 ====");
-      console.log("BASE_URL:", BASE_URL);
-      console.log("Request data:", data);
-      console.log("Email value:", email);
-      console.log("Password value:", password);
+      // console.log("회원가입 요청 정보:");
+      // console.log("BASE_URL:", BASE_URL);
+      // console.log("Full URL:", `${BASE_URL}/users/auth/register`);
+      // console.log("Request body:", requestData);
 
-      const endpoint = `/users/auth/login`;
+      const endpoint = `/users/auth/signup`;
 
-      console.log(`로그인 API 호출: ${BASE_URL}${endpoint}`);
-      console.log(`사용하는 데이터:`, data);
+      // console.log(`회원가입 API 호출: ${BASE_URL}${endpoint}`);
+      // console.log(`사용하는 데이터:`, requestData);
 
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestData),
       });
 
-      console.log("==== 서버 응답 정보 ====");
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
+      // console.log(`API 응답 상태:`, response.status);
+      // console.log("Response headers:", response.headers);
 
-      // 응답 본문 확인 (성공/실패 모두)
-      let responseBody = null;
-      const responseText = await response.text();
-      console.log("Response body (text):", responseText);
-
-      try {
-        responseBody = JSON.parse(responseText);
-        console.log("Response body (parsed):", responseBody);
-      } catch (e) {
-        console.log("Response body를 JSON으로 파싱할 수 없음:", e.message);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log("Error response body:", errorText);
       }
 
-      if (response.status === 200) {
-        if (responseBody && responseBody.object) {
-          const token = responseBody.object;
+      if (response.status === 201 || response.status === 200) {
+        // setResponseMessage(
+        //   `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
+        // );
 
-          // 토큰 저장
-          localStorage.setItem("authToken", token);
-
-          setResponseMessage("로그인 성공!");
-
-          // 리다이렉트 URL이 있고 getAppointment 페이지면 그대로 리다이렉트, 아니면 원래 URL 또는 MonthView로 이동
+        setTimeout(() => {
           const redirectUrl = searchParams.get("redirect");
-          setTimeout(() => {
-            if (redirectUrl) {
-              const decodedUrl = decodeURIComponent(redirectUrl);
-              // getAppointment 페이지에서 온 경우 그대로 리다이렉트
-              if (decodedUrl.includes("/getAppointment?appointmentId=")) {
-                navigate(decodedUrl);
-              } else {
-                navigate(decodedUrl);
-              }
-            } else {
-              navigate("/MonthView");
-            }
-          }, 1000);
-        } else {
-          console.error("응답 데이터 형식이 예상과 다릅니다:", responseBody);
-          setError(true);
-          setResponseMessage("로그인 응답 처리 중 오류가 발생했습니다.");
-        }
-      } else if (response.status === 401) {
-        let errorMessage =
-          "등록되지 않은 정보이거나 이메일, 비밀번호가 일치하지 않습니다.";
-
-        // 서버 응답에서 더 구체적인 오류 메시지 확인
-        if (responseBody && responseBody.error) {
-          errorMessage = responseBody.error;
-        } else if (responseBody && responseBody.message) {
-          errorMessage = responseBody.message;
-        }
-
+          const loginPath = redirectUrl 
+            ? `/login?redirect=${encodeURIComponent(redirectUrl)}`
+            : "/login";
+          
+          navigate(loginPath, {
+            state: {
+              registeredName: name,
+              registeredEmail: email,
+              // message: `회원가입한 이름(${name}) 또는 이메일(${email})로 로그인하세요.`,
+            },
+          });
+        }, 200);
+      } else if (response.status === 409) {
         setError(true);
-        setResponseMessage(errorMessage);
+        setResponseMessage("이미 등록된 이메일입니다.");
       } else if (response.status === 400) {
-        // 400 오류에 대한 더 구체적인 처리
-        let errorMessage = "요청 정보가 올바르지 않습니다.";
-
-        // 서버 응답에서 오류 메시지 확인
-        if (responseBody && responseBody.error) {
-          errorMessage = responseBody.error;
-        } else if (responseBody && responseBody.message) {
-          errorMessage = responseBody.message;
-        } else {
-          // 입력 값 검증
-          if (email.trim().length < 5 || !email.includes("@")) {
-            errorMessage = "올바른 이메일 주소를 입력해주세요.";
-          } else if (password.length < 2) {
-            errorMessage = "비밀번호는 2글자 이상 입력해주세요.";
-          } else {
-            errorMessage = "입력한 정보를 다시 확인해주세요. (서버 검증 실패)";
-          }
-        }
-
         setError(true);
-        setResponseMessage(errorMessage);
+        setResponseMessage("입력 정보가 올바르지 않습니다.");
       } else {
-        let errorMessage = `로그인에 실패했습니다. (오류 코드: ${response.status})`;
-
-        // 서버 응답에서 오류 메시지 확인
-        if (responseBody && responseBody.error) {
-          errorMessage = responseBody.error;
-        } else if (responseBody && responseBody.message) {
-          errorMessage = responseBody.message;
-        }
-
         setError(true);
-        setResponseMessage(errorMessage);
+        if (response.status === 500) {
+          setResponseMessage(
+            "서버에서 회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요."
+          );
+        } else if (response.status === 404) {
+          setResponseMessage(
+            "회원가입 기능이 현재 사용할 수 없습니다. 기존 계정으로 로그인해주세요."
+          );
+        } else {
+          setResponseMessage("회원가입에 실패했습니다.");
+        }
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Register error:", error);
       setError(true);
       setResponseMessage("서버 오류가 발생했습니다.");
     } finally {
@@ -275,8 +224,8 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <title>로그인 - 언제볼까?</title>
-        <meta name="description" content="언제볼까? 서비스에 로그인하세요." />
+        <title>회원가입 - 언제볼까?</title>
+        <meta name="description" content="언제볼까? 서비스에 회원가입하세요." />
       </Helmet>
 
       <div className="flex items-center justify-center min-h-screen bg-[var(--white)] ">
@@ -299,12 +248,12 @@ const Login = () => {
               "text-[2rem] mb-[4rem] text-center"
             )}
           >
-            로그인
+            새로운 계정 만들기
           </h1>
 
-          {/* 로그인 폼 */}
+          {/* 회원가입 폼 */}
           <form onSubmit={handleSubmit} className="w-auto " noValidate>
-            {/* email / PW */}
+            {/* email / PW /name */}
             <div className="w-full flex flex-col items-end justify-center !space-y-[2rem]  ">
               {/* 이메일 */}
               <div className="flex flex-col items-end w-full">
@@ -407,7 +356,6 @@ const Login = () => {
                   </div>
                 </div>
               </div>
-
               {/* 비밀번호 */}
               <div className="flex flex-col items-end w-full">
                 <label
@@ -427,9 +375,9 @@ const Login = () => {
                   <div className="relative flex-2 !w-[32rem]">
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                       className={cn(
                         inputClasses(
                           password.length === 0,
@@ -440,10 +388,77 @@ const Login = () => {
                         colorVariants({ color: "gray-700" }),
                         "placeholder:text-[var(--gray-500)]"
                       )}
-                      placeholder="비밀번호를 입력하세요"
+                      placeholder="비밀번호 (4~12자)"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute z-10 right-2 top-1/2 -translate-y-1/2  flex items-center justify-center"
+                    >
+                      <img
+                        src={
+                          showPassword
+                            ? "/icon-view-open.svg"
+                            : "/icon-view.svg"
+                        }
+                        alt={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                        className="w-[2.4rem] h-[2.4rem]"
+                      />
+                    </button>
                   </div>
+                </div>
+                <div
+                  className="w-[32rem]  relative"
+                  // style={{ minHeight: "2rem" }}
+                >
+                  {passwordError && (
+                    <div
+                      className={cn(
+                        typographyVariants({ variant: "d3-rg" }),
+                        colorVariants({ color: "red-300" }),
+                        "absolute left-0 top-3 w-full text-left whitespace-nowrap z-[999]"
+                      )}
+                    >
+                      {passwordError}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* 이름 */}
+              <div className="flex flex-col items-end w-full">
+                <label
+                  htmlFor="name"
+                  className={cn(
+                    typographyVariants({ variant: "b2-md" }),
+                    colorVariants({ color: "gray-700" }),
+                    "block mb-2"
+                  )}
+                ></label>
+                <div className="flex gap-2 items-center !w-full justify-center">
+                  <div className="relative">
+                    <span className=" absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
+                      *
+                    </span>
+                  </div>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={handleNameChange}
+                    className={cn(
+                      inputClasses(
+                        name.length === 0,
+                        error && name.length === 0
+                      ),
+                      " !w-[32rem] pl-[1.6rem] pr-[0.5rem] py-[1.2rem] border-0 outline-none border-b-[0.1rem] border-b-[var(--gray-300)] rounded-none",
+                      typographyVariants({ variant: "h3-md" }),
+                      colorVariants({ color: "gray-700" }),
+                      "placeholder:text-[var(--gray-500)]"
+                    )}
+                    placeholder="이름을 입력하세요"
+                    required
+                  />
                 </div>
               </div>
 
@@ -479,10 +494,11 @@ const Login = () => {
             </div>
             {/* 카카오톡으로 연결 */}
             <Button
-              type="button"
+              type="submit"
               size="L"
-              onClick={handleKakaoLogin}
-              disabled={loading}
+              disabled={
+                !(isPasswordValid && isEmailValid && isNameValid) || loading
+              }
               additionalClass={cn(
                 "mt-6 flex items-center justify-center gap-2",
                 colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
@@ -494,55 +510,45 @@ const Login = () => {
                 alt="카카오톡 아이콘"
                 className="w-[1.6rem] h-[1.6rem]"
               />
-              {loading ? "연결 중..." : "카카오톡으로 연결"}
+              {loading ? "카카오톡으로 연결중..." : "카카오톡으로 연결"}
             </Button>
 
-            {/* 로그인 버튼 */}
+            {/* 회원가입 버튼 */}
             <Button
               type="submit"
               size="L"
-              disabled={!isFormValid || loading}
+              disabled={
+                !(isPasswordValid && isEmailValid && isNameValid) || loading
+              }
               additionalClass={cn(
                 "rounded-[0.8rem] mt-[1.2rem]",
-                isFormValid
+                isPasswordValid && isEmailValid && isNameValid
                   ? "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]"
                   : "bg-[var(--gray-100)] border border-[var(--gray-500)] text-[var(--gray-900)]"
               )}
             >
-              {loading ? "로그인 중..." : "로그인"}
+              {loading ? "회원가입 중..." : "계정 만들기"}
             </Button>
           </form>
 
           {/* 하단 링크 */}
-            <div
-              className={cn(
-                typographyVariants({ variant: "b2-md" }),
-                "mt-[3rem] flex !flex-col !gap-[2rem] w-full h-full !text-[1.2rem]"
-              )}
-            >
+          <div className="mt-[3rem] text-center">
+            <p className={typographyVariants({ variant: "b2-md" })}>
               <button
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/login")}
                 className={cn(
                   colorVariants({ color: "gray-700" }),
-                  "hover:no-underline"
+                  "hover:no-underline  !text-[1.2rem]"
                 )}
               >
-                새 계정 만들기
+                기존 계정으로 로그인
               </button>
-              <button
-                onClick={() => navigate("/")}
-                className={cn(
-                  colorVariants({ color: "gray-700" }),
-                  "hover:no-underline"
-                )}
-              >
-                비밀번호 찾기
-              </button>
-            </div>
+            </p>
           </div>
+        </div>
       </div>
     </>
   );
 };
 
-export default Login;
+export default Register;
