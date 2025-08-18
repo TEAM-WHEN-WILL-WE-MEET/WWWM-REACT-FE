@@ -480,7 +480,11 @@ const EventCalendar = () => {
               `}
               onClick={() => setSelectedDate(key)}
             >
-              {moment(date, "YYYY-MM-DD").format("M/D(ddd)")}
+              {(() => {
+                const m = moment(date, "YYYY-MM-DD");
+                const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+                return `${m.format("M/D")}(${dayNames[m.day()]})`;
+              })()}
             </div>
           ))}
         </div>
