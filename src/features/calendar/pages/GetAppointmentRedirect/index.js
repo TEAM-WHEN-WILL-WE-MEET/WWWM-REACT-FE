@@ -71,22 +71,6 @@ const GetAppointmentRedirect = () => {
     return username;
   };
 
-  // 토큰 유효성 검사 함수
-  const validateToken = async (token, BASE_URL) => {
-    try {
-      const response = await fetch(`${BASE_URL}/users/auth/validate`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      return response.ok;
-    } catch (error) {
-      console.error("Token validation error:", error);
-      return false;
-    }
-  };
 
   useEffect(() => {
     const handleAppointmentAccess = async () => {
@@ -208,14 +192,7 @@ const GetAppointmentRedirect = () => {
     };
 
     handleAppointmentAccess();
-  }, [
-    searchParams,
-    navigate,
-    initializeFromResponse,
-    initializeFromSchedules,
-    setUserInfo,
-    setUserSchedule,
-  ]);
+  }, [searchParams, navigate, initializeFromResponse, initializeFromSchedules, setUserInfo, setUserSchedule, extractUsernameFromToken, loading]);
 
   return loading ? <Loading /> : null;
 };

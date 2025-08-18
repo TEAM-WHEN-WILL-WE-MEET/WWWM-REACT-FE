@@ -1,25 +1,18 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment-timezone";
 import "moment/locale/ko";
 import "./styles.css";
 import { typographyVariants } from "../../../../styles/typography.ts";
-import { colorVariants, colors } from "../../../../styles/color.ts";
-import { cn } from "../../../../utils/cn";
+import { colorVariants } from "../../../../styles/color.ts";
 import { Button } from "../../../../components/Button.tsx";
 import { Helmet } from "react-helmet-async";
 import { useAppointmentStore } from "../../../../store/appointmentStore";
-import { useCalendarStore } from "../../../../store/calendarStore";
 import { useUserStore } from "../../../../store/userStore";
 import Loading from "../../../../components/Loading";
 import { fetchApi } from "../../../../utils/api";
 import { API_ENDPOINTS } from "../../../../config/environment";
 
-// NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
-const BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? process.env.REACT_APP_WWWM_BE_ENDPOINT
-    : process.env.REACT_APP_WWWM_BE_DEV_EP;
 
 const IndividualCalendar = () => {
   const [loading, setLoading] = useState(false);
@@ -28,6 +21,7 @@ const IndividualCalendar = () => {
   const [forceUpdate, setForceUpdate] = useState(0);
   const [localDates, setLocalDates] = useState([]);
   const [localTimes, setLocalTimes] = useState([]);
+  const [bulkTimesArray, setBulkTimesArray] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -65,8 +59,6 @@ const IndividualCalendar = () => {
   const [isVisuallyChecked, setIsVisuallyChecked] = useState(false);
   const minuteSlot = [10, 20, 30, 40, 50];
 
-  //서버에 보낼 times 배열 (화면 UI에 display할 selected와는 별개)
-  const [bulkTimesArray, setBulkTimesArray] = useState([]);
 
   // 모바일 터치 드래그 관련 ref 추가
   const mobileDragStartRef = useRef(null);
@@ -242,20 +234,6 @@ const IndividualCalendar = () => {
     };
   }, [selectedTimes, selectedDate, times, dates]);
 
-  const findCellFromPoint = (x, y) => {
-    // document.elementFromPoint를 사용하여 현재 터치/마우스 포인트 아래의 요소 찾기
-    const element = document.elementFromPoint(x, y);
-    if (!element) return null;
-
-    // 타임슬롯 버튼 찾기
-    const button = element.closest("[data-time-index]");
-    if (!button) return null;
-
-    const timeIndex = parseInt(button.getAttribute("data-time-index"));
-    const buttonIndex = parseInt(button.getAttribute("data-button-index"));
-
-    return { timeIndex, buttonIndex };
-  };
 
   // 버튼의 mousedown: 단일 클릭/드래그 판단을 위한 초기 좌표와 셀 정보를 기록 (즉, 실제 업데이트는 여기서 진행하지 않음)
   const handleButtonMouseDown = (timeIndex, buttonIndex, event) => {
@@ -309,7 +287,7 @@ const IndividualCalendar = () => {
     }
   };
 
-  const { fetchMyInfo, name: currentUserName, userId } = useUserStore();
+  const { fetchMyInfo, name: currentUserName } = useUserStore();
 
   // 현재 사용자 이름 가져오기 헬퍼 함수
   const getCurrentUserName = () => {
@@ -359,7 +337,6 @@ const IndividualCalendar = () => {
 
         // 사용자 정보 가져오기
         await fetchMyInfo();
-        const currentUser = useUserStore.getState();
 
         // 사용자 캘린더 목록 가져오기
         const response = await fetchApi(API_ENDPOINTS.GET_USER_APPOINTMENTS, {
@@ -514,14 +491,11 @@ const IndividualCalendar = () => {
 
     // schedules에서 현재 사용자가 선택한 timeslot 찾기
     const userSelectedTimes = {};
-    const { dates: storeDates, times: storeTimes } =
-      useAppointmentStore.getState();
+    const { times: storeTimes } = useAppointmentStore.getState();
 
     // 각 날짜별로 처리
     schedules.forEach((schedule, scheduleIndex) => {
-      const scheduleDate = moment
-        .tz(schedule.date, "Asia/Seoul")
-        .format("YYYY-MM-DD");
+      const scheduleDate = moment.tz(schedule.date, "Asia/Seoul").format("YYYY-MM-DD");
 
       if (schedule.times && schedule.times.length > 0) {
         // 해당 날짜의 모든 시간 슬롯 확인

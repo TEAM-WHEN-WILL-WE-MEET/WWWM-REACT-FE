@@ -10,7 +10,7 @@ import { cn } from "../../../utils/cn";
 
 const EditProfile = () => {
   const navigate = useNavigate();
-  const { name, email, userId, isLoading, error, fetchMyInfo } = useUserStore();
+  const { name, email, userId, isLoading, fetchMyInfo } = useUserStore();
 
   const [formData, setFormData] = useState({
     name: "",

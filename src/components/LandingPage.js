@@ -2,8 +2,8 @@ import React from "react";
 import { useCallback, useEffect, useState} from "react";
 import Lottie from "lottie-react";
 
-import { useNavigate, useLocation } from 'react-router-dom';
-import { colorVariants, colors } from '../styles/color.ts';
+import { useNavigate } from 'react-router-dom';
+import { colorVariants } from '../styles/color.ts';
 import { Button } from './Button.tsx';
 import { motion } from "framer-motion";
 import { Helmet } from 'react-helmet-async';
@@ -74,7 +74,7 @@ const Section1 = ({navigate, handleNewAppointment }) => (
           size="participate" 
           onClick={handleNewAppointment}
           additionalClass="hover:opacity-80 text-[1.6rem] w-[14.2rem] h-[4.8rem]"
-          aria-role="button"
+          role="button"
           aria-label="새 약속 만들기 버튼"
         />
       </motion.div>

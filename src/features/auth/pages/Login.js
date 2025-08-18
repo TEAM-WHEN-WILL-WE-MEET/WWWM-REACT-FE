@@ -25,7 +25,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
-  const [registrationInfo, setRegistrationInfo] = useState(null);
 
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
@@ -38,10 +37,6 @@ const Login = () => {
   // 회원가입에서 넘어온 정보 처리
   useEffect(() => {
     if (location.state?.registeredEmail) {
-      setRegistrationInfo({
-        email: location.state.registeredEmail,
-        message: location.state.message,
-      });
       // 회원가입한 이메일을 파싱해서 설정
       const registeredEmail = location.state.registeredEmail;
       if (registeredEmail.includes("@")) {

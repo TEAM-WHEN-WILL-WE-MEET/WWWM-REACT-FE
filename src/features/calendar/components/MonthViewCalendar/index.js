@@ -7,9 +7,8 @@ import moment from "moment-timezone";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { colors, colorVariants } from "../../../../styles/color.ts";
+import { colorVariants } from "../../../../styles/color.ts";
 import { typographyVariants } from "../../../../styles/typography.ts";
-import Loading from "../../../../components/Loading";
 import { useCalendarStore } from "../../../../store/index.ts";
 
 const MonthView = () => {
@@ -18,7 +17,6 @@ const MonthView = () => {
   const [isMonthModalOpen, setIsMonthModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("month");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [viewMode, setViewMode] = useState("month");
   const [calendarDate, setCalendarDate] = useState(new Date());
 
   // Zustand store에서 상태와 액션들을 가져옵니다
@@ -112,12 +110,6 @@ useEffect(() => {
     return classes.join(" ");
   };
 
-  // 연/월 선택 모달을 여는 함수
-  const openMonthModal = () => {
-    setSelectedYear(calendarDate.getFullYear());
-    setIsMonthModalOpen(true);
-    setModalMode("month");
-  };
 
   // 모달에서 연도를 선택했을 때 호출되는 함수
   const handleYearSelectInModal = (year) => {

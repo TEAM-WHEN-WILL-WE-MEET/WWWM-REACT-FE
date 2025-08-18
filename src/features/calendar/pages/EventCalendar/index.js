@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useSwipeable } from "react-swipeable";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
 
 import "moment/locale/ko";
 import { typographyVariants } from "../../../../styles/typography.ts";
-import { colorVariants, colors } from "../../../../styles/color.ts";
-import { cn } from "../../../../utils/cn.js";
+import { colorVariants } from "../../../../styles/color.ts";
 import { Button } from "../../../../components/Button.tsx";
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,10 +24,6 @@ const EventCalendar = () => {
   // console.log("user이름:",userName );
 
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
-  const BASE_URL =
-    process.env.NODE_ENV === "production"
-      ? process.env.REACT_APP_WWWM_BE_ENDPOINT
-      : process.env.REACT_APP_WWWM_BE_DEV_EP;
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -56,12 +50,10 @@ const EventCalendar = () => {
   const appointmentId =
     searchParams.get("appointmentId") || state.appointmentId;
   const userName = state.userName || currentUserName;
-  const responseData = state.responseData;
   // console.log("userName:: ",userName);
   const [userList, setUserList] = useState("");
   const [hoverUserList, setHoverUserList] = useState([]);
   const [isTimeslotAreaHovered, setIsTimeslotAreaHovered] = useState(true);
-  const [result, setResult] = useState("");
 
   const [showToast, setShowToast] = useState(false);
 
@@ -272,7 +264,6 @@ const EventCalendar = () => {
 
             timesFormatted.forEach((time, timeIndex) => {
               const hour = moment(time, "HH:mm").format("HH");
-              const mm = moment(time, "HH:mm").format("mm");
 
               const minutesArray = userSelections[datePath]?.[hour] || [];
 
@@ -365,10 +356,6 @@ const EventCalendar = () => {
     // );
 
     setHoverUserList(filteredUserList);
-  };
-  // 참여자 목록을 저장하는 함수
-  const handleMouseEnter = (userList) => {
-    setHoverUserList(userList);
   };
   // hover 벗어날 때 nowUserList 초기화
   const handleTimeslotLeave = () => {

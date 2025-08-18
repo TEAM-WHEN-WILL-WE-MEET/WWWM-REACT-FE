@@ -279,7 +279,6 @@ const TimePicker = ({ onCreateCalendar }) => {
               ref={meridiemDialRef}
             >
               {["오전", "오후"].map((m) => {
-                const isActive = startMeridiem === m;
                 return (
                   <div
                     key={m}
