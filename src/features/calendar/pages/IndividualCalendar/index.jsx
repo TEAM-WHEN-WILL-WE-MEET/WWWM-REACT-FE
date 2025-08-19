@@ -992,12 +992,12 @@ const IndividualCalendar = () => {
           />
         </Helmet>
         <div
-          className={`h-auto flex flex-col ${colorVariants({ bg: "gray-50" })}`}
+          className={`min-h-screen flex flex-col overflow-x-hidden ${colorVariants({ bg: "gray-50" })}`}
         >
           <div
             className={`flex ${colorVariants({
               bg: "white",
-            })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}
+            })} w-full pr-[2rem] pt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}
           >
             <img
               className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in active:scale-95"
@@ -1097,7 +1097,7 @@ const IndividualCalendar = () => {
                        }
                        tracking-[-0.35px]
                        p-[0.9rem]
-                       w-[7.4rem]
+                       min-w-[6rem] w-[7.4rem] max-w-[7.4rem]
                        text-center
                        flex-shrink-0
                        flex-grow-0
@@ -1121,7 +1121,7 @@ const IndividualCalendar = () => {
                 )}`}
               >
                 <div
-                  className={`w-[27rem] ml-[4rem] flex items-center justify-end`}
+                  className={`w-full max-w-[27rem] ml-[2rem] sm:ml-[4rem] flex items-center justify-end`}
                 >
                   <div
                     className={`
@@ -1131,7 +1131,7 @@ const IndividualCalendar = () => {
                     !text-[1.2rem]
                     gap-[1.8rem]
                     pb-[0.4rem]
-                    w-[23.7rem]
+                    w-full max-w-[23.7rem]
                   `}
                   >
                     {minuteSlot.map((num, index) => (
@@ -1198,6 +1198,7 @@ const IndividualCalendar = () => {
                   </div>
                 ))}
               </div>
+              <div className="flex-1"></div>
               <div className="flex items-center justify-center mb-[1.4rem]">
                 <input
                   type="checkbox"
@@ -1241,12 +1242,12 @@ const IndividualCalendar = () => {
         />
       </Helmet>
       <div
-        className={`h-auto flex flex-col ${colorVariants({ bg: "gray-50" })}`}
+        className={`min-h-screen flex flex-col overflow-x-hidden ${colorVariants({ bg: "gray-50" })}`}
       >
         <div
           className={`flex ${colorVariants({
             bg: "white",
-          })} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}
+          })} w-full pr-[2rem] pt-[2rem] h-[4.8rem] flex-row items-center gap-[0.8rem]`}
         >
           <img
             className="bg-none cursor-pointer pl-px-[1rem] pt-px-[0.8rem] transition-colors duration-200 ease-in active:scale-95"
@@ -1331,7 +1332,7 @@ const IndividualCalendar = () => {
             { bg: "gray-50" }
           )}`}
         >
-          <div className={`w-[27rem] ml-[4rem] flex items-center justify-end`}>
+          <div className={`w-full max-w-[27rem] ml-[2rem] sm:ml-[4rem] flex items-center justify-end`}>
             <div
               className={`
               ${typographyVariants({ variant: "d3-rg" })} 
@@ -1340,7 +1341,7 @@ const IndividualCalendar = () => {
               !text-[1.2rem]
               gap-[1.8rem]
               pb-[0.4rem]
-              w-[23.7rem]
+              w-full max-w-[23.7rem]
             `}
             >
               {minuteSlot.map((num, index) => (
@@ -1405,6 +1406,7 @@ const IndividualCalendar = () => {
             </div>
           ))}
         </div>
+        <div className="flex-1"></div>
         <div className="flex items-center justify-center mb-[1.4rem]">
           <input
             type="checkbox"

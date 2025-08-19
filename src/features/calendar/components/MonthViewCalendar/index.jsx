@@ -36,7 +36,7 @@ const MonthView = () => {
     clsx(
       //default
       "flex",
-      "w-[320px]",
+      "w-full",
       "h-[40px]",
       "flex-col",
       "justify-end",
@@ -212,7 +212,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex flex-col w-auto h-auto !px-[0.8rem]">
+    <div className="flex flex-col w-auto min-h-screen">
       <div className="flex justify-between items-center w-full">
         <img
           alt="언제볼까? 서비스 로고"

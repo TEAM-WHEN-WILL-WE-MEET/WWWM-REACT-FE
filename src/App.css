@@ -20,10 +20,10 @@
 
 body{
   overflow-y: scroll;
+  overflow-x: hidden;
   -ms-overflow-style: none;
- scrollbar-width: none;
- -ms-overflow-style: none;
- scrollbar-gutter: stable
+  scrollbar-width: none;
+  scrollbar-gutter: stable;
 }
 	/* 크롬, 사파리, 오페라 스크롤바 옵션 */
 
@@ -65,10 +65,11 @@ body{
 }
 
 .App {
-  width: 360px; 
-  height: 800px;
+  width: 100%;
+  max-width: 48rem; /* 480px */
+  min-height: 100vh;
   margin: 0 auto !important;
-  padding: 0;  
+  padding: 0; /* 양쪽 여백 제거 */
 }
 /* 사용자가 다크모드일 시 */
 /* Chrome, Edge에서 라이트모드로 전환되는거 확인, 삼성인터넷은 브라우저 자체가 지원X */
@@ -93,7 +94,7 @@ body{
 /* 모바일 퍼스트 */
 /* 가장 작은 디바이스를 우선으로 작성한 뒤 뷰포트를 확대하면서 분기점 추가가 */
  
-/* 소형 모바일 (가로 360 이하) */
+/* 소형 모바일 (가로 360px 이하) */
 @media (max-width: 360px) {
   html {
     font-size: 62.5%;
@@ -102,20 +103,21 @@ body{
     font-size: 1.4rem; /* 1.4 * 10px = 14px */
   }
   .App {
-    width: 31.5rem; /* 10px * 31.5 = 315px */
-    margin: 0 auto;
+    padding: 0; /* 여백 제거 */
   }
 }
 
-/* 중/대형 모바일 (가로 361px ~ 812px 정도) */
+/* 중/대형 모바일 (가로 361px ~ 812px) */
 @media (min-width: 361px) and (max-width: 812px) {
-  /* html {
-    font-size: 62.5%; 
+  .App {
+    padding: 0; /* 여백 제거 */
   }
-  body {
-    font-size: 1.5rem; 
-  } */
-  /* 15px * 24 = 360px  */
+}
 
+/* 태블릿 이상 (813px 이상) */
+@media (min-width: 813px) {
+  .App {
+    padding: 0; /* 여백 제거 */
+  }
 }
 
