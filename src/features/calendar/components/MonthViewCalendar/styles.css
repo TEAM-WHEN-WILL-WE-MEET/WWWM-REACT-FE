@@ -22,13 +22,15 @@
 }
 
 .react-calendar__month-view__days {
-  display: grid;
+  display: grid !important;
   grid-template-columns: repeat(7, 1fr) !important;
   gap: 0;
   row-gap: 0.8rem;
   column-gap: 0.5rem !important;
   justify-content: start;
-  width: fit-content;
+  width: 100% !important;
+  box-sizing: border-box;
+
 }
 
 .react-calendar--doubleView {
@@ -65,31 +67,34 @@
   color: #767676;
   font-size: 1.2rem;
   font-weight: 500;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  column-gap: 0.5rem;
   padding: 0;
-  justify-content: center;
-  align-items: center;
+  width: 100% !important;
+  box-sizing: border-box;
 }
 
 .react-calendar__month-view__weekdays__weekday {
-  max-width: 4.2rem;
-  margin-left: 0.4rem;
   display: flex;
-  width: auto;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
   height: 2rem;
   padding: 1rem;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .react-calendar__tile {
   transition: background-color 0.3s ease;
   display: flex;
-  max-width: 4.2rem;
+  width: 100% !important;
+  max-width:55px;
+  min-width: 0 !important;
+  justify-content:center;
   min-height: 4.4rem;
   padding: 1rem;
   justify-content: center;
@@ -106,6 +111,7 @@
   font-weight: 400;
   line-height: var(--Height-16, 1.6rem);
   letter-spacing: -0.35px;
+  box-sizing: border-box;
 }
 
 .month-button {
@@ -157,4 +163,5 @@
   border: 0.1rem solid var(--gray-100); /* 1px */
   background: var(--gray-50);
   color: var(--gray-600, #767676);
+  
 }
