@@ -227,7 +227,7 @@ useEffect(() => {
           onClick={() => navigate("/menu")}
         />
       </div>
-      <div className="relative px-4">
+      <div className="relative px-4 flex justify-center items-center">
         <input
           className={inputClasses}
           type="text"
@@ -241,8 +241,7 @@ useEffect(() => {
         <img
           alt="캘린더 제목 지우기 버튼"
           src="/Icon_X.svg"
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-[3.2rem] h-[3.2rem] cursor-pointer"
-          style={{ cursor: "pointer" }}
+          className="absolute right-6 top-1/3 transform -translate-y-1/2 w-[3.2rem] h-[3.2rem] cursor-pointer"
           onClick={handleClear}
         />
       </div>
