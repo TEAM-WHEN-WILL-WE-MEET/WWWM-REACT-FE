@@ -34,6 +34,9 @@ const Register = () => {
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isNameValid, setIsNameValid] = useState(false);
 
+  // 도메인 관련 상태 추가
+  const [domainError, setDomainError] = useState("");
+
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
   const domainOptions = [
@@ -87,10 +90,30 @@ const Register = () => {
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
     setEmailDomain(value);
+    
+    // 커스텀 도메인인 경우 유효성 검사
+    if (customDomain) {
+      validateDomain(value);
+    }
+    
     const isValid =
       emailId.trim().length > 0 &&
-      (customDomain ? value.includes(".") : value.trim().length > 0);
+      (customDomain ? value.includes(".") && !domainError : value.trim().length > 0);
     setIsEmailValid(isValid);
+  };
+
+  // 도메인 유효성 검사 함수
+  const validateDomain = (domain) => {
+    // 도메인 형식 검증 (최소한 점이 포함되고 올바른 형식)
+    const domainPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
+    
+    if (!domain.trim()) {
+      setDomainError("도메인을 입력해주세요.");
+    } else if (!domainPattern.test(domain.trim())) {
+      setDomainError("올바른 도메인 형식을 입력해주세요. (예: example.com)");
+    } else {
+      setDomainError("");
+    }
   };
 
   const handleNameChange = (e) => {
@@ -103,10 +126,12 @@ const Register = () => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
+      setDomainError("");
       setIsEmailValid(false);
     } else {
       setCustomDomain(false);
       setEmailDomain(domain);
+      setDomainError("");
       setIsEmailValid(emailId.trim().length > 0);
     }
     setShowDomainDropdown(false);
@@ -265,7 +290,7 @@ const Register = () => {
                     "block mb-2"
                   )}
                 ></label>
-                <div className="flex w-full  items-center justify-center">
+                <div className="flex w-[32rem] items-center justify-center">
                   <div className="relative flex-shrink-0">
                     <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
                       *
@@ -294,21 +319,56 @@ const Register = () => {
                   <span className="mx-4 text-[2rem] text-gray-500 flex-shrink-0">
                     @
                   </span>
-                  <div className="relative flex-1 max-w-[14.4rem] z-30">
+                  <div className="relative w-[14.4rem] z-30">
                     {customDomain ? (
-                      <input
-                        type="text"
-                        value={emailDomain}
-                        onChange={handleEmailDomainChange}
-                        className={cn(
-                          inputClasses(
-                            emailDomain.length === 0,
-                            error && emailDomain.length === 0
-                          ),
-                          "w-full border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={emailDomain}
+                          onChange={handleEmailDomainChange}
+                          className={cn(
+                            inputClasses(
+                              emailDomain.length === 0,
+                              error && emailDomain.length === 0
+                            ),
+                            "w-full pr-[2.5rem] border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                          )}
+                          placeholder="도메인 입력"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowDomainDropdown(!showDomainDropdown)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
+                        >
+                          <img
+                            src="/dropdwonarrow.svg"
+                            alt="도메인 선택"
+                            className={cn(
+                              "w-[1.2rem] h-[0.6rem] transition-transform",
+                              showDomainDropdown && "transform rotate-180"
+                            )}
+                          />
+                        </button>
+                        {showDomainDropdown && (
+                          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            {domainOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => handleDomainSelect(option.value)}
+                                className={cn(
+                                  "w-full px-5 py-3 text-left hover:bg-gray-50",
+                                  typographyVariants({ variant: "b2-md" })
+                                )}
+                              >
+                                {option.value === "custom"
+                                  ? option.label
+                                  : `${option.label}`}
+                              </button>
+                            ))}
+                          </div>
                         )}
-                        placeholder="도메인 입력"
-                      />
+                      </div>
                     ) : (
                       <>
                         <button
@@ -354,6 +414,20 @@ const Register = () => {
                       </>
                     )}
                   </div>
+                </div>
+                {/* 도메인 에러 메시지 */}
+                <div className="w-[32rem] relative min-h-[1.5rem]">
+                  {customDomain && domainError && (
+                  <div
+                    className={cn(
+                      typographyVariants({ variant: "d3-rg" }),
+                      colorVariants({ color: "red-300" }),
+                      "mt-2  w-full text-left text-[1.3rem]"
+                    )}
+                  >
+                    {domainError}
+                  </div>
+                  )}
                 </div>
               </div>
               {/* 비밀번호 */}
