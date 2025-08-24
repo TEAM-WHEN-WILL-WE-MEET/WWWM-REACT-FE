@@ -214,8 +214,7 @@ const Login = () => {
           setResponseMessage("로그인 응답 처리 중 오류가 발생했습니다.");
         }
       } else if (response.status === 401) {
-        let errorMessage =
-          "등록되지 않은 정보이거나 이메일, 비밀번호가 일치하지 않습니다.";
+        let errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
 
         // 서버 응답에서 더 구체적인 오류 메시지 확인
         if (responseBody && responseBody.error) {
@@ -227,31 +226,37 @@ const Login = () => {
         setError(true);
         setResponseMessage(errorMessage);
       } else if (response.status === 400) {
-        // 400 오류에 대한 더 구체적인 처리
-        let errorMessage = "요청 정보가 올바르지 않습니다.";
+        // 400 오류에 대한 처리 - 서버 메시지 우선, 없으면 기본 인증 오류 메시지
+        let errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
 
-        // 서버 응답에서 오류 메시지 확인
+        // 서버 응답에서 오류 메시지 확인 (서버 메시지가 있으면 우선 사용)
         if (responseBody && responseBody.error) {
           errorMessage = responseBody.error;
         } else if (responseBody && responseBody.message) {
           errorMessage = responseBody.message;
         } else {
-          // 입력 값 검증
+          // 서버 메시지가 없는 경우에만 클라이언트 사이드 검증
           if (email.trim().length < 5 || !email.includes("@")) {
             errorMessage = "올바른 이메일 주소를 입력해주세요.";
           } else if (password.length < 4) {
             errorMessage = "비밀번호는 최소 4자 이상이어야 합니다.";
           } else if (password.length > 12) {
             errorMessage = "비밀번호는 최대 12자까지 가능합니다.";
-          } else {
-            errorMessage = "입력한 정보를 다시 확인해주세요. (서버 검증 실패)";
           }
+          // 나머지 경우는 기본 메시지("이메일 또는 비밀번호가 올바르지 않습니다.") 유지
         }
 
         setError(true);
         setResponseMessage(errorMessage);
       } else {
-        let errorMessage = `로그인에 실패했습니다. (오류 코드: ${response.status})`;
+        let errorMessage;
+        
+        // 일반적인 인증 실패 상태 코드들
+        if (response.status === 403 || response.status === 404) {
+          errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
+        } else {
+          errorMessage = `로그인에 실패했습니다. (오류 코드: ${response.status})`;
+        }
 
         // 서버 응답에서 오류 메시지 확인
         if (responseBody && responseBody.error) {
