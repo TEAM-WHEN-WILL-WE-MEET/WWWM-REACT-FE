@@ -26,6 +26,10 @@ const Login = () => {
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
 
+  // 비밀번호 관련 상태 추가
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
   const domainOptions = [
@@ -81,6 +85,24 @@ const Login = () => {
       setEmailDomain(domain);
     }
     setShowDomainDropdown(false);
+  };
+
+  // 비밀번호 유효성 검사 함수 추가
+  const validatePassword = (value) => {
+    if (value.length < 4) {
+      setPasswordError("비밀번호는 최소 4자 이상이어야 합니다.");
+    } else if (value.length > 12) {
+      setPasswordError("비밀번호는 최대 12자까지 가능합니다.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  // password onChange 핸들러 수정
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
   };
 
   const handleKakaoLogin = async () => {
@@ -447,9 +469,9 @@ const Login = () => {
                   <div className="relative flex-2 !w-[32rem]">
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                       className={cn(
                         inputClasses(
                           password.length === 0,
@@ -460,10 +482,40 @@ const Login = () => {
                         colorVariants({ color: "gray-700" }),
                         "placeholder:text-[var(--gray-500)]"
                       )}
-                      placeholder="비밀번호를 입력하세요"
+                      placeholder="비밀번호 (4~12자)"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute z-10 right-2 top-1/2 -translate-y-1/2  flex items-center justify-center"
+                    >
+                      <img
+                        src={
+                          showPassword
+                            ? "/icon-view-open.svg"
+                            : "/icon-view.svg"
+                        }
+                        alt={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                        className="w-[2.4rem] h-[2.4rem]"
+                      />
+                    </button>
                   </div>
+                </div>
+                <div
+                  className="w-[32rem]  relative"
+                >
+                  {passwordError && (
+                    <div
+                      className={cn(
+                        typographyVariants({ variant: "d3-rg" }),
+                        colorVariants({ color: "red-300" }),
+                        "absolute left-0 top-3 w-full text-left whitespace-nowrap z-[999]"
+                      )}
+                    >
+                      {passwordError}
+                    </div>
+                  )}
                 </div>
               </div>
 
