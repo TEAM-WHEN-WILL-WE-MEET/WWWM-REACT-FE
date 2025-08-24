@@ -184,9 +184,8 @@ const Register = () => {
       }
 
       if (response.status === 201 || response.status === 200) {
-        // setResponseMessage(
-        //   `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
-        // );
+        setError(false);
+        setResponseMessage("회원가입 성공!");
 
         setTimeout(() => {
           const redirectUrl = searchParams.get("redirect");
@@ -198,10 +197,10 @@ const Register = () => {
             state: {
               registeredName: name,
               registeredEmail: email,
-              // message: `회원가입한 이름(${name}) 또는 이메일(${email})로 로그인하세요.`,
+              message: `회원가입한 이메일(${email})로 로그인하세요.`,
             },
           });
-        }, 200);
+        }, 1500);
       } else if (response.status === 409) {
         setError(true);
         setResponseMessage("이미 등록된 이메일입니다.");
@@ -541,7 +540,9 @@ const Register = () => {
                 <div
                   className={cn(
                     "text-center  whitespace-nowrap  overflow-x-auto",
-                    error ? colorVariants({ color: "red-300" }) : " "
+                    error 
+                      ? colorVariants({ color: "red-300" }) 
+                      : colorVariants({ color: "green-600" })
                   )}
                   style={{ whiteSpace: "nowrap" }}
                 >
