@@ -124,6 +124,19 @@ const Login = () => {
       return;
     }
 
+    // 비밀번호 길이 검증
+    if (password.length < 4) {
+      setError(true);
+      setResponseMessage("비밀번호는 최소 4자 이상이어야 합니다.");
+      return;
+    }
+
+    if (password.length > 12) {
+      setError(true);
+      setResponseMessage("비밀번호는 최대 12자까지 가능합니다.");
+      return;
+    }
+
     setLoading(true);
     setError(false);
     setResponseMessage("");
@@ -226,8 +239,10 @@ const Login = () => {
           // 입력 값 검증
           if (email.trim().length < 5 || !email.includes("@")) {
             errorMessage = "올바른 이메일 주소를 입력해주세요.";
-          } else if (password.length < 2) {
-            errorMessage = "비밀번호는 2글자 이상 입력해주세요.";
+          } else if (password.length < 4) {
+            errorMessage = "비밀번호는 최소 4자 이상이어야 합니다.";
+          } else if (password.length > 12) {
+            errorMessage = "비밀번호는 최대 12자까지 가능합니다.";
           } else {
             errorMessage = "입력한 정보를 다시 확인해주세요. (서버 검증 실패)";
           }
