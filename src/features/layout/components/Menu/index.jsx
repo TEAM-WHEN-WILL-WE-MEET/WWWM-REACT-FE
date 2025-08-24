@@ -227,7 +227,7 @@ export default function Menu() {
           <button
             onClick={() => {
               closeSidebar();
-              navigate("/");
+              navigate("/MonthView");
             }}
             className={`items-end p-[1.2rem]`}
           >
