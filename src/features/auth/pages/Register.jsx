@@ -477,21 +477,6 @@ const Register = () => {
                 </div>
               )}
             </div>
-            {/* 로그인 유지하기 체크박스 */}
-            <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
-              <label className="register-checkbox-container">
-                <input type="checkbox" className="register-checkbox" />
-                <span className="register-checkmark"></span>
-                <span
-                  className={cn(
-                    typographyVariants({ variant: "b2-md" }),
-                    colorVariants({ color: "gray-700" })
-                  )}
-                >
-                  로그인 유지하기
-                </span>
-              </label>
-            </div>
             {/* 카카오톡으로 연결 */}
             <Button
               type="submit"
@@ -500,7 +485,7 @@ const Register = () => {
                 !(isPasswordValid && isEmailValid && isNameValid) || loading
               }
               additionalClass={cn(
-                "mt-6 flex items-center justify-center gap-2",
+                "mt-[6.4rem] flex items-center justify-center gap-2",
                 colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
                 "!text-[var(--kakao-black)]"
               )}
