@@ -178,9 +178,16 @@ const Register = () => {
       // console.log(`API 응답 상태:`, response.status);
       // console.log("Response headers:", response.headers);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Error response body:", errorText);
+      // 응답 본문 확인 (성공/실패 모두)
+      let responseBody = null;
+      const responseText = await response.text();
+      console.log("Response body (text):", responseText);
+
+      try {
+        responseBody = JSON.parse(responseText);
+        console.log("Response body (parsed):", responseBody);
+      } catch (e) {
+        console.log("Response body를 JSON으로 파싱할 수 없음:", e.message);
       }
 
       if (response.status === 201 || response.status === 200) {
@@ -202,24 +209,81 @@ const Register = () => {
           });
         }, 1500);
       } else if (response.status === 409) {
+        // 이미 등록된 이메일
+        let errorMessage = "이미 등록된 이메일입니다.";
+        
+        // 서버 응답에서 더 구체적인 메시지 확인
+        if (responseBody && responseBody.error) {
+          errorMessage = responseBody.error;
+        } else if (responseBody && responseBody.message) {
+          errorMessage = responseBody.message;
+        }
+        
         setError(true);
-        setResponseMessage("이미 등록된 이메일입니다.");
+        setResponseMessage(errorMessage);
       } else if (response.status === 400) {
+        // 잘못된 요청 형식 - 이메일 중복도 400으로 올 수 있음
+        console.log("==== 400 에러 디버깅 ====");
+        console.log("responseBody:", responseBody);
+        
+        let errorMessage = "이미 등록된 이메일입니다."; // 기본값을 이메일 중복으로 변경
+        
+        // 서버 응답에서 더 구체적인 메시지 확인
+        if (responseBody) {
+          if (responseBody.error) {
+            console.log("서버 error 메시지:", responseBody.error);
+            errorMessage = responseBody.error;
+          } else if (responseBody.message) {
+            console.log("서버 message 메시지:", responseBody.message);
+            errorMessage = responseBody.message;
+          }
+          
+          // 만약 이메일 중복이 아닌 다른 400 에러라면 구분
+          if (errorMessage.toLowerCase().includes("password") || 
+              errorMessage.toLowerCase().includes("비밀번호") ||
+              errorMessage.toLowerCase().includes("name") ||
+              errorMessage.toLowerCase().includes("이름")) {
+            errorMessage = "입력 정보가 올바르지 않습니다.";
+          }
+        }
+        
+        console.log("최종 에러 메시지:", errorMessage);
         setError(true);
-        setResponseMessage("입력 정보가 올바르지 않습니다.");
+        setResponseMessage(errorMessage);
+      } else if (response.status === 422) {
+        // 유효성 검사 실패 (이메일 중복 등)
+        let errorMessage = "이미 등록된 이메일입니다.";
+        
+        if (responseBody && responseBody.error) {
+          errorMessage = responseBody.error;
+        } else if (responseBody && responseBody.message) {
+          errorMessage = responseBody.message;
+        }
+        
+        setError(true);
+        setResponseMessage(errorMessage);
       } else {
         setError(true);
+        let errorMessage;
+        
         if (response.status === 500) {
-          setResponseMessage(
-            "서버에서 회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요."
-          );
+          errorMessage = "서버에서 회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요.";
         } else if (response.status === 404) {
-          setResponseMessage(
-            "회원가입 기능이 현재 사용할 수 없습니다. 기존 계정으로 로그인해주세요."
-          );
+          errorMessage = "회원가입 기능이 현재 사용할 수 없습니다. 기존 계정으로 로그인해주세요.";
+        } else if (response.status === 503) {
+          errorMessage = "서비스가 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.";
         } else {
-          setResponseMessage("회원가입에 실패했습니다.");
+          errorMessage = "회원가입에 실패했습니다.";
         }
+        
+        // 서버 응답에서 오류 메시지 확인
+        if (responseBody && responseBody.error) {
+          errorMessage = responseBody.error;
+        } else if (responseBody && responseBody.message) {
+          errorMessage = responseBody.message;
+        }
+        
+        setResponseMessage(errorMessage);
       }
     } catch (error) {
       console.error("Register error:", error);
