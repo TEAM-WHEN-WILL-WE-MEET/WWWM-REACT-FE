@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { typographyVariants } from "../../../styles/typography.ts";
@@ -10,9 +10,9 @@ import "../styles/Register.css";
 
 const Register = () => {
   const BASE_URL =
-    process.env.NODE_ENV === "production"
-      ? process.env.REACT_APP_WWWM_BE_ENDPOINT
-      : process.env.REACT_APP_WWWM_BE_DEV_EP;
+    import.meta.env.PROD
+      ? import.meta.env.VITE_WWWM_BE_ENDPOINT
+      : import.meta.env.VITE_WWWM_BE_DEV_EP;
 
   const navigate = useNavigate();
   const location = useLocation();

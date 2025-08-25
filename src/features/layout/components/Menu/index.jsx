@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../components/Button.tsx";
 import { fetchApi } from "../../../../utils/api.ts";
 import { API_ENDPOINTS } from "../../../../config/environment.ts";
 import { useUserStore } from "../../../../store/userStore";
 
-import { colors, colorVariants } from "../../../../styles/color.ts";
+import { colorVariants } from "../../../../styles/color.ts";
 import { typographyVariants } from "../../../../styles/typography.ts";
 
 export default function Menu() {
@@ -19,7 +17,6 @@ export default function Menu() {
   const navigate = useNavigate();
   // 2) 체크박스에서 선택된 아이템의 id들을 별도로 저장
   const [selectedIds, setSelectedIds] = useState([]);
-  const [isSelected, setisSelected] = useState(false);
 
   // 모달 열림/닫힘 상태
   const [showModal, setShowModal] = useState(false);
@@ -433,7 +430,7 @@ export default function Menu() {
                       className={`  ${colorVariants({
                         bg: "red-300",
                         color: "white",
-                      })} text-[1.4rem] rounded-[0.6rem] w-[11rem] h-[4rem]  \py-[1.2rem]  text-[var(--white)] `}
+                      })} text-[1.4rem] rounded-[0.6rem] w-[11rem] h-[4rem]  py-[1.2rem]  text-[var(--white)] `}
                     >
                       삭제
                     </button>
@@ -510,7 +507,7 @@ export default function Menu() {
                       className={`  ${colorVariants({
                         bg: "gray-900",
                         color: "white",
-                      })} text-[1.4rem] rounded-[0.6rem] w-[11rem] h-[4rem]  \py-[1.2rem]  text-[var(--white)] `}
+                      })} text-[1.4rem] rounded-[0.6rem] w-[11rem] h-[4rem]  py-[1.2rem]  text-[var(--white)] `}
                     >
                       예
                     </button>

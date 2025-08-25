@@ -65,9 +65,9 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     try {
       const BASE_URL =
-        process.env.NODE_ENV === "production"
-          ? process.env.REACT_APP_WWWM_BE_ENDPOINT
-          : process.env.REACT_APP_WWWM_BE_DEV_EP;
+        import.meta.env.PROD
+          ? import.meta.env.VITE_WWWM_BE_ENDPOINT
+          : import.meta.env.VITE_WWWM_BE_DEV_EP;
 
       // console.log("=== 내 정보 조회 API 호출 ===");
       // console.log("BASE_URL:", BASE_URL);

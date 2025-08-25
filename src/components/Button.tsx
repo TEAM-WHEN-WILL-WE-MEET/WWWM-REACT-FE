@@ -1,7 +1,7 @@
 import { cn } from "../utils/cn";
 import { cva, VariantProps } from "class-variance-authority";
 import { ButtonHTMLAttributes, FC } from "react";
-import { colors, colorVariants } from "../styles/color";
+import { colors } from "../styles/color";
 import { typographyVariants } from "../styles/typography";
 import React from "react";
 /**
