@@ -16,6 +16,7 @@ import { useAppointmentStore } from "../../../../store/appointmentStore";
 import { useUserStore } from "../../../../store/userStore";
 
 const EventCalendar = () => {
+  
   // const { responseData, appointmentId, userSchedule } = location.state;
 
   // console.log("받은 전체 responseData 구조:", responseData);
