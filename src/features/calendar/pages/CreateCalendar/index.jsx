@@ -49,8 +49,10 @@ const CreateCalendar = () => {
           <p>{error}</p>
         </div>
       )}
-      <MonthView />
-      <TimePicker onCreateCalendar={handleCalendarCreation} />
+      <div className="min-h-screen flex flex-col">
+        <MonthView />
+        <TimePicker onCreateCalendar={handleCalendarCreation} />
+      </div>
     </>
   );
 };

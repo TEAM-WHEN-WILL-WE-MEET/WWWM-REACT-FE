@@ -232,7 +232,7 @@ const TimePicker = ({ onCreateCalendar }) => {
 
   return (
     <div className="flex flex-col items-center mt-5 p-5">
-      <div className="flex flex-col items-start space-y-4 p-0 w-[32rem] h-[22.4rem]">
+      <div className="flex flex-col items-start space-y-4 p-0 w-full max-w-[32rem] h-[22.4rem]">
         <div
           className={cn(
             "flex justify-between w-full cursor-pointer ",
@@ -589,7 +589,7 @@ const TimePicker = ({ onCreateCalendar }) => {
         />
         {showConfirmModal && (
           <div className="modal-backdrop fixed !m-0 inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
-            <div className="modal flex flex-col gap-[2rem] p-[2.4rem] bg-white text-center w-[28rem] h-[16rem] rounded-[1.2rem] shadow-md">
+            <div className="modal flex flex-col gap-[2rem] p-[2.4rem] bg-white text-center w-full max-w-[28rem] h-[16rem] rounded-[1.2rem] shadow-md mx-4">
               <div className="flex flex-col gap-[1.2rem]">
                 <p
                   className={`
