@@ -34,6 +34,9 @@ const Register = () => {
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isNameValid, setIsNameValid] = useState(false);
 
+  // 도메인 관련 상태 추가
+  const [domainError, setDomainError] = useState("");
+
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
   const domainOptions = [
@@ -87,10 +90,30 @@ const Register = () => {
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
     setEmailDomain(value);
+    
+    // 커스텀 도메인인 경우 유효성 검사
+    if (customDomain) {
+      validateDomain(value);
+    }
+    
     const isValid =
       emailId.trim().length > 0 &&
-      (customDomain ? value.includes(".") : value.trim().length > 0);
+      (customDomain ? value.includes(".") && !domainError : value.trim().length > 0);
     setIsEmailValid(isValid);
+  };
+
+  // 도메인 유효성 검사 함수
+  const validateDomain = (domain) => {
+    // 도메인 형식 검증 (최소한 점이 포함되고 올바른 형식)
+    const domainPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
+    
+    if (!domain.trim()) {
+      setDomainError("도메인을 입력해주세요.");
+    } else if (!domainPattern.test(domain.trim())) {
+      setDomainError("올바른 도메인 형식을 입력해주세요. (예: example.com)");
+    } else {
+      setDomainError("");
+    }
   };
 
   const handleNameChange = (e) => {
@@ -103,10 +126,12 @@ const Register = () => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
+      setDomainError("");
       setIsEmailValid(false);
     } else {
       setCustomDomain(false);
       setEmailDomain(domain);
+      setDomainError("");
       setIsEmailValid(emailId.trim().length > 0);
     }
     setShowDomainDropdown(false);
@@ -153,15 +178,21 @@ const Register = () => {
       // console.log(`API 응답 상태:`, response.status);
       // console.log("Response headers:", response.headers);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Error response body:", errorText);
+      // 응답 본문 확인 (성공/실패 모두)
+      let responseBody = null;
+      const responseText = await response.text();
+      console.log("Response body (text):", responseText);
+
+      try {
+        responseBody = JSON.parse(responseText);
+        console.log("Response body (parsed):", responseBody);
+      } catch (e) {
+        console.log("Response body를 JSON으로 파싱할 수 없음:", e.message);
       }
 
       if (response.status === 201 || response.status === 200) {
-        // setResponseMessage(
-        //   `회원가입이 완료되었습니다! 로그인 시 이름: "${name}", 이메일: "${email}"을 사용하세요.`
-        // );
+        setError(false);
+        setResponseMessage("회원가입 성공!");
 
         setTimeout(() => {
           const redirectUrl = searchParams.get("redirect");
@@ -173,29 +204,86 @@ const Register = () => {
             state: {
               registeredName: name,
               registeredEmail: email,
-              // message: `회원가입한 이름(${name}) 또는 이메일(${email})로 로그인하세요.`,
+              message: `회원가입한 이메일(${email})로 로그인하세요.`,
             },
           });
-        }, 200);
+        }, 1500);
       } else if (response.status === 409) {
+        // 이미 등록된 이메일
+        let errorMessage = "이미 등록된 이메일입니다.";
+        
+        // 서버 응답에서 더 구체적인 메시지 확인
+        if (responseBody && responseBody.error) {
+          errorMessage = responseBody.error;
+        } else if (responseBody && responseBody.message) {
+          errorMessage = responseBody.message;
+        }
+        
         setError(true);
-        setResponseMessage("이미 등록된 이메일입니다.");
+        setResponseMessage(errorMessage);
       } else if (response.status === 400) {
+        // 잘못된 요청 형식 - 이메일 중복도 400으로 올 수 있음
+        console.log("==== 400 에러 디버깅 ====");
+        console.log("responseBody:", responseBody);
+        
+        let errorMessage = "이미 등록된 이메일입니다."; // 기본값을 이메일 중복으로 변경
+        
+        // 서버 응답에서 더 구체적인 메시지 확인
+        if (responseBody) {
+          if (responseBody.error) {
+            console.log("서버 error 메시지:", responseBody.error);
+            errorMessage = responseBody.error;
+          } else if (responseBody.message) {
+            console.log("서버 message 메시지:", responseBody.message);
+            errorMessage = responseBody.message;
+          }
+          
+          // 만약 이메일 중복이 아닌 다른 400 에러라면 구분
+          if (errorMessage.toLowerCase().includes("password") || 
+              errorMessage.toLowerCase().includes("비밀번호") ||
+              errorMessage.toLowerCase().includes("name") ||
+              errorMessage.toLowerCase().includes("이름")) {
+            errorMessage = "입력 정보가 올바르지 않습니다.";
+          }
+        }
+        
+        console.log("최종 에러 메시지:", errorMessage);
         setError(true);
-        setResponseMessage("입력 정보가 올바르지 않습니다.");
+        setResponseMessage(errorMessage);
+      } else if (response.status === 422) {
+        // 유효성 검사 실패 (이메일 중복 등)
+        let errorMessage = "이미 등록된 이메일입니다.";
+        
+        if (responseBody && responseBody.error) {
+          errorMessage = responseBody.error;
+        } else if (responseBody && responseBody.message) {
+          errorMessage = responseBody.message;
+        }
+        
+        setError(true);
+        setResponseMessage(errorMessage);
       } else {
         setError(true);
+        let errorMessage;
+        
         if (response.status === 500) {
-          setResponseMessage(
-            "서버에서 회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요."
-          );
+          errorMessage = "서버에서 회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요.";
         } else if (response.status === 404) {
-          setResponseMessage(
-            "회원가입 기능이 현재 사용할 수 없습니다. 기존 계정으로 로그인해주세요."
-          );
+          errorMessage = "회원가입 기능이 현재 사용할 수 없습니다. 기존 계정으로 로그인해주세요.";
+        } else if (response.status === 503) {
+          errorMessage = "서비스가 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.";
         } else {
-          setResponseMessage("회원가입에 실패했습니다.");
+          errorMessage = "회원가입에 실패했습니다.";
         }
+        
+        // 서버 응답에서 오류 메시지 확인
+        if (responseBody && responseBody.error) {
+          errorMessage = responseBody.error;
+        } else if (responseBody && responseBody.message) {
+          errorMessage = responseBody.message;
+        }
+        
+        setResponseMessage(errorMessage);
       }
     } catch (error) {
       console.error("Register error:", error);
@@ -265,7 +353,7 @@ const Register = () => {
                     "block mb-2"
                   )}
                 ></label>
-                <div className="flex w-full  items-center justify-center">
+                <div className="flex w-[32rem] items-center justify-center">
                   <div className="relative flex-shrink-0">
                     <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
                       *
@@ -294,21 +382,56 @@ const Register = () => {
                   <span className="mx-4 text-[2rem] text-gray-500 flex-shrink-0">
                     @
                   </span>
-                  <div className="relative flex-1 max-w-[14.4rem] z-30">
+                  <div className="relative w-[14.4rem] z-30">
                     {customDomain ? (
-                      <input
-                        type="text"
-                        value={emailDomain}
-                        onChange={handleEmailDomainChange}
-                        className={cn(
-                          inputClasses(
-                            emailDomain.length === 0,
-                            error && emailDomain.length === 0
-                          ),
-                          "w-full border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={emailDomain}
+                          onChange={handleEmailDomainChange}
+                          className={cn(
+                            inputClasses(
+                              emailDomain.length === 0,
+                              error && emailDomain.length === 0
+                            ),
+                            "w-full pr-[2.5rem] border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                          )}
+                          placeholder="도메인 입력"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowDomainDropdown(!showDomainDropdown)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
+                        >
+                          <img
+                            src="/dropdwonarrow.svg"
+                            alt="도메인 선택"
+                            className={cn(
+                              "w-[1.2rem] h-[0.6rem] transition-transform",
+                              showDomainDropdown && "transform rotate-180"
+                            )}
+                          />
+                        </button>
+                        {showDomainDropdown && (
+                          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            {domainOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => handleDomainSelect(option.value)}
+                                className={cn(
+                                  "w-full px-5 py-3 text-left hover:bg-gray-50",
+                                  typographyVariants({ variant: "b2-md" })
+                                )}
+                              >
+                                {option.value === "custom"
+                                  ? option.label
+                                  : `${option.label}`}
+                              </button>
+                            ))}
+                          </div>
                         )}
-                        placeholder="도메인 입력"
-                      />
+                      </div>
                     ) : (
                       <>
                         <button
@@ -354,6 +477,20 @@ const Register = () => {
                       </>
                     )}
                   </div>
+                </div>
+                {/* 도메인 에러 메시지 */}
+                <div className="w-[32rem] relative min-h-[1.5rem]">
+                  {customDomain && domainError && (
+                  <div
+                    className={cn(
+                      typographyVariants({ variant: "d3-rg" }),
+                      colorVariants({ color: "red-300" }),
+                      "mt-2  w-full text-left text-[1.3rem]"
+                    )}
+                  >
+                    {domainError}
+                  </div>
+                  )}
                 </div>
               </div>
               {/* 비밀번호 */}
@@ -467,7 +604,9 @@ const Register = () => {
                 <div
                   className={cn(
                     "text-center  whitespace-nowrap  overflow-x-auto",
-                    error ? colorVariants({ color: "red-300" }) : " "
+                    error 
+                      ? colorVariants({ color: "red-300" }) 
+                      : colorVariants({ color: "green-600" })
                   )}
                   style={{ whiteSpace: "nowrap" }}
                 >
@@ -477,21 +616,6 @@ const Register = () => {
                 </div>
               )}
             </div>
-            {/* 로그인 유지하기 체크박스 */}
-            <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
-              <label className="register-checkbox-container">
-                <input type="checkbox" className="register-checkbox" />
-                <span className="register-checkmark"></span>
-                <span
-                  className={cn(
-                    typographyVariants({ variant: "b2-md" }),
-                    colorVariants({ color: "gray-700" })
-                  )}
-                >
-                  로그인 유지하기
-                </span>
-              </label>
-            </div>
             {/* 카카오톡으로 연결 */}
             <Button
               type="submit"
@@ -500,7 +624,7 @@ const Register = () => {
                 !(isPasswordValid && isEmailValid && isNameValid) || loading
               }
               additionalClass={cn(
-                "mt-6 flex items-center justify-center gap-2",
+                "mt-[6.4rem] flex items-center justify-center gap-2",
                 colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
                 "!text-[var(--kakao-black)]"
               )}

@@ -26,6 +26,13 @@ const Login = () => {
   const [responseMessage, setResponseMessage] = useState("");
   const [error, setError] = useState(false);
 
+  // 비밀번호 관련 상태 추가
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
+  // 도메인 관련 상태 추가
+  const [domainError, setDomainError] = useState("");
+
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
   const domainOptions = [
@@ -70,17 +77,56 @@ const Login = () => {
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
     setEmailDomain(value);
+    
+    // 커스텀 도메인인 경우 유효성 검사
+    if (customDomain) {
+      validateDomain(value);
+    }
+  };
+
+  // 도메인 유효성 검사 함수
+  const validateDomain = (domain) => {
+    // 도메인 형식 검증 (최소한 점이 포함되고 올바른 형식)
+    const domainPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
+    
+    if (!domain.trim()) {
+      setDomainError("도메인을 입력해주세요.");
+    } else if (!domainPattern.test(domain.trim())) {
+      setDomainError("올바른 도메인 형식을 입력해주세요. (예: example.com)");
+    } else {
+      setDomainError("");
+    }
   };
 
   const handleDomainSelect = (domain) => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
+      setDomainError("");
     } else {
       setCustomDomain(false);
       setEmailDomain(domain);
+      setDomainError("");
     }
     setShowDomainDropdown(false);
+  };
+
+  // 비밀번호 유효성 검사 함수 추가
+  const validatePassword = (value) => {
+    if (value.length < 4) {
+      setPasswordError("비밀번호는 최소 4자 이상이어야 합니다.");
+    } else if (value.length > 12) {
+      setPasswordError("비밀번호는 최대 12자까지 가능합니다.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  // password onChange 핸들러 수정
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
   };
 
   const handleKakaoLogin = async () => {
@@ -121,6 +167,19 @@ const Login = () => {
     if (emailId.trim() === "" || password.trim() === "") {
       setError(true);
       setResponseMessage("모든 필드를 입력해주세요.");
+      return;
+    }
+
+    // 비밀번호 길이 검증
+    if (password.length < 4) {
+      setError(true);
+      setResponseMessage("비밀번호는 최소 4자 이상이어야 합니다.");
+      return;
+    }
+
+    if (password.length > 12) {
+      setError(true);
+      setResponseMessage("비밀번호는 최대 12자까지 가능합니다.");
       return;
     }
 
@@ -201,8 +260,7 @@ const Login = () => {
           setResponseMessage("로그인 응답 처리 중 오류가 발생했습니다.");
         }
       } else if (response.status === 401) {
-        let errorMessage =
-          "등록되지 않은 정보이거나 이메일, 비밀번호가 일치하지 않습니다.";
+        let errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
 
         // 서버 응답에서 더 구체적인 오류 메시지 확인
         if (responseBody && responseBody.error) {
@@ -214,29 +272,37 @@ const Login = () => {
         setError(true);
         setResponseMessage(errorMessage);
       } else if (response.status === 400) {
-        // 400 오류에 대한 더 구체적인 처리
-        let errorMessage = "요청 정보가 올바르지 않습니다.";
+        // 400 오류에 대한 처리 - 서버 메시지 우선, 없으면 기본 인증 오류 메시지
+        let errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
 
-        // 서버 응답에서 오류 메시지 확인
+        // 서버 응답에서 오류 메시지 확인 (서버 메시지가 있으면 우선 사용)
         if (responseBody && responseBody.error) {
           errorMessage = responseBody.error;
         } else if (responseBody && responseBody.message) {
           errorMessage = responseBody.message;
         } else {
-          // 입력 값 검증
+          // 서버 메시지가 없는 경우에만 클라이언트 사이드 검증
           if (email.trim().length < 5 || !email.includes("@")) {
             errorMessage = "올바른 이메일 주소를 입력해주세요.";
-          } else if (password.length < 2) {
-            errorMessage = "비밀번호는 2글자 이상 입력해주세요.";
-          } else {
-            errorMessage = "입력한 정보를 다시 확인해주세요. (서버 검증 실패)";
+          } else if (password.length < 4) {
+            errorMessage = "비밀번호는 최소 4자 이상이어야 합니다.";
+          } else if (password.length > 12) {
+            errorMessage = "비밀번호는 최대 12자까지 가능합니다.";
           }
+          // 나머지 경우는 기본 메시지("이메일 또는 비밀번호가 올바르지 않습니다.") 유지
         }
 
         setError(true);
         setResponseMessage(errorMessage);
       } else {
-        let errorMessage = `로그인에 실패했습니다. (오류 코드: ${response.status})`;
+        let errorMessage;
+        
+        // 일반적인 인증 실패 상태 코드들
+        if (response.status === 403 || response.status === 404) {
+          errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
+        } else {
+          errorMessage = `로그인에 실패했습니다. (오류 코드: ${response.status})`;
+        }
 
         // 서버 응답에서 오류 메시지 확인
         if (responseBody && responseBody.error) {
@@ -316,7 +382,7 @@ const Login = () => {
                     "block mb-2"
                   )}
                 ></label>
-                <div className="flex w-full  items-center justify-center">
+                <div className="flex w-[32rem] items-center justify-center">
                   <div className="relative flex-shrink-0">
                     <span className="absolute top-1/2 -translate-y-1/2 left-[0.8rem] z-10 text-[var(--red-300)] text-[1.6rem]">
                       *
@@ -345,21 +411,56 @@ const Login = () => {
                   <span className="mx-4 text-[2rem] text-gray-500 flex-shrink-0">
                     @
                   </span>
-                  <div className="relative flex-1 max-w-[14.4rem] z-30">
+                  <div className="relative w-[14.4rem] z-30">
                     {customDomain ? (
-                      <input
-                        type="text"
-                        value={emailDomain}
-                        onChange={handleEmailDomainChange}
-                        className={cn(
-                          inputClasses(
-                            emailDomain.length === 0,
-                            error && emailDomain.length === 0
-                          ),
-                          "w-full border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={emailDomain}
+                          onChange={handleEmailDomainChange}
+                          className={cn(
+                            inputClasses(
+                              emailDomain.length === 0,
+                              error && emailDomain.length === 0
+                            ),
+                            "w-full pr-[2.5rem] border-0 border-b-[0.1rem] border-b-[var(--gray-300)] outline-none"
+                          )}
+                          placeholder="도메인 입력"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowDomainDropdown(!showDomainDropdown)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
+                        >
+                          <img
+                            src="/dropdwonarrow.svg"
+                            alt="도메인 선택"
+                            className={cn(
+                              "w-[1.2rem] h-[0.6rem] transition-transform",
+                              showDomainDropdown && "transform rotate-180"
+                            )}
+                          />
+                        </button>
+                        {showDomainDropdown && (
+                          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            {domainOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => handleDomainSelect(option.value)}
+                                className={cn(
+                                  "w-full px-10 py-3 text-left hover:bg-gray-50",
+                                  typographyVariants({ variant: "b2-md" })
+                                )}
+                              >
+                                {option.value === "custom"
+                                  ? option.label
+                                  : `${option.label}`}
+                              </button>
+                            ))}
+                          </div>
                         )}
-                        placeholder="도메인 입력"
-                      />
+                      </div>
                     ) : (
                       <>
                         <button
@@ -406,6 +507,18 @@ const Login = () => {
                     )}
                   </div>
                 </div>
+                {/* 도메인 에러 메시지 */}
+                {customDomain && domainError && (
+                  <div
+                    className={cn(
+                      typographyVariants({ variant: "d3-rg" }),
+                      colorVariants({ color: "red-300" }),
+                      "mt-2  w-full text-left text-[1.2rem]"
+                    )}
+                  >
+                    {domainError}
+                  </div>
+                )}
               </div>
 
               {/* 비밀번호 */}
@@ -427,9 +540,9 @@ const Login = () => {
                   <div className="relative flex-2 !w-[32rem]">
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                       className={cn(
                         inputClasses(
                           password.length === 0,
@@ -440,10 +553,40 @@ const Login = () => {
                         colorVariants({ color: "gray-700" }),
                         "placeholder:text-[var(--gray-500)]"
                       )}
-                      placeholder="비밀번호를 입력하세요"
+                      placeholder="비밀번호 (4~12자)"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute z-10 right-2 top-1/2 -translate-y-1/2  flex items-center justify-center"
+                    >
+                      <img
+                        src={
+                          showPassword
+                            ? "/icon-view-open.svg"
+                            : "/icon-view.svg"
+                        }
+                        alt={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                        className="w-[2.4rem] h-[2.4rem]"
+                      />
+                    </button>
                   </div>
+                </div>
+                <div
+                  className="w-[32rem]  relative"
+                >
+                  {passwordError && (
+                    <div
+                      className={cn(
+                        typographyVariants({ variant: "d3-rg" }),
+                        colorVariants({ color: "red-300" }),
+                        "absolute left-0 top-3 w-full text-left whitespace-nowrap z-[999]"
+                      )}
+                    >
+                      {passwordError}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -462,21 +605,6 @@ const Login = () => {
                 </div>
               )}
             </div>
-            {/* 로그인 유지하기 체크박스 */}
-            <div className="flex items-center justify-end w-full mt[1.2rem] mb-[6.4rem]">
-              <label className="register-checkbox-container">
-                <input type="checkbox" className="register-checkbox" />
-                <span className="register-checkmark"></span>
-                <span
-                  className={cn(
-                    typographyVariants({ variant: "b2-md" }),
-                    colorVariants({ color: "gray-700" })
-                  )}
-                >
-                  로그인 유지하기
-                </span>
-              </label>
-            </div>
             {/* 카카오톡으로 연결 */}
             <Button
               type="button"
@@ -484,7 +612,7 @@ const Login = () => {
               onClick={handleKakaoLogin}
               disabled={loading}
               additionalClass={cn(
-                "mt-6 flex items-center justify-center gap-2",
+                "mt-[6.4rem] flex items-center justify-center gap-2",
                 colorVariants({ bg: "kakao-yellow", color: "kakao-black" }),
                 "!text-[var(--kakao-black)]"
               )}

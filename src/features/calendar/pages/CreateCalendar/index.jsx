@@ -10,14 +10,6 @@ const CreateCalendar = () => {
   const navigate = useNavigate();
   const { isLoading, error, createCalendar } = useCalendarStore();
 
-  // 인증 체크: 토큰이 없으면 로그인 페이지로 리다이렉트
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      navigate("/login");
-    }
-  }, [navigate]);
-
   const handleCalendarCreation = async () => {
     try {
       const appointmentId = await createCalendar();

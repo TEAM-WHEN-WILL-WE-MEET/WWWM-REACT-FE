@@ -101,6 +101,10 @@ const EditProfile = () => {
     if (changedFields.password !== undefined) {
       if (!changedFields.password.trim()) {
         newErrors.password = "비밀번호를 입력해주세요.";
+      } else if (changedFields.password.trim().length < 4) {
+        newErrors.password = "비밀번호는 4자 이상이어야 합니다.";
+      } else if (changedFields.password.trim().length > 12) {
+        newErrors.password = "비밀번호는 12자 이하여야 합니다.";
       }
     }
 
@@ -400,27 +404,32 @@ const EditProfile = () => {
 
               
             </div>
+            
             {/* 일반 에러 메시지 */}
             {(noChangesError || errors.submit) && (
-                <div className="text-center  absolute z-[9999] whitespace-nowrap overflow-x-auto">
-                  <span
+              <div className="w-full flex justify-center mt-[2rem]">
+                <div className="w-[32rem] text-left">
+                  <div
                     className={cn(
                       typographyVariants({ variant: "b2-md" }),
                       colorVariants({ color: "red-300" }),
-                      "!text-[1.2rem]   justify-start flex z-[9999]"
+                      "text-[1.4rem]"
                     )}
                   >
-                    {noChangesError || errors.submit}
-                  </span>
+                    <div>변경된 정보가 없습니다.</div>
+                    <div>최소 1개 이상의 정보를 수정해주세요.</div>
+                  </div>
                 </div>
-              )}
+              </div>
+            )}
+
             {/* 저장 버튼 */}
             <Button
               type="submit"
               size="L"
               disabled={isSubmitting}
               additionalClass={cn(
-                "rounded-[0.8rem] mt-[6.4rem]",
+                "rounded-[0.8rem] mt-[2rem]",
                 "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]",
                 isSubmitting && "opacity-50 cursor-not-allowed"
               )}

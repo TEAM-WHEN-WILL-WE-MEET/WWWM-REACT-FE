@@ -212,7 +212,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex flex-col w-auto min-h-screen">
+    <div className="flex flex-col w-auto">
       <div className="min-w-[33rem] flex flex-col mx-auto">
         <div className="flex justify-between items-center w-full">
           <img

@@ -227,7 +227,7 @@ export default function Menu() {
           <button
             onClick={() => {
               closeSidebar();
-              navigate("/");
+              navigate("/MonthView");
             }}
             className={`items-end p-[1.2rem]`}
           >
@@ -288,7 +288,19 @@ export default function Menu() {
                     className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
                   >
                     {/* 왼쪽 체크박스 + 타이틀 */}
-                    <div className="flex items-center">
+                    <div 
+                      className="flex items-center cursor-pointer select-none flex-1"
+                      onClick={() => handleClickWithLongPress(item.id)}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        handleTitleLongPress(item.id);
+                      }}
+                      onTouchStart={() => handleTouchStart(item.id)}
+                      onTouchEnd={handleTouchEnd}
+                      onMouseDown={() => handleTouchStart(item.id)}
+                      onMouseUp={handleTouchEnd}
+                      onMouseLeave={handleTouchEnd}
+                    >
                       {isSelectionMode && (
                         <div className=" flex flex-col !items-end !justify-end  ">
                           <input
@@ -331,20 +343,8 @@ export default function Menu() {
                     ${typographyVariants({ variant: "b2-md" })}
                     !text-[1.4rem]
                     ${colorVariants({ color: "gray-800" })}
-                    hover:bg-gray-100
-                    cursor-pointer
-                    select-none
+                    pointer-events-none
                   `}
-                        onClick={() => handleClickWithLongPress(item.id)}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          handleTitleLongPress(item.id);
-                        }}
-                        onTouchStart={() => handleTouchStart(item.id)}
-                        onTouchEnd={handleTouchEnd}
-                        onMouseDown={() => handleTouchStart(item.id)}
-                        onMouseUp={handleTouchEnd}
-                        onMouseLeave={handleTouchEnd}
                       >
                         {item.title}
                       </span>
