@@ -398,12 +398,12 @@ const EventCalendar = () => {
       </Helmet>
       {loading && <Loading />} {/* 로딩 중일 때 Loading 컴포넌트 렌더링 */}
       <div
-        className={`h-auto flex flex-col ${colorVariants({ bg: "gray-50" })}`}
+        className={`min-h-screen flex flex-col overflow-x-hidden ${colorVariants({ bg: "gray-50" })}`}
       >
         <div
           className={`flex items-center flex-row justify-between ${colorVariants(
             { bg: "white" }
-          )} w-[36rem] pr-[2rem] mt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}
+          )} w-full pr-[2rem] pt-[2rem] h-[4.8rem] flex-row items-start gap-[0.8rem]`}
         >
           {/* <h2>{eventName}</h2> */}
           <div className="flex flex-row items-center">
@@ -457,7 +457,7 @@ const EventCalendar = () => {
               className={`
                 tracking-[-0.35px]
                 p-[0.9rem]
-                w-[7.4rem]
+                min-w-[6rem] w-[7.4rem] max-w-[7.4rem]
                 text-center
                 flex-shrink-0
                 flex-grow-0
@@ -501,7 +501,7 @@ const EventCalendar = () => {
         >
           <div
             className={`
-                    w-[27rem] ml-[4rem] 
+                    w-full max-w-[27rem] ml-[2rem] sm:ml-[4rem] 
                     flex items-center justify-end
                   `}
           >
@@ -513,7 +513,7 @@ const EventCalendar = () => {
                       !text-[1.2rem]
                       gap-[1.8rem]
                       pb-[0.4rem]
-                      w-[23.7rem]
+                      w-full max-w-[23.7rem]
                     `}
             >
               {minuteSlot.map((num, index) => (
@@ -628,6 +628,7 @@ const EventCalendar = () => {
             </div>
           ))}
         </div>
+        <div className="flex-1"></div>
         <div className="flex !justify-center">
           <Button
             label="내 참여시간 수정"
@@ -636,7 +637,7 @@ const EventCalendar = () => {
             additionalClass="items-center !transform-none mb-[2rem]"
           />
         </div>
-        <div className="flex flex-col h-full justify-end">
+        <div className="mt-auto">
           <div
             className={`h-[19rem] px-[2.2rem] ${colorVariants({
               bg: "white",
@@ -665,7 +666,7 @@ const EventCalendar = () => {
                 {TotalUsers}명
               </div>
             </div>
-            <div className="flex flex-wrap max-w-[31.6rem] items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
+            <div className="flex flex-wrap w-full items-start content-start !gap-x-[0.4rem] gap-y-[1.2rem] self-stretch">
               {/* 만약 slotSelectdFlag가 false면 아래 기존에 있던 userList 보여주고, True면  nowUserList 보여주기*/}
               {isTimeslotAreaHovered
                 ? hoverUserList.length > 0
@@ -730,7 +731,7 @@ const EventCalendar = () => {
                 exit={{ opacity: 0 }}
               >
                 <motion.div
-                  className="bg-white w-[36rem] h-[15.8rem] justify-center rounded-t-xl flex flex-col items-center p-4 pt-0"
+                  className="bg-white w-full max-w-[36rem] h-[15.8rem] justify-center rounded-t-xl flex flex-col items-center p-4 pt-0"
                   onClick={(e) => e.stopPropagation()}
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
