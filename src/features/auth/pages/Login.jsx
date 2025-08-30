@@ -195,17 +195,7 @@ const Login = () => {
         name: "dd",
       };
 
-      console.log("==== 로그인 요청 정보 ====");
-      console.log("BASE_URL:", BASE_URL);
-      console.log("Request data:", data);
-      console.log("Email value:", email);
-      console.log("Password value:", password);
-
       const endpoint = `/users/auth/login`;
-
-      console.log(`로그인 API 호출: ${BASE_URL}${endpoint}`);
-      console.log(`사용하는 데이터:`, data);
-
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
@@ -214,20 +204,14 @@ const Login = () => {
         body: JSON.stringify(data),
       });
 
-      console.log("==== 서버 응답 정보 ====");
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
 
       // 응답 본문 확인 (성공/실패 모두)
       let responseBody = null;
       const responseText = await response.text();
-      console.log("Response body (text):", responseText);
 
       try {
         responseBody = JSON.parse(responseText);
-        console.log("Response body (parsed):", responseBody);
       } catch (e) {
-        console.log("Response body를 JSON으로 파싱할 수 없음:", e.message);
       }
 
       if (response.status === 200) {
@@ -255,7 +239,6 @@ const Login = () => {
             }
           }, 1000);
         } else {
-          console.error("응답 데이터 형식이 예상과 다릅니다:", responseBody);
           setError(true);
           setResponseMessage("로그인 응답 처리 중 오류가 발생했습니다.");
         }
@@ -315,7 +298,6 @@ const Login = () => {
         setResponseMessage(errorMessage);
       }
     } catch (error) {
-      console.error("Login error:", error);
       setError(true);
       setResponseMessage("서버 오류가 발생했습니다.");
     } finally {

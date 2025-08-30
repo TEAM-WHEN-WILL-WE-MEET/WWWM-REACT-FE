@@ -157,7 +157,6 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
         schedules: updatedData.object.schedules,
       }));
     } catch (error) {
-      console.error("Failed to update schedule:", error);
       throw error;
     }
   },
@@ -185,7 +184,6 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
           }
         );
         results.push(disableResponse);
-        // console.log("Disable timeslots response:", disableResponse);
       }
 
       // 기존에 선택 안된 것들을 켜는 API 요청 (enabled: true)
@@ -201,7 +199,6 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
           }
         );
         results.push(enableResponse);
-        // console.log("Enable timeslots response:", enableResponse);
       }
 
       // 모든 요청이 성공했는지 확인
@@ -210,7 +207,6 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
       );
 
       if (allSuccessful) {
-        console.log("All schedule v2 updates successful");
 
         // 성공 시 새로운 약속 데이터를 가져와서 store 업데이트
         const updatedAppointment = await fetchApi(
@@ -234,7 +230,6 @@ export const useAppointmentStore = create<AppointmentState>((set) => ({
         );
       }
     } catch (error) {
-      console.error("Failed to update schedule v2:", error);
       throw error;
     }
   },

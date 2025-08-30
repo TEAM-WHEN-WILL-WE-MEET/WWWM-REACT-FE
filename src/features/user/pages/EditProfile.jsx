@@ -196,7 +196,6 @@ const EditProfile = () => {
         });
       }
     } catch (error) {
-      console.error("사용자 정보 업데이트 실패:", error);
       setErrors({ submit: "네트워크 오류가 발생했습니다. 다시 시도해주세요." });
     } finally {
       setIsSubmitting(false);

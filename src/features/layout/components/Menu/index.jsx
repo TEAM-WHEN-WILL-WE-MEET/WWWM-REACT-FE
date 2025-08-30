@@ -49,7 +49,6 @@ export default function Menu() {
           setItems(transformedItems);
         }
       } catch (err) {
-        console.error("약속 데이터 가져오기 실패:", err);
         setError(err.message);
         // 에러 시 빈 배열로 설정
         setItems([]);
@@ -136,7 +135,6 @@ export default function Menu() {
   };
 
   const handleProfileClick = () => {
-    console.log("개인정보 수정 버튼 클릭됨 - 개인정보 수정 페이지로 이동");
     navigate("/profile/edit");
   };
 
@@ -169,11 +167,9 @@ export default function Menu() {
           if (response.success) {
             return { id: appointmentId, success: true };
           } else {
-            console.error(`약속 ${appointmentId} 삭제 실패:`, response.msg);
             return { id: appointmentId, success: false, error: response.msg };
           }
         } catch (error) {
-          console.error(`약속 ${appointmentId} 삭제 중 오류:`, error);
           return { id: appointmentId, success: false, error: error.message };
         }
       });
@@ -202,7 +198,6 @@ export default function Menu() {
       setShowModal(false);
       setIsSelectionMode(false); // 선택 모드 해제
     } catch (error) {
-      console.error("약속 삭제 중 예상치 못한 오류:", error);
       alert("약속 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
   };

@@ -36,41 +36,16 @@ export async function fetchApi(endpoint: string, options: FetchOptions = {}) {
   }
 
   const fullUrl = `${API_CONFIG.BASE_URL}${endpoint}`;
-  console.log("API Request:", {
-    url: fullUrl,
-    method: options.method || "GET",
-    headers: {
-      ...headers,
-      Authorization: headers.Authorization
-        ? `${headers.Authorization.substring(0, 20)}...`
-        : undefined,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
   const response = await fetch(fullUrl, {
     ...restOptions,
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  console.log("API Response:", {
-    status: response.status,
-    statusText: response.statusText,
-    url: fullUrl,
-    ok: response.ok,
-  });
-
   if (!response.ok) {
     const error = await response
       .json()
       .catch(() => ({ message: "An error occurred" }));
-    console.error("API Error:", {
-      status: response.status,
-      statusText: response.statusText,
-      url: fullUrl,
-      error,
-    });
 
     // 새로운 백엔드 v2 응답 구조에 맞는 에러 처리
     if (error.status === "BAD_REQUEST" && error.msg) {
@@ -83,7 +58,6 @@ export async function fetchApi(endpoint: string, options: FetchOptions = {}) {
   }
 
   const responseData = await response.json();
-  console.log("API Response Data:", responseData);
 
   // 새로운 백엔드 v2 응답 구조에 맞는 추가 검증
   if (responseData.success === false && responseData.msg) {

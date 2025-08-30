@@ -13,6 +13,7 @@ const TimePicker = ({ onCreateCalendar }) => {
     isFormReady,
     setStartTime,
     setEndTime,
+    updateJsonData,
   } = useCalendarStore();
 
   const endMeridiemDialRef = useRef(null);
@@ -101,6 +102,9 @@ const TimePicker = ({ onCreateCalendar }) => {
       const hh = String(nextH).padStart(2, "0");
       setEndTime(`${hh}:00`);
     }
+    
+    // 시간 변경 시 즉시 JSON 데이터 업데이트
+    setTimeout(() => updateJsonData(), 0);
   };
 
   const meridiemDialRef = useRef(null);

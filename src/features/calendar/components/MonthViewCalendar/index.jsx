@@ -19,11 +19,12 @@ const MonthView = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [calendarDate, setCalendarDate] = useState(new Date());
 
-  // Zustand store에서 상태와 액션들을 가져옵니다
   const {
     selectedDates,
     savedDates,
     eventName,
+    startTime,
+    endTime,
     setSelectedDates,
     setSavedDates,
     setEventName,
@@ -72,9 +73,9 @@ useEffect(() => {
   }, [calendarDate, savedDates, setSelectedDates]);
 
   useEffect(() => {
-    // 선택된 날짜나 이벤트명이 변경될 때마다 API 전송용 JSON 데이터를 업데이트
+    // 선택된 날짜, 이벤트명, 시작/종료 시간이 변경될 때마다 API 전송용 JSON 데이터를 업데이트
     updateJsonData();
-  }, [selectedDates, eventName, updateJsonData]);
+  }, [selectedDates, startTime, endTime, updateJsonData]);
 
   // 이벤트명 입력 필드의 값이 변경될 때 호출
   const handleInputChange = (e) => {
