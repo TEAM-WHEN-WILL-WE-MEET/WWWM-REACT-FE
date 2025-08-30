@@ -17,12 +17,6 @@ import { useUserStore } from "../../../../store/userStore";
 
 const EventCalendar = () => {
   
-  // const { responseData, appointmentId, userSchedule } = location.state;
-
-  // console.log("받은 전체 responseData 구조:", responseData);
-  // console.log("responseData.object 구조:", responseData.object);
-  //  console.log("user 스케줄정보: ", responseData.userSchedule);
-  // console.log("user이름:",userName );
 
   // NODE_ENV에 기반하여 BASE_URL에 환경변수 할당
   const [loading, setLoading] = useState(false);
@@ -31,7 +25,6 @@ const EventCalendar = () => {
   //공유 key
   const KAKAO_SHARE_KEY = import.meta.env.VITE_WWWM_FE_KAKAO_API_KEY_SHARE;
 
-  //정상작동 console.log(" KAKAO_SHARE_KEY: ",  import.meta.env.VITE_WWWM_FE_KAKAO_API_KEY_SHARE);
   const [dates, setDates] = useState([]);
   const [times, setTimes] = useState([]);
   const [eventName, setEventName] = useState("");
@@ -51,7 +44,6 @@ const EventCalendar = () => {
   const appointmentId =
     searchParams.get("appointmentId") || state.appointmentId;
   const userName = state.userName || currentUserName;
-  // console.log("userName:: ",userName);
   const [userList, setUserList] = useState("");
   const [hoverUserList, setHoverUserList] = useState([]);
   const [isTimeslotAreaHovered, setIsTimeslotAreaHovered] = useState(true);
@@ -244,16 +236,6 @@ const EventCalendar = () => {
           setTotalUsers(responseData.object.users.length);
           setUserList(responseData.object.users);
 
-          //  디버깅: 전체 사용자 목록 구조 확인
-          // console.log(
-          //   "전체 사용자 목록 (responseData.object.users):",
-          //   responseData.object.users
-          // );
-          // console.log(
-          //   "첫 번째 사용자 객체 구조:",
-          //   responseData.object.users[0]
-          // );
-
           const savedTimes = {};
 
           datesArray.forEach((dateInfo, dateIndex) => {
@@ -303,7 +285,6 @@ const EventCalendar = () => {
           setSelectedTimes(savedTimes);
         }
       } catch (error) {
-        console.error("EventCalendar 데이터 로딩 실패:", error);
       } finally {
         setLoading(false); // 요청 끝나면 로딩끄기
       }
@@ -323,12 +304,6 @@ const EventCalendar = () => {
         }
       });
     }
-
-    // 디버깅: hover 시 사용자 목록 확인
-    // console.log("handleTimeslotHover - 원본 nowUserList:", nowUserList);
-    // if (nowUserList.length > 0) {
-    //   console.log("handleTimeslotHover - 첫 번째 사용자 구조:", nowUserList[0]);
-    // }
 
     // 사용자 ID를 실제 사용자 정보와 매핑
     const mappedUserList = nowUserList.map(user => {
@@ -351,23 +326,12 @@ const EventCalendar = () => {
 
     // 올바른 user 객체(즉, user && user.name가 존재하는 객체)만 필터링
     const filteredUserList = mappedUserList.filter((user) => user && user.name);
-    // console.log(
-    //   "handleTimeslotHover - 매핑 및 필터링 후 사용자 목록:",
-    //   filteredUserList
-    // );
-
     setHoverUserList(filteredUserList);
   };
   // hover 벗어날 때 nowUserList 초기화
   const handleTimeslotLeave = () => {
     setHoverUserList([]);
   };
-
-  // useEffect(() => {
-  //     if (selectedTimes) {
-  //         console.log("selectedTimes가 업데이트됨:", selectedTimes);
-  //     }
-  // }, [selectedTimes]);
 
   const truncateName = (name) => {
     const hasKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(name);
@@ -583,17 +547,8 @@ const EventCalendar = () => {
                     `}
                       handleMouseEnter={() => {
                         if (slot) {
-                          // 디버깅: Button hover 시 slot 데이터 확인
-                          // console.log("Button hover - slot 데이터:", slot);
-                          // console.log(
-                          //   "Button hover - slot.userList:",
-                          //   slot?.userList
-                          // );
                           if (slot?.userList && slot.userList.length > 0) {
-                            // console.log(
-                            //   "Button hover - 첫 번째 사용자 구조:",
-                            //   slot.userList[0]
-                            // );
+                            return;
                           }
 
                           // 사용자 ID를 실제 사용자 정보와 매핑
@@ -691,10 +646,6 @@ const EventCalendar = () => {
                         {/* user가 문자열이면 그대로, 객체면 user.name 사용 */}
                         {(() => {
                           // 디버깅: 렌더링 시 user 객체 확인
-                          console.log("렌더링 중인 user 객체:", user);
-                          console.log("user 타입:", typeof user);
-                          console.log("user.name:", user?.name);
-                          
                           return typeof user === "string" ? user : user?.name || "";
                         })()}
                       </div>

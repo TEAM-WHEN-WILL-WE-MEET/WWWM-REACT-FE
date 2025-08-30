@@ -247,37 +247,21 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      console.log("Creating calendar with data:", jsonData);
-      console.log("API Base URL:", API_CONFIG.BASE_URL);
-      console.log(
-        "Full API endpoint:",
-        `${API_CONFIG.BASE_URL}${API_ENDPOINTS.CREATE_APPOINTMENT}`
-      );
 
       const response: CreateAppointmentResponse = await fetchApi(API_ENDPOINTS.CREATE_APPOINTMENT, {
         method: "POST",
         body: jsonData,
       });
 
-      console.log("Calendar creation response:", response);
       
       // 새로운 백엔드 v2 응답 구조에 맞게 수정
       if (response.success && response.status === "CREATED") {
         const appointmentId = response.object.id;
-        console.log("Successfully created appointment:", appointmentId);
         return appointmentId;
       } else {
         throw new Error(response.msg || "Failed to create calendar");
       }
     } catch (error) {
-      console.error("Calendar creation failed:", error);
-      console.error("Error details:", {
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : "No stack trace",
-        jsonData,
-        apiConfig: API_CONFIG,
-      });
-
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create calendar";
       set({ error: errorMessage });

@@ -19,7 +19,6 @@ const MonthView = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [calendarDate, setCalendarDate] = useState(new Date());
 
-  // Zustand store에서 상태와 액션들을 가져옵니다
   const {
     selectedDates,
     savedDates,

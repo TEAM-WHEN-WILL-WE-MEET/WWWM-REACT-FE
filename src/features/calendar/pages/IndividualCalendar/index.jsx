@@ -158,7 +158,6 @@ const IndividualCalendar = () => {
     const dx = touch.clientX - start.startX;
     const dy = touch.clientY - start.startY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    // console.log("이거슨 distance", distance);
     const CLICK_THRESHOLD = 5;
     // const end = mobileDragEndRef.current;
     if (distance < CLICK_THRESHOLD) {
@@ -297,15 +296,6 @@ const IndividualCalendar = () => {
   // Store 데이터 확인 및 초기화
   useEffect(() => {
     const initializeData = async () => {
-      console.log("Store 상태 확인:", {
-        appointmentId,
-        eventName,
-        dates: dates?.length,
-        times: times?.length,
-        userName,
-        currentUserName,
-        responseData: !!responseData,
-      });
 
       // appointmentId가 있으면 기존 로직 실행
       if (appointmentId) {
@@ -462,7 +452,6 @@ const IndividualCalendar = () => {
         decoded.sub || decoded.userId || decoded.id || decoded.user_id || null
       );
     } catch (error) {
-      console.error("JWT 토큰 디코딩 실패:", error);
       return null;
     }
   };
@@ -482,13 +471,6 @@ const IndividualCalendar = () => {
     const currentUserName = getCurrentUserName();
     const currentUserId = currentUser.userId || extractUserIdFromToken();
 
-    console.log("=== 사용자 정보 디버깅 ===");
-    console.log("currentUser:", currentUser);
-    console.log("currentUserName:", currentUserName);
-    console.log("currentUserId (store):", currentUser.userId);
-    console.log("currentUserId (token):", extractUserIdFromToken());
-    console.log("currentUserId (final):", currentUserId);
-
     // schedules에서 현재 사용자가 선택한 timeslot 찾기
     const userSelectedTimes = {};
     const { times: storeTimes } = useAppointmentStore.getState();
@@ -503,39 +485,18 @@ const IndividualCalendar = () => {
           const timeString = timeSlot.time;
           const users = timeSlot.users || [];
 
-          // 현재 사용자가 이 시간대에 참여했는지 확인
-          // console.log("=== 시간슬롯 확인 ===");
-          // console.log("timeString:", timeString);
-          // console.log("users:", users);
-          // console.log(
-          //   "users 타입:",
-          //   users.map((u) => typeof u)
-          // );
-
           const isUserParticipated = users.some((user) => {
-            // console.log(
-            //   "비교 중 - user:",
-            //   user,
-            //   "currentUserId:",
-            //   currentUserId,
-            //   "currentUserName:",
-            //   currentUserName
-            // );
             // 사용자 ID로 비교하거나 이름으로 비교
             if (typeof user === "string") {
               const match = user === currentUserId || user === currentUserName;
-              // console.log("문자열 비교 결과:", match);
               return match;
             } else if (user && typeof user === "object") {
               const match =
                 user.id === currentUserId || user.name === currentUserName;
-              // console.log("객체 비교 결과:", match);
               return match;
             }
             return false;
           });
-
-          // console.log("isUserParticipated:", isUserParticipated);
 
           if (isUserParticipated) {
             // 시간을 파싱해서 시간과 분 추출
@@ -782,10 +743,6 @@ const IndividualCalendar = () => {
         }
       });
 
-      console.log("Original selected times:", Array.from(originalSelectedTimes));
-      console.log("Current UI selected times:", Array.from(currentUISelectedTimes));
-      console.log("Times to enable:", timesToEnable);
-      console.log("Times to disable:", timesToDisable);
 
       // 4. 수정된 v2 API 호출 (두 개의 분리된 요청)
       if (timesToEnable.length > 0 || timesToDisable.length > 0) {
@@ -802,7 +759,6 @@ const IndividualCalendar = () => {
 
       navigate(`/eventCalendar?appointmentId=${currentAppointmentId}`);
     } catch (error) {
-      console.error("Save error:", error);
       alert("서버 오류가 발생했습니다.");
     } finally {
       setLoading(false);

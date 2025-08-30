@@ -13,7 +13,6 @@ const CreateCalendar = () => {
   const handleCalendarCreation = async () => {
     try {
       const appointmentId = await createCalendar();
-      console.log("Calendar created successfully:", appointmentId);
       navigate("/individualCalendar", { 
         state: { 
           appointmentId: appointmentId,
@@ -21,7 +20,6 @@ const CreateCalendar = () => {
         }
       });
     } catch (error) {
-      console.error("Failed to create calendar:", error);
       // 에러는 이미 store에서 처리되므로 여기서는 로깅만
     }
   };

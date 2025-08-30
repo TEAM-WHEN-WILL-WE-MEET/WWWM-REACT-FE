@@ -61,7 +61,6 @@ const ProtectedRoute = ({ children }) => {
         }
       } catch (error) {
         // 네트워크 오류 등은 무시하고 계속 진행 (사용자가 오프라인일 수 있음)
-        console.warn("Auth check failed, but continuing:", error);
       }
     };
 

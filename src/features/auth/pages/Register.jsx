@@ -157,15 +157,7 @@ const Register = () => {
         name: name,
       };
 
-      // console.log("회원가입 요청 정보:");
-      // console.log("BASE_URL:", BASE_URL);
-      // console.log("Full URL:", `${BASE_URL}/users/auth/register`);
-      // console.log("Request body:", requestData);
-
       const endpoint = `/users/auth/signup`;
-
-      // console.log(`회원가입 API 호출: ${BASE_URL}${endpoint}`);
-      // console.log(`사용하는 데이터:`, requestData);
 
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
@@ -175,19 +167,14 @@ const Register = () => {
         body: JSON.stringify(requestData),
       });
 
-      // console.log(`API 응답 상태:`, response.status);
-      // console.log("Response headers:", response.headers);
 
       // 응답 본문 확인 (성공/실패 모두)
       let responseBody = null;
       const responseText = await response.text();
-      console.log("Response body (text):", responseText);
 
       try {
         responseBody = JSON.parse(responseText);
-        console.log("Response body (parsed):", responseBody);
       } catch (e) {
-        console.log("Response body를 JSON으로 파싱할 수 없음:", e.message);
       }
 
       if (response.status === 201 || response.status === 200) {
@@ -223,18 +210,14 @@ const Register = () => {
         setResponseMessage(errorMessage);
       } else if (response.status === 400) {
         // 잘못된 요청 형식 - 이메일 중복도 400으로 올 수 있음
-        console.log("==== 400 에러 디버깅 ====");
-        console.log("responseBody:", responseBody);
         
         let errorMessage = "이미 등록된 이메일입니다."; // 기본값을 이메일 중복으로 변경
         
         // 서버 응답에서 더 구체적인 메시지 확인
         if (responseBody) {
           if (responseBody.error) {
-            console.log("서버 error 메시지:", responseBody.error);
             errorMessage = responseBody.error;
           } else if (responseBody.message) {
-            console.log("서버 message 메시지:", responseBody.message);
             errorMessage = responseBody.message;
           }
           
@@ -247,7 +230,6 @@ const Register = () => {
           }
         }
         
-        console.log("최종 에러 메시지:", errorMessage);
         setError(true);
         setResponseMessage(errorMessage);
       } else if (response.status === 422) {
@@ -286,7 +268,6 @@ const Register = () => {
         setResponseMessage(errorMessage);
       }
     } catch (error) {
-      console.error("Register error:", error);
       setError(true);
       setResponseMessage("서버 오류가 발생했습니다.");
     } finally {
