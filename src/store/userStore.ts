@@ -69,28 +69,11 @@ export const useUserStore = create<UserState>((set, get) => ({
           ? import.meta.env.VITE_WWWM_BE_ENDPOINT
           : import.meta.env.VITE_WWWM_BE_DEV_EP;
 
-      // console.log("=== 내 정보 조회 API 호출 ===");
-      // console.log("BASE_URL:", BASE_URL);
-      // console.log("토큰 존재:", token ? "있음" : "없음");
-      // console.log("토큰 길이:", token ? token.length : 0);
-      // console.log("토큰 원본:", JSON.stringify(token));
-      // console.log(
-      //   "토큰 시작 부분:",
-      //   token ? token.substring(0, 20) + "..." : "없음"
-      // );
-
       // 토큰 trim 처리 후 확인
       const trimmedToken = token?.trim();
-      // console.log("토큰 trim 후:", JSON.stringify(trimmedToken));
 
       // 토큰 형식 확인 및 처리
       const startsWithBearer = trimmedToken?.startsWith("Bearer");
-      // console.log("토큰에 Bearer 포함 여부:", startsWithBearer);
-      // console.log("Bearer 체크:", {
-      //   hasBearer: trimmedToken?.includes("Bearer"),
-      //   startsWithBearer: trimmedToken?.startsWith("Bearer"),
-      //   startsWithBearerSpace: trimmedToken?.startsWith("Bearer "),
-      // });
 
       // Bearer로 시작하면 그대로 사용, 아니면 Bearer 추가
       let authToken;
@@ -105,10 +88,8 @@ export const useUserStore = create<UserState>((set, get) => ({
       } else {
         authToken = `Bearer ${trimmedToken}`;
       }
-      // console.log("최종 인증 토큰:", authToken.substring(0, 20) + "...");
 
       const url = `${BASE_URL}/users/me`;
-      // console.log("API 요청 URL:", url);
 
       const response = await fetch(url, {
         method: "GET",
@@ -118,10 +99,8 @@ export const useUserStore = create<UserState>((set, get) => ({
         },
       });
 
-      // console.log("응답 상태:", response.status);
 
       const responseData = await response.json();
-      // console.log("응답 데이터:", responseData);
 
       if (response.status === 200) {
         // API 명세서에 따른 응답 구조 확인
@@ -162,7 +141,6 @@ export const useUserStore = create<UserState>((set, get) => ({
         });
       }
     } catch (error) {
-      // console.error("내 정보 조회 실패:", error);
       set({
         error: "네트워크 오류가 발생했습니다.",
         isLoading: false,

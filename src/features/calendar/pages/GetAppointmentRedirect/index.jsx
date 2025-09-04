@@ -38,7 +38,6 @@ const GetAppointmentRedirect = () => {
       const decoded = JSON.parse(atob(padded));
       return decoded;
     } catch (error) {
-      console.error("JWT 디코딩 실패:", error);
       return null;
     }
   };
@@ -46,13 +45,11 @@ const GetAppointmentRedirect = () => {
   // 토큰에서 사용자명 추출 함수
   const extractUsernameFromToken = (token) => {
     if (!token || typeof token !== "string") {
-      console.warn("유효하지 않은 토큰입니다.");
       return null;
     }
 
     const payload = decodeJWT(token);
     if (!payload) {
-      console.warn("토큰 페이로드 디코딩에 실패했습니다.");
       return null;
     }
 
@@ -64,7 +61,6 @@ const GetAppointmentRedirect = () => {
       null;
 
     if (!username) {
-      console.warn("토큰에서 사용자명을 찾을 수 없습니다. 페이로드:", payload);
       return null;
     }
 
@@ -93,29 +89,20 @@ const GetAppointmentRedirect = () => {
       // 토큰 체크 및 인증 처리
       const token = localStorage.getItem("authToken");
       if (!token) {
-        console.log("토큰이 없어 로그인 페이지로 리다이렉트");
         navigate(`/login?redirect=${encodeURIComponent(`/getAppointment?appointmentId=${appointmentId}`)}`);
         return;
       }
 
       try {
-        console.log("=== GetAppointmentRedirect 시작 ===");
-        console.log("appointmentId:", appointmentId);
-
         // 토큰 형식 정리 (이미 Bearer가 포함되어 있을 수 있음)
         let cleanToken = token;
         if (token.startsWith("Bearer")) {
           cleanToken = token.substring(6).trim(); // "Bearer" 제거
         }
-        console.log("정리된 토큰 (앞 20자):", cleanToken.substring(0, 20) + "...");
-
         // 토큰에서 사용자명 추출
         const userName = extractUsernameFromToken(cleanToken);
         if (!userName) {
-          console.warn("토큰에서 사용자명 추출 실패, 약속 정보로 토큰 유효성 확인");
         }
-
-        console.log("추출된 사용자명:", userName);
 
         // 약속 정보 가져오기로 토큰 유효성 검증 (v2 API 사용)
         const response = await fetch(
@@ -129,9 +116,7 @@ const GetAppointmentRedirect = () => {
         );
 
         if (!response.ok) {
-          console.error("약속 정보 가져오기 실패:", response.status);
           if (response.status === 401 || response.status === 403) {
-            console.log("인증 실패, 토큰 삭제 후 로그인 페이지로 리다이렉트");
             localStorage.removeItem("authToken");
             navigate(`/login?redirect=${encodeURIComponent(`/getAppointment?appointmentId=${appointmentId}`)}`);
             return;
@@ -140,7 +125,6 @@ const GetAppointmentRedirect = () => {
         }
 
         const appointmentData = await response.json();
-        console.log("약속 정보:", appointmentData);
 
         // 사용자 개별 스케줄 가져오기 (사용자명이 있는 경우에만)
         let hasExistingSchedule = false;
@@ -160,18 +144,14 @@ const GetAppointmentRedirect = () => {
             if (userScheduleResponse.ok) {
               const userScheduleData = await userScheduleResponse.json();
               hasExistingSchedule = userScheduleData.object && userScheduleData.object.length > 0;
-              console.log("기존 스케줄 존재 여부:", hasExistingSchedule);
             } else {
-              console.warn("사용자 스케줄 조회 실패:", userScheduleResponse.status);
             }
           } catch (error) {
-            console.warn("사용자 스케줄 조회 중 오류:", error);
           }
         }
 
         // 개별 캘린더로 리다이렉트 (사용자명 또는 기본값 사용)
         const finalUserName = userName || "참여자";
-        console.log(`${hasExistingSchedule ? '재로그인' : '첫 로그인'} 사용자 (${finalUserName}) - 개별 캘린더로 리다이렉트`);
         
         navigate("/individualCalendar", {
           state: { 
@@ -182,9 +162,6 @@ const GetAppointmentRedirect = () => {
         });
 
       } catch (error) {
-        console.error("=== GetAppointmentRedirect 오류 ===");
-        console.error("Error:", error);
-        console.log("홈으로 리다이렉션");
         navigate("/");
       } finally {
         setLoading(false);

@@ -202,7 +202,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
         .map((dateString) => ({
           date: moment
-            .tz(dateString, "YYYY-MM-DD", API_CONFIG.TIMEZONE)
+            .tz(`${dateString} 00:00`, "YYYY-MM-DD HH:mm", API_CONFIG.TIMEZONE)
             .format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
@@ -210,6 +210,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const earliestDate = sortedDates[0];
       const latestDate = sortedDates[sortedDates.length - 1];
 
+      // startTime은 가장 이른 날짜의 시작시간으로, endTime은 가장 늦은 날짜의 종료시간으로 설정
       const startDateTime = moment
         .tz(
           `${earliestDate} ${startTime}`,
@@ -229,7 +230,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         endTime: endDateTime,
         timeZone: API_CONFIG.TIMEZONE,
       };
-
+      
       set({ jsonData: data, isFormReady: true });
     } else {
       set({ isFormReady: false });
@@ -246,37 +247,21 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      console.log("Creating calendar with data:", jsonData);
-      console.log("API Base URL:", API_CONFIG.BASE_URL);
-      console.log(
-        "Full API endpoint:",
-        `${API_CONFIG.BASE_URL}${API_ENDPOINTS.CREATE_APPOINTMENT}`
-      );
 
       const response: CreateAppointmentResponse = await fetchApi(API_ENDPOINTS.CREATE_APPOINTMENT, {
         method: "POST",
         body: jsonData,
       });
 
-      console.log("Calendar creation response:", response);
       
       // 새로운 백엔드 v2 응답 구조에 맞게 수정
       if (response.success && response.status === "CREATED") {
         const appointmentId = response.object.id;
-        console.log("Successfully created appointment:", appointmentId);
         return appointmentId;
       } else {
         throw new Error(response.msg || "Failed to create calendar");
       }
     } catch (error) {
-      console.error("Calendar creation failed:", error);
-      console.error("Error details:", {
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : "No stack trace",
-        jsonData,
-        apiConfig: API_CONFIG,
-      });
-
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create calendar";
       set({ error: errorMessage });
