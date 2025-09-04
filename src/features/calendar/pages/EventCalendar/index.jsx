@@ -383,7 +383,9 @@ const EventCalendar = () => {
               ${typographyVariants({ variant: "h1-sb" })}
             `}
             >
-              {eventName}
+              <div className="notranslate">
+                 {eventName}
+              </div>
             </div>
           </div>
           <img

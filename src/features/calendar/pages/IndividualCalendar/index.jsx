@@ -1221,7 +1221,9 @@ const IndividualCalendar = () => {
             truncate
           `}
           >
+            <div className="notranslate">
             {eventName}
+            </div>
           </div>
         </div>
         <div
