@@ -27,13 +27,11 @@
   --red-300: #D92B2B;
 
   /* blue */
-  --blue-50: #D1E4FF;
-  --blue-100: #A3D5FF;
-  --blue-200: #76C0FF;
-  --blue-300: #30A0FF;
-  --blue-400: #007BE3;
-  --blue-500: #006AC4;
-  --blue-900: #003073;
+  --NB-50:  #E9EEF9;
+  --NB-100: #AAC4FF;
+  --NB-200: #78A1FF;
+  --NB-300: #1D5FEE;
+  --NB-900: #1B2437;
 
   --kakao-yellow: #FAE100;
   --kakao-black: #3C1D1E;

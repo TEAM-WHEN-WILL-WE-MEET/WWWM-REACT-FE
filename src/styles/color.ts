@@ -34,6 +34,13 @@ export const colors = {
     500: 'var(--blue-500)',
     900: 'var(--blue-900)',
   },
+  NB: {
+    50: 'var(--NB-50)',
+    100: 'var(--NB-100)',
+    200: 'var(--NB-200)',
+    300: 'var(--NB-300)',
+    900: 'var(--NB-900)',
+  },
 };
 
 export const colorVariants = cva('', {
@@ -64,6 +71,11 @@ export const colorVariants = cva('', {
       'blue-400': 'text-[var(--blue-400)]',
       'blue-500': 'text-[var(--blue-500)]',
       'blue-900': 'text-[var(--blue-900)]',
+      'NB-50': 'text-[var(--NB-50)]',
+      'NB-100': 'text-[var(--NB-100)]',
+      'NB-200': 'text-[var(--NB-200)]',
+      'NB-300': 'text-[var(--NB-300)]',
+      'NB-900': 'text-[var(--NB-900)]',
       'kakao-yellow': 'text-[var(--kakao-yellow)]',
       'kakao-black':'text-[var(--kakao-black)]',
 
@@ -94,6 +106,11 @@ export const colorVariants = cva('', {
         'blue-400': 'bg-[var(--blue-400)]',
         'blue-500': 'bg-[var(--blue-500)]',
         'blue-900': 'bg-[var(--blue-900)]',
+        'NB-50': 'bg-[var(--NB-50)]',
+        'NB-100': 'bg-[var(--NB-100)]',
+        'NB-200': 'bg-[var(--NB-200)]',
+        'NB-300': 'bg-[var(--NB-300)]',
+        'NB-900': 'bg-[var(--NB-900)]',
         'kakao-yellow': 'bg-[var(--kakao-yellow)]',
         'kakao-black':'bg-[var(--kakao-black)]',
   
