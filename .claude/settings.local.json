@@ -4,7 +4,9 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(mv:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "mcp__figma-dev-mode-mcp-server__get_code",
+      "mcp__figma-dev-mode-mcp-server__get_image"
     ],
     "defaultMode": "acceptEdits"
   }
