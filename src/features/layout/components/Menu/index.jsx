@@ -278,86 +278,88 @@ export default function Menu() {
                 </li>
               ) : (
                 items.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
-                  >
-                    {/* 왼쪽 체크박스 + 타이틀 */}
-                    <div 
-                      className="flex items-center cursor-pointer select-none flex-1"
-                      onClick={() => handleClickWithLongPress(item.id)}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        handleTitleLongPress(item.id);
-                      }}
-                      onTouchStart={() => handleTouchStart(item.id)}
-                      onTouchEnd={handleTouchEnd}
-                      onMouseDown={() => handleTouchStart(item.id)}
-                      onMouseUp={handleTouchEnd}
-                      onMouseLeave={handleTouchEnd}
+                  <div className="notranslate">
+                    <li
+                      key={item.id}
+                      className="flex justify-between items-center  pb-[0.8rem] pt-[1.2rem] border-b border-[var(--gray-100)] "
                     >
-                      {isSelectionMode && (
-                        <div className=" flex flex-col !items-end !justify-end  ">
-                          <input
-                            type="checkbox"
-                            id={`Keep-logged-in-${item.id}`}
-                            className="invite-screen-reader"
-                            checked={selectedIds.includes(item.id)}
-                            onChange={(e) => {
-                              setIsChecked(e.target.checked);
-                              setIsVisuallyChecked(e.target.checked);
-                              e.stopPropagation();
-                              handleToggleSelect(item.id);
-                            }}
-                          />
-                          <div className="invite-label-box">
-                            <label
-                              htmlFor={`Keep-logged-in-${item.id}`}
-                              className={`${typographyVariants({
-                                variant: "b2-md",
-                              })} 
-                        !text-[1.4rem]
-                        ${
-                          isVisuallyChecked || isChecked
-                            ? colorVariants({ color: "gray-900" })
-                            : colorVariants({ color: "gray-700" })
-                        }`}
-                            >
-                              <span
-                                className="invite-check-icon"
-                                aria-hidden="true"
-                              ></span>
-                            </label>
+                      {/* 왼쪽 체크박스 + 타이틀 */}
+                      <div 
+                        className="flex items-center cursor-pointer select-none flex-1"
+                        onClick={() => handleClickWithLongPress(item.id)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          handleTitleLongPress(item.id);
+                        }}
+                        onTouchStart={() => handleTouchStart(item.id)}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={() => handleTouchStart(item.id)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
+                      >
+                        {isSelectionMode && (
+                          <div className=" flex flex-col !items-end !justify-end  ">
+                            <input
+                              type="checkbox"
+                              id={`Keep-logged-in-${item.id}`}
+                              className="invite-screen-reader"
+                              checked={selectedIds.includes(item.id)}
+                              onChange={(e) => {
+                                setIsChecked(e.target.checked);
+                                setIsVisuallyChecked(e.target.checked);
+                                e.stopPropagation();
+                                handleToggleSelect(item.id);
+                              }}
+                            />
+                            <div className="invite-label-box">
+                              <label
+                                htmlFor={`Keep-logged-in-${item.id}`}
+                                className={`${typographyVariants({
+                                  variant: "b2-md",
+                                })} 
+                          !text-[1.4rem]
+                          ${
+                            isVisuallyChecked || isChecked
+                              ? colorVariants({ color: "gray-900" })
+                              : colorVariants({ color: "gray-700" })
+                          }`}
+                              >
+                                <span
+                                  className="invite-check-icon"
+                                  aria-hidden="true"
+                                ></span>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      <span
-                        className={`
-                    ml-2
-                    ${typographyVariants({ variant: "b2-md" })}
-                    !text-[1.4rem]
-                    ${colorVariants({ color: "gray-800" })}
-                    pointer-events-none
-                  `}
+                        <span
+                          className={`
+                      ml-2
+                      ${typographyVariants({ variant: "b2-md" })}
+                      !text-[1.4rem]
+                      ${colorVariants({ color: "gray-800" })}
+                      pointer-events-none
+                    `}
+                        >
+                          {item.title}
+                        </span>
+                      </div>
+                      <div
+                        className={` ${typographyVariants({
+                          variant: "d3-rg",
+                        })} ${colorVariants({ color: "gray-600" })}
+                                !text-[1.2rem] `}
                       >
-                        {item.title}
-                      </span>
-                    </div>
-                    <div
-                      className={` ${typographyVariants({
-                        variant: "d3-rg",
-                      })} ${colorVariants({ color: "gray-600" })}
-                               !text-[1.2rem] `}
-                    >
-                      <span
-                        className={` ${colorVariants({ color: "red-300" })} `}
-                      >
-                        {item.daysLeft}
-                      </span>
-                      일 후 삭제
-                    </div>
-                  </li>
+                        <span
+                          className={` ${colorVariants({ color: "red-300" })} `}
+                        >
+                          {item.daysLeft}
+                        </span>
+                        일 후 삭제
+                      </div>
+                    </li>
+                  </div>
                 ))
               )}
               {isSelectionMode && selectedIds.length > 0 && (
