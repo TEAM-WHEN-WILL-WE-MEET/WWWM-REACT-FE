@@ -1,52 +1,216 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import { useNavigate } from "react-router-dom";
 import "./styles.css";
+// import moment from "moment";
 import moment from "moment-timezone";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import { colorVariants } from "../../../../styles/color.ts";
 import { typographyVariants } from "../../../../styles/typography.ts";
-import { useTitleField } from "./hooks/useTitleField.js";
-import { useCalendarNavigation } from "./hooks/useCalendarNavigation.js";
-import { useTimeSelection } from "./hooks/useTimeSelection.js";
-import { getInputClasses } from "./utils/styleUtils.js";
-import { formatMonthYear, formatDay } from "./utils/dateUtils.js";
+import { useCalendarStore } from "../../../../store/index.ts";
 
 const MonthView = () => {
   const navigate = useNavigate();
-  
-  // Custom hooks
+  const [isFocused, setIsFocused] = useState(false);
+  const [isMonthModalOpen, setIsMonthModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("month");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [calendarDate, setCalendarDate] = useState(new Date());
+
   const {
+    selectedDates,
+    savedDates,
     eventName,
-    isFocused,
-    handleInputChange,
-    handleFocus,
-    handleBlur,
-    handleClear,
-  } = useTitleField();
-
-  const {
-    calendarDate,
-    isMonthModalOpen,
-    modalMode,
-    selectedYear,
-    setIsMonthModalOpen,
-    setModalMode,
-    tileClassName,
-    tileDisabled,
-    goToPreviousMonth,
-    goToNextMonth,
-    handleYearSelectInModal,
-    handleMonthSelect,
+    startTime,
+    endTime,
+    setSelectedDates,
+    setSavedDates,
+    setEventName,
     handleDateChange,
-  } = useCalendarNavigation();
+    updateJsonData,
+  } = useCalendarStore();
 
-  const { startTime, endTime } = useTimeSelection();
+  // input field
+  const inputClasses = twMerge(
+    clsx(
+      //default
+      "flex",
+      "w-full",
+      "h-[40px]",
+      "flex-col",
+      "justify-end",
+      "items-start",
+      "gap-[4px]",
+      "flex-shrink-0",
+      "mb-[12px]",
+      "peer",
+      typographyVariants({
+        variant: "h1-sb",
+      }),
+      colorVariants({
+        color: "gray-500",
+      }),
 
-  // Styles
-  const inputClasses = getInputClasses();
+      "text-[20px]",
 
+      //사용자가 input field 클릭했을 때
+      "focus:outline-none",
+      "focus:border-b-2",
+      "focus:ring-[var(--gray-800)]",
+      "focus:text-[var(--gray-800)]",
+
+      //사용자가 input field 입력했을때
+      "valid:text-[var(--gray-800)]"
+    )
+  );
+
+useEffect(() => {
+    // 현재 달력 월이 변경될 때마다 해당 월의 저장된 선택 날짜들을 로드
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    setSelectedDates(savedDates[currentMonthKey] || []);
+  }, [calendarDate, savedDates, setSelectedDates]);
+
+  useEffect(() => {
+    // 선택된 날짜, 이벤트명, 시작/종료 시간이 변경될 때마다 API 전송용 JSON 데이터를 업데이트
+    updateJsonData();
+  }, [selectedDates, startTime, endTime, updateJsonData]);
+
+  // 이벤트명 입력 필드의 값이 변경될 때 호출
+  const handleInputChange = (e) => {
+    setEventName(e.target.value);
+  };
+
+  // 이벤트명 입력 필드에 포커스가 갈 때 호출
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  // 이벤트명 입력 필드에서 포커스가 벗어날 때 호출
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
+  // react-calendar의 각 날짜 타일에 적용할 CSS 클래스를 결정하는 함수
+  const tileClassName = ({ date, view }) => {
+    const dateString = moment(date).format("YYYY-MM-DD");
+    const today = moment().startOf("day");
+    const classes = [];
+
+    // 오늘 이전 날짜는 비활성화 스타일 적용
+    if (moment(date).isBefore(today)) {
+      classes.push("disabled-date");
+    }
+
+    // 선택된 날짜는 선택 스타일 적용
+    if (selectedDates.includes(dateString)) {
+      classes.push("selected-date");
+    }
+
+    return classes.join(" ");
+  };
+
+
+  // 모달에서 연도를 선택했을 때 호출되는 함수
+  const handleYearSelectInModal = (year) => {
+    setSelectedYear(year);
+    setModalMode("month");
+  };
+
+  // 모달에서 특정 월을 선택했을 때 호출되는 함수
+  const handleMonthSelect = (monthIndex) => {
+    // 현재 월의 선택된 날짜들을 저장소에 백업
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates({
+        ...savedDates,
+        [currentMonthKey]: selectedDates,
+      });
+    }
+
+    // 새로운 월로 달력 날짜 변경
+    const newDate = new Date(selectedYear, monthIndex, 1);
+    setCalendarDate(newDate);
+
+    // 새로운 월의 저장된 선택 날짜들을 로드
+    const newMonthKey = moment(newDate).format("YYYY-MM");
+    setSelectedDates(savedDates[newMonthKey] || []);
+
+    // 모달 닫기
+    setIsMonthModalOpen(false);
+    setModalMode("month");
+  };
+
+  // react-calendar에서 특정 날짜를 비활성화할지 결정하는 함수
+  const tileDisabled = ({ date, view }) => {
+    if (view === "month") {
+      const today = moment().startOf("day");
+
+      // 오늘 이전 날짜는 비활성화
+      if (moment(date).isBefore(today)) {
+        return true;
+      }
+
+      // 현재 달력 월 외의 날짜들은 비활성화
+      const currentYear = calendarDate.getFullYear();
+      const currentMonth = calendarDate.getMonth();
+      const tileYear = date.getFullYear();
+      const tileMonth = date.getMonth();
+
+      return currentYear !== tileYear || currentMonth !== tileMonth;
+    }
+    return false;
+  };
+
+  // 이전 달로 이동하는 함수
+  const goToPreviousMonth = () => {
+    const currentMonth = moment(calendarDate);
+    const previousMonth = currentMonth.subtract(1, "month");
+
+    // 현재 월의 선택된 날짜들을 저장소에 백업
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates({
+        ...savedDates,
+        [currentMonthKey]: selectedDates,
+      });
+    }
+
+    // 이전 달로 달력 날짜 변경
+    setCalendarDate(previousMonth.toDate());
+
+    // 이전 달의 저장된 선택 날짜들을 로드
+    const newMonthKey = previousMonth.format("YYYY-MM");
+    setSelectedDates(savedDates[newMonthKey] || []);
+  };
+
+  // 다음 달로 이동하는 함수
+  const goToNextMonth = () => {
+    const currentMonth = moment(calendarDate);
+    const nextMonth = currentMonth.add(1, "month");
+
+    // 현재 월의 선택된 날짜들을 저장소에 백업
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates({
+        ...savedDates,
+        [currentMonthKey]: selectedDates,
+      });
+    }
+
+    // 다음 달로 달력 날짜 변경
+    setCalendarDate(nextMonth.toDate());
+
+    // 다음 달의 저장된 선택 날짜들을 로드
+    const newMonthKey = nextMonth.format("YYYY-MM");
+    setSelectedDates(savedDates[newMonthKey] || []);
+  };
+
+  // 이벤트명 입력 필드를 초기화하는 함수
+  const handleClear = () => {
+    setEventName("");
+  };
 
   return (
     <div className="flex flex-col w-auto">
@@ -93,7 +257,7 @@ const MonthView = () => {
               )
             )}
           >
-            {formatMonthYear(calendarDate)}
+            {moment(calendarDate).format("YYYY년 MM월")}
           </div>
           <div className="flex items-center ml-[0.8rem]">
             <img
@@ -118,7 +282,7 @@ const MonthView = () => {
           calendarType="gregory"
           onClickDay={handleDateChange}
           tileClassName={tileClassName}
-          formatDay={formatDay}
+          formatDay={(locale, date) => moment(date).format("DD")}
           showNeighboringMonth={true}
           tileDisabled={tileDisabled}
           minDate={new Date(new Date().setHours(0, 0, 0, 0))}
