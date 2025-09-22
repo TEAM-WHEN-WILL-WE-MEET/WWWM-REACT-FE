@@ -33,7 +33,7 @@ export const ButtonVariants = cva(
           `text-[${colors.gray[100]}]`,
         ],
       },
-      size: {
+      property: {
         default: "",
         //토스트 버튼
         toast: [
@@ -87,8 +87,8 @@ export const ButtonVariants = cva(
         // 비활성화: 회색 배경 / 활성화: 파란 배경
         enter: [
           "flex",
-          "w-[27.6rem]",
-          "h-[4.4rem]",
+          "w-[32.8rem]",
+          "h-[4.8rem]",
           "items-center",
           "justify-center",
           "px-[1.6rem]",
@@ -267,7 +267,7 @@ interface ButtonProps
   //icon component 같은 리엑트 컴포넌트에 사용
   additionalClass?: string;
   handleMouseEnter?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  size:
+  property:
     | "toast"
     | "choiceTime"
     | "enter"
@@ -289,7 +289,7 @@ interface ButtonProps
  */
 export const Button: FC<ButtonProps> = ({
   variant,
-  size,
+  property,
   children,
   label,
   additionalClass,
@@ -301,7 +301,7 @@ export const Button: FC<ButtonProps> = ({
   // console.log('Applied classes:', ButtonVariants({ variant, size }));
   return (
     <button
-      className={cn(ButtonVariants({ variant, size }), additionalClass)}
+      className={cn(ButtonVariants({ variant, property }), additionalClass)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onMouseLeave}
       {...props}
