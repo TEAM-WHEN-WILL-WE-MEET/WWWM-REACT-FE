@@ -80,12 +80,12 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-20 flex items-end justify-center z-50"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-t-3xl w-full mx-0 max-h-[80vh] min-h-fit overflow-auto ">
+        className="bg-white rounded-t-[2rem] w-full mx-0 max-h-[80vh] min-h-fit overflow-auto ">
         {/* Calendar Container */}
         <div className="px-[2.2rem] pt-[2.6rem] flex flex-col gap-[2rem]">
           {/* Calendar Header */}
@@ -98,7 +98,7 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
               <img
                 src={isPreviousButtonEnabled ? BackwardSvg : GrayBackwardSvg}
                 alt="previous month"
-                className="w-6 h-6"
+                className=""
               />
             </button>
 
@@ -113,7 +113,7 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
               <img
                 src={ForwardSvg}
                 alt="next month"
-                className="w-6 h-6"
+                className=""
               />
             </button>
           </div>
@@ -127,7 +127,7 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
               onClickDay={handleDateChange}
               tileClassName={tileClassName}
               formatDay={formatDay}
-              showNeighboringMonth={true}
+              showNeighboringMonth={false}
               tileDisabled={tileDisabled}
               minDate={new Date(new Date().setHours(0, 0, 0, 0))}
             />
