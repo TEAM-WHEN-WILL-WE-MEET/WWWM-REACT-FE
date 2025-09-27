@@ -21,8 +21,7 @@ export const ButtonVariants = cva(
   //모든 경우에 공통으로 들어갈 CSS
   `
   flex justify-center items-center active:scale-95 rounded-xl
-  text-slate-100 transition-all
-  hover:scale-105 duration-200 
+  text-slate-100 transition-none
   `,
   {
     variants: {
@@ -75,8 +74,6 @@ export const ButtonVariants = cva(
           "leading-[2rem]",
           "tracking-[-0.04rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
           "disabled:!text-[var(--gray-400)]",
           "disabled:border",
           "disabled:bg-white",
@@ -102,8 +99,6 @@ export const ButtonVariants = cva(
           "leading-[2rem]",
           "tracking-[-0.04rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
           "disabled:bg-[var(--gray-400)]",
           "disabled:text-white",
           "disabled:cursor-not-allowed",
@@ -128,8 +123,6 @@ export const ButtonVariants = cva(
           "leading-[2rem]",
           "tracking-[-0.035rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
         ],
         // 링크 복사하기 버튼
          linkShare: [
@@ -150,8 +143,6 @@ export const ButtonVariants = cva(
           "leading-[1.6rem]",
           "tracking-[-0.035rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
         ],
         // 카카오톡 공유 버튼
         kakaoShare: [
@@ -172,13 +163,11 @@ export const ButtonVariants = cva(
           "leading-[1.6rem]",
           "tracking-[-0.035rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
         ],
         //날짜 선택, 기간 선택
         dateSelect: [
           "flex",
-          "w-[8.8rem]",
+          "w-[9.1rem]",
           "h-[3.2rem]",
           "items-center",
           "justify-center",
@@ -186,7 +175,29 @@ export const ButtonVariants = cva(
           "px-[1.4rem]",
           "py-0",
           "rounded-[2.3rem]",
-          "bg-[var(--NB-50)]",
+          "bg-[var(--white)]",
+          "border",
+          "border-[var(--gray-300)]",
+          "text-[var(--gray-600)]",
+          "font-pretendard",
+          "font-medium",
+          "text-[1.4rem]",
+          "leading-[2rem]",
+          "tracking-[-0.035rem]",
+          "whitespace-nowrap",
+        ],
+        //(선택된 상태) 날짜 선택, 기간 선택 
+        dateSelectActive: [
+          "flex",
+          "w-[9.1rem]",
+          "h-[3.2rem]",
+          "items-center",
+          "justify-center",
+          "gap-[0.4rem]",
+          "px-[1.4rem]",
+          "py-0",
+          "rounded-[2.3rem]",
+          "bg-#EDF1FD",
           "border",
           "border-[var(--NB-100)]",
           "text-[var(--NB-300)]",
@@ -196,12 +207,6 @@ export const ButtonVariants = cva(
           "leading-[2rem]",
           "tracking-[-0.035rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
-          "disabled:bg-white",
-          "disabled:border-[var(--gray-300)]",
-          "disabled:text-[var(--gray-600)]",
-          "disabled:cursor-not-allowed",
         ],
         // 멤버 이름 block
         memberNameBlock: [
@@ -223,8 +228,6 @@ export const ButtonVariants = cva(
           "leading-[1.6rem]",
           "tracking-[-0.035rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
         ],
         //pw 랜덤 생성 버튼
         randomCreate: [
@@ -245,8 +248,6 @@ export const ButtonVariants = cva(
           "leading-[1.3rem]",
           "tracking-[-0.0325rem]",
           "whitespace-nowrap",
-          "!transform-none",
-          "!hover:transform-none",
         ],
       },
     },
@@ -275,6 +276,7 @@ interface ButtonProps
     | "linkShare"
     | "kakaoShare"
     | "dateSelect"
+    | "dateSelectActive"
     | "memberNameBlock"
     | "randomCreate"
 }
