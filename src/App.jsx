@@ -13,7 +13,6 @@ import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
 import KakaoCallback from "./features/auth/pages/KakaoCallback";
 import AppointmentNameInput from "./components/AppointmentNameInput";
-import DateSelectionPage from "./components/DateSelectionPage";
 import TimeSelectionModal from "./components/TimeSelectionModal";
 
 
@@ -108,7 +107,6 @@ function App() {
           <Route path="/eventCalendar" element={<EventCalendar />} />
           <Route path="/individualCalendar" element={<IndividualCalendar />} />
           <Route path="/appointment-name" element={<AppointmentNameInput />} />
-          <Route path="/date-selection" element={<DateSelectionPage />} />
           <Route path="/time-modal" element={<TimeSelectionModal />} />
         </Routes>
       </div>

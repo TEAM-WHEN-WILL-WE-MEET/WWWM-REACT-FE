@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { typographyVariants } from '../styles/typography';
 import { colors, colorVariants } from '../styles/color';
+import DateSelectionModal from './DateSelectionModal';
 
 interface AppointmentNameInputProps {
   className?: string;
@@ -10,6 +11,7 @@ interface AppointmentNameInputProps {
 
 const AppointmentNameInput: React.FC<AppointmentNameInputProps> = ({ className = '' }) => {
   const [appointmentName, setAppointmentName] = useState('');
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const keywords = ['프로젝트', '회의', '모임', '스터디'];
@@ -82,11 +84,19 @@ const AppointmentNameInput: React.FC<AppointmentNameInputProps> = ({ className =
                 property="enter"
                 disabled={!isButtonEnabled}
                 label="약속 날짜 정하기"
+                onClick={() => setIsDateModalOpen(true)}
               />
             </div>
           </div>
         </div>
       </div>
+
+      {/* Date Selection Modal */}
+      <DateSelectionModal
+        isOpen={isDateModalOpen}
+        onClose={() => setIsDateModalOpen(false)}
+        appointmentTitle={appointmentName || "새 약속"}
+      />
     </div>
   );
 };
