@@ -85,7 +85,7 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-t-3xl w-[36rem] mx-0 max-h-[90vh] overflow-auto ">
+        className="bg-white rounded-t-3xl w-full mx-0 max-h-[80vh] min-h-fit overflow-auto ">
         {/* Calendar Container */}
         <div className="px-[2.2rem] pt-[2.6rem] flex flex-col gap-[2rem]">
           {/* Calendar Header */}
@@ -153,15 +153,15 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
 
         </div>
         {/* Action Buttons */}
-          <div className="flex mb-[2.4rem] mt-[2.4rem] mx-auto justify-center ">
-            <Button
-              variant="default"
-              property="choiceTime"
-              disabled={!isButtonEnabled}
-              label="시간 선택하기"
-              onClick={onClose}
-            />
-          </div>
+        <div className="flex-shrink-0 mb-[2.4rem] mt-[2.4rem] mx-auto justify-center flex px-[2.2rem]">
+          <Button
+            variant="default"
+            property="choiceTime"
+            disabled={!isButtonEnabled}
+            label="시간 선택하기"
+            onClick={onClose}
+          />
+        </div>
 
         {/* Month/Year Modal */}
         {isMonthModalOpen && (
