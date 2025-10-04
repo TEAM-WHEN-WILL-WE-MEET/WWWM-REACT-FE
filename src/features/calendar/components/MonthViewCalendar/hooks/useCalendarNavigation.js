@@ -76,7 +76,14 @@ export const useCalendarNavigation = () => {
     const currentMonth = moment(calendarDate);
     const previousMonth = currentMonth.subtract(1, "month");
 
-    saveCurrentMonthDates();
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates({
+        ...savedDates,
+        [currentMonthKey]: selectedDates,
+      });
+    }
+
     setCalendarDate(previousMonth.toDate());
 
     const newMonthKey = previousMonth.format("YYYY-MM");
@@ -87,7 +94,14 @@ export const useCalendarNavigation = () => {
     const currentMonth = moment(calendarDate);
     const nextMonth = currentMonth.add(1, "month");
 
-    saveCurrentMonthDates();
+    const currentMonthKey = moment(calendarDate).format("YYYY-MM");
+    if (selectedDates.length > 0) {
+      setSavedDates({
+        ...savedDates,
+        [currentMonthKey]: selectedDates,
+      });
+    }
+
     setCalendarDate(nextMonth.toDate());
 
     const newMonthKey = nextMonth.format("YYYY-MM");

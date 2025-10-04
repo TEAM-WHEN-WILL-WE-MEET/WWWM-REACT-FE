@@ -38,6 +38,7 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
     handleMonthSelect,
   } = useCalendarNavigation();
 
+
   const handleDateChange = (date: Date) => {
     const dateString = moment(date).format("YYYY-MM-DD");
     if (selectedDates.includes(dateString)) {
@@ -85,7 +86,8 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-t-[2rem] w-full mx-0 max-h-[80vh] min-h-fit overflow-auto ">
+        className="bg-white rounded-t-[2rem] w-full mx-0 max-h-[80vh] min-h-fit overflow-auto "
+      >
         {/* Calendar Container */}
         <div className="px-[2.2rem] pt-[2.6rem] flex flex-col gap-[2rem]">
           {/* Calendar Header */}
@@ -110,11 +112,7 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
               onClick={goToNextMonth}
               className="w-[2.4rem] h-[2.4rem] flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
             >
-              <img
-                src={ForwardSvg}
-                alt="next month"
-                className=""
-              />
+              <img src={ForwardSvg} alt="next month" className="" />
             </button>
           </div>
 
@@ -126,8 +124,9 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
               calendarType="gregory"
               onClickDay={handleDateChange}
               tileClassName={tileClassName}
-              formatDay={formatDay}
-              showNeighboringMonth={false}
+              // formatDay={formatDay}
+              formatDay={(locale, date) => moment(date).format("DD")}
+              showNeighboringMonth={true}
               tileDisabled={tileDisabled}
               minDate={new Date(new Date().setHours(0, 0, 0, 0))}
             />
@@ -135,22 +134,39 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
 
           {/* Selection Buttons */}
           <div className="flex gap-[0.8rem] justify-center">
-              <Button
-                variant="default"
-                property={selectionMode === 'date' ? "dateSelectActive" : "dateSelect"}
-                children={<img src={selectionMode === 'date' ? BlueEllipseSvg : GrayEllipseSvg} alt="Ellipse" className="w-[0.5rem] h-[0.5rem]" />}
-                label="날짜 선택"
-                onClick={() => setSelectionMode('date')}
-              />
-              <Button
-                variant="default"
-                property={selectionMode === 'period' ? "dateSelectActive" : "dateSelect"}
-                children={<img src={selectionMode === 'period' ? BlueLineSvg : GrayLineSvg} alt="line" className="w-[0.8rem] " />}
-                label="기간 선택"
-                onClick={() => setSelectionMode('period')}
-              />
+            <Button
+              variant="default"
+              property={
+                selectionMode === "date" ? "dateSelectActive" : "dateSelect"
+              }
+              children={
+                <img
+                  src={
+                    selectionMode === "date" ? BlueEllipseSvg : GrayEllipseSvg
+                  }
+                  alt="Ellipse"
+                  className="w-[0.5rem] h-[0.5rem]"
+                />
+              }
+              label="날짜 선택"
+              onClick={() => setSelectionMode("date")}
+            />
+            <Button
+              variant="default"
+              property={
+                selectionMode === "period" ? "dateSelectActive" : "dateSelect"
+              }
+              children={
+                <img
+                  src={selectionMode === "period" ? BlueLineSvg : GrayLineSvg}
+                  alt="line"
+                  className="w-[0.8rem] "
+                />
+              }
+              label="기간 선택"
+              onClick={() => setSelectionMode("period")}
+            />
           </div>
-
         </div>
         {/* Action Buttons */}
         <div className="flex-shrink-0 mb-[2.4rem] mt-[2.4rem] mx-auto justify-center flex px-[2.2rem]">

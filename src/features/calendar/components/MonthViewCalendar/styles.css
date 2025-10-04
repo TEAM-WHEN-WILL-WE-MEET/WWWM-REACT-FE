@@ -156,6 +156,7 @@
   letter-spacing: -0.35px;
 }
 .react-calendar__month-view__days__day--neighboringMonth {
-  display: none;
-  
+  visibility: hidden;
+
+
 }
