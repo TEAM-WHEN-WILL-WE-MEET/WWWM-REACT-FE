@@ -24,6 +24,8 @@ interface DateSelectionModalProps {
 const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose, appointmentTitle }) => {
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [selectionMode, setSelectionMode] = useState<'date' | 'period'>('date');
+  const [periodStart, setPeriodStart] = useState<string | null>(null);
+  const [periodEnd, setPeriodEnd] = useState<string | null>(null);
 
   const {
     calendarDate,
@@ -41,10 +43,54 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
 
   const handleDateChange = (date: Date) => {
     const dateString = moment(date).format("YYYY-MM-DD");
-    if (selectedDates.includes(dateString)) {
-      setSelectedDates(selectedDates.filter(d => d !== dateString));
+
+    if (selectionMode === 'date') {
+      if (selectedDates.includes(dateString)) {
+        setSelectedDates(selectedDates.filter(d => d !== dateString));
+      } else {
+        setSelectedDates([...selectedDates, dateString]);
+      }
     } else {
-      setSelectedDates([...selectedDates, dateString]);
+      // 기간 선택 모드
+      if (!periodStart || (periodStart && periodEnd)) {
+        // 첫 번째 날짜 선택 또는 재선택
+        setPeriodStart(dateString);
+        setPeriodEnd(null);
+        // 첫 번째 날짜를 바로 selectedDates에 추가
+        if (!selectedDates.includes(dateString)) {
+          setSelectedDates([...selectedDates, dateString]);
+        }
+      } else {
+        // 두 번째 날짜 선택
+        const start = moment(periodStart);
+        const end = moment(dateString);
+
+        if (end.isBefore(start)) {
+          // 종료일이 시작일보다 이전이면 시작일을 새로 설정
+          setPeriodStart(dateString);
+          setPeriodEnd(null);
+          // 기존에 선택된 periodStart 제거하고 새로운 날짜 추가
+          const newDates = selectedDates.filter(d => d !== periodStart);
+          if (!newDates.includes(dateString)) {
+            setSelectedDates([...newDates, dateString]);
+          }
+        } else {
+          setPeriodEnd(dateString);
+
+          // 기간 내의 모든 날짜를 selectedDates에 추가
+          const periodDates: string[] = [];
+          let current = start.clone();
+          while (current.isSameOrBefore(end)) {
+            periodDates.push(current.format("YYYY-MM-DD"));
+            current.add(1, 'day');
+          }
+
+          // 기존 selectedDates에서 periodStart 제거 후 periodDates 추가
+          const filteredDates = selectedDates.filter(d => d !== periodStart);
+          const newDates = [...filteredDates, ...periodDates].filter((date, index, self) => self.indexOf(date) === index);
+          setSelectedDates(newDates);
+        }
+      }
     }
   };
 
@@ -149,7 +195,11 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
                 />
               }
               label="날짜 선택"
-              onClick={() => setSelectionMode("date")}
+              onClick={() => {
+                setSelectionMode("date");
+                setPeriodStart(null);
+                setPeriodEnd(null);
+              }}
             />
             <Button
               variant="default"
@@ -164,7 +214,11 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
                 />
               }
               label="기간 선택"
-              onClick={() => setSelectionMode("period")}
+              onClick={() => {
+                setSelectionMode("period");
+                setPeriodStart(null);
+                setPeriodEnd(null);
+              }}
             />
           </div>
         </div>
