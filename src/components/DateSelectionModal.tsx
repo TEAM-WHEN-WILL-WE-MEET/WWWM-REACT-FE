@@ -105,6 +105,42 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
 
     if (selectedDates.includes(dateString)) {
       classes.push("selected-date");
+
+      // 연속된 날짜가 있으면 타원형 스타일 적용 (모드와 무관)
+      if (selectedDates.length > 1) {
+        const sortedDates = [...selectedDates].sort();
+        const currentMoment = moment(dateString);
+
+        // 연속된 날짜 그룹 찾기
+        const previousDate = currentMoment.clone().subtract(1, 'day').format("YYYY-MM-DD");
+        const nextDate = currentMoment.clone().add(1, 'day').format("YYYY-MM-DD");
+
+        const hasPrevious = sortedDates.includes(previousDate);
+        const hasNext = sortedDates.includes(nextDate);
+
+        // 요일 확인 (0: 일요일, 6: 토요일)
+        const dayOfWeek = moment(date).day();
+        const isLeftEdge = dayOfWeek === 0; // 일요일 (왼쪽 끝)
+        const isRightEdge = dayOfWeek === 6; // 토요일 (오른쪽 끝)
+
+        if (!hasPrevious && !hasNext) {
+          // 단독 날짜 - 원형 유지
+          classes.push("period-single");
+        } else if (!hasPrevious && hasNext) {
+          // 그룹의 시작
+          classes.push("period-start");
+          if (isLeftEdge) classes.push("period-left-edge");
+        } else if (hasPrevious && hasNext) {
+          // 그룹의 중간
+          classes.push("period-middle");
+          if (isLeftEdge) classes.push("period-left-edge");
+          if (isRightEdge) classes.push("period-right-edge");
+        } else if (hasPrevious && !hasNext) {
+          // 그룹의 끝
+          classes.push("period-end");
+          if (isRightEdge) classes.push("period-right-edge");
+        }
+      }
     }
 
     return classes.join(" ");
