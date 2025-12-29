@@ -407,7 +407,7 @@ const Register = () => {
                               >
                                 {option.value === "custom"
                                   ? option.label
-                                  : `${option.label}`}
+                                  :  <div className="notranslate">{option.label}</div>}
                               </button>
                             ))}
                           </div>
@@ -426,7 +426,7 @@ const Register = () => {
                             typographyVariants({ variant: "b2-md" })
                           )}
                         >
-                          {emailDomain}
+                          <div className="notranslate"> {emailDomain} </div>
                           <img
                             src="/dropdwonarrow.svg"
                             alt="도메인 선택"
@@ -450,7 +450,7 @@ const Register = () => {
                               >
                                 {option.value === "custom"
                                   ? option.label
-                                  : `${option.label}`}
+                                  :  <div className="notranslate">{option.label}</div>}
                               </button>
                             ))}
                           </div>

@@ -34,7 +34,147 @@ export const ButtonVariants = cva(
       },
       property: {
         default: "",
-        //토스트 버튼
+        XXS: [
+          "w-[4.6rem]",
+          "h-[3.2rem]",
+          "flex-shrink-0",
+          "border",
+          "border-[var(--gray-300)]",
+          "bg-[var(--white)]",
+          "whitespace-nowrap",
+          "rounded-none",
+          "selected:border-[var(--NB-200)]",
+          "selected:bg-[var(--NB-50)]",
+        ],
+        XS: [
+          "w-[4.4rem]",
+          "!h-[2.8rem]",
+          "flex-shrink-0",
+          "border",
+          "border-[var(--gray-300)]",
+          "bg-[var(--white)]",
+          "whitespace-nowrap",
+          "rounded-none",
+        ],
+        S: [
+          "flex",
+          "w-[15.2rem]",
+          "h-[4rem]",
+          "px-[5.1rem]",
+          "py-[1.2rem]",
+          "justify-center",
+          "items-center",
+          "flex-shrink-0",
+          "rounded-[0.8rem]",
+          "border",
+          "border-[var(--red-100)]",
+          "bg-[var(--red-50)]",
+          "whitespace-nowrap",
+        ],
+        M: [
+          "flex",
+          "w-[31.2rem]",
+          "h-[4rem]",
+          "px-[11.9rem]",
+          "py-[1.4rem]",
+          "justify-center",
+          "items-center",
+          "gap-[1rem]",
+          "flex-shrink-0",
+          "rounded-[0.8rem]",
+          "border",
+          "border-[var(--gray-400)]",
+          "bg-[var(--white)]",
+          "shadow-[0.1rem_0.1rem_0px_0px_var(--gray-400)]",
+          "whitespace-nowrap",
+          typographyVariants({ variant: "b2-md" }),
+          "text-[var(--gray-800)]",
+          "pressed:border",
+          "pressed:border-[var(--gray-400)]",
+          "pressed:bg-[var(--gray-50)]",
+          "pressed:text-[var(--gray-800)]",
+        ],
+        L: [
+          "flex",
+          "w-[32rem]",
+          "h-[4.4rem]",
+          "px-[12.2rem]",
+          "py-[1.6rem]",
+          "justify-center",
+          "items-center",
+          "gap-[1rem]",
+          "flex-shrink-0",
+          "rounded-[0.8rem]",
+          "border",
+          "border-[var(--gray-900)]",
+          "bg-[var(--white)]",
+          // "shadow-[0.1rem_0.1rem_0px_0px_var(--gray-900)]",
+          "whitespace-nowrap",
+          typographyVariants({ variant: "b1-sb" }),
+          "text-[1.4rem]",
+          "text-[var(--gray-900)]",
+          "pressed:border",
+          "pressed:border-[var(--gray-900)]",
+          "pressed:bg-[var(--gray-50)]",
+        ],
+        XL: [
+          "flex",
+          "w-[32rem]",
+          "h-[4.8rem]",
+          "px-[12.2rem]",
+          "py-[1.6rem]",
+          "justify-center",
+          "items-center",
+          "gap-[1rem]",
+          "flex-shrink-0",
+          "rounded-[0.8rem]",
+          "bg-[var(--gray-900)]",
+          "tracking-normal",
+          "font-pretendard",
+          "whitespace-nowrap",
+          "!transform-none",
+          "!hover:transform-none",
+          !typographyVariants({ variant: "b1-sb" }),
+          "disabled:!text-[var(--gray-600)]",
+          "disabled:border",
+          "disabled:bg-[var(--gray-50)]",
+          "disabled:cursor-not-allowed",
+          "disabled:border-[var(--gray-500)]",
+          "pressed:border",
+          "pressed:!text-[var(--gray-100)]",
+          "pressed:border-[var(--gray-900)]",
+          "pressed:bg-[var(--gray-800)]",
+        ],
+        participate: [
+          "w-[11.2rem]",
+          "h-[4rem]",
+          "flex-shrink-0",
+          "rounded-[0.6rem]",
+          "bg-[var(--gray-900)]",
+          "whitespace-nowrap",
+          typographyVariants({ variant: "b1-sb" }),
+          `text-[var(--white)]`,
+          "hover:transform-none",
+          "hover:none",
+        ],
+        share: [
+          "flex",
+          "pl-[1.6rem]",
+          "w-[31.2rem]",
+          "h-[4.4rem]",
+          "py-[1.4rem]",
+          "!justify-start",
+          "items-center",
+          "!whitespace-nowrap",
+          "!text-center",
+          "gap-[0.4rem]",
+          "rounded-[0.8rem]",
+          "border",
+          "bg-[var(--gray-900)]",
+          "whitespace-normal",
+          typographyVariants({ variant: "b2-md" }),
+          "text-[var(--white)]",
+        ],
         toast: [
           "inline-flex",
           "h-[4rem]",
@@ -51,6 +191,7 @@ export const ButtonVariants = cva(
           "leading-[var(--line-height-16)]",
           "tracking-[var(--spacing)]",
         ],
+<<<<<<< HEAD
         // 시간 선택하기
         // 비활성화: 회색 테두리 / 활성화: 파란 테두리
         choiceTime: [
@@ -249,6 +390,8 @@ export const ButtonVariants = cva(
           "tracking-[-0.0325rem]",
           "whitespace-nowrap",
         ],
+=======
+>>>>>>> origin/main
       },
     },
     defaultVariants: {
@@ -270,6 +413,7 @@ interface ButtonProps
   handleMouseEnter?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   property:
     | "toast"
+<<<<<<< HEAD
     | "choiceTime"
     | "enter"
     | "inputMyTime"
@@ -279,6 +423,16 @@ interface ButtonProps
     | "dateSelectActive"
     | "memberNameBlock"
     | "randomCreate"
+=======
+    | "share"
+    | "participate"
+    | "XL"
+    | "L"
+    | "M"
+    | "S"
+    | "XS"
+    | "XXS";
+>>>>>>> origin/main
 }
 
 /**

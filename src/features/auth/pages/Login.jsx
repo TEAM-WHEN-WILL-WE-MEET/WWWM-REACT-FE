@@ -437,7 +437,7 @@ const Login = () => {
                               >
                                 {option.value === "custom"
                                   ? option.label
-                                  : `${option.label}`}
+                                  :  <div className="notranslate">{option.label}</div>}
                               </button>
                             ))}
                           </div>
@@ -456,7 +456,7 @@ const Login = () => {
                             typographyVariants({ variant: "b2-md" })
                           )}
                         >
-                          {emailDomain}
+                           <div className="notranslate">{emailDomain}</div>
                           <img
                             src="/dropdwonarrow.svg"
                             alt="도메인 선택"
@@ -468,22 +468,22 @@ const Login = () => {
                         </button>
                         {showDomainDropdown && (
                           <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                            {domainOptions.map((option) => (
-                              <button
-                                key={option.value}
-                                type="button"
-                                onClick={() => handleDomainSelect(option.value)}
-                                className={cn(
-                                  "w-full px-5 py-3 text-left hover:bg-gray-50",
-                                  typographyVariants({ variant: "b2-md" })
-                                )}
-                              >
-                                {option.value === "custom"
-                                  ? option.label
-                                  : `${option.label}`}
-                              </button>
-                            ))}
-                          </div>
+                              {domainOptions.map((option) => (
+                                <button
+                                  key={option.value}
+                                  type="button"
+                                  onClick={() => handleDomainSelect(option.value)}
+                                  className={cn(
+                                    "w-full px-5 py-3 text-left hover:bg-gray-50",
+                                    typographyVariants({ variant: "b2-md" })
+                                  )}
+                                >
+                                  {option.value === "custom"
+                                    ? option.label
+                                    :  <div className="notranslate">{option.label}</div>}
+                                </button>
+                              ))}
+                            </div>
                         )}
                       </>
                     )}
