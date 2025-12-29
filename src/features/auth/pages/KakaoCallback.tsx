@@ -3,6 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Loading from "../../../sharedcomponent/Loading.tsx";
 
+interface ResponseData {
+  access_token?: string;
+  is_agreed_required_term?: boolean;
+}
+
 const KakaoCallback = () => {
   const BASE_URL =
     import.meta.env.PROD
@@ -11,10 +16,10 @@ const KakaoCallback = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
-  //소셜 로그인 페이지로 리다이렉션 되어, 2차 API 호출 
+  //소셜 로그인 페이지로 리다이렉션 되어, 2차 API 호출
   useEffect(() => {
     const handleKakaoCallback = async () => {
       try {
@@ -40,7 +45,7 @@ const KakaoCallback = () => {
         });
 
         if (response.ok) {
-          const responseData = await response.json();
+          const responseData: ResponseData = await response.json();
           const { access_token, is_agreed_required_term } = responseData;
 
           if (access_token) {

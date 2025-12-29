@@ -9,9 +9,9 @@ import LandingPage from "./sharedcomponent/LandingPage.tsx";
 import Menu from "./features/menu/Menu";
 
 import EditProfile from "./features/user/EditProfile";
-import Login from "./features/auth/pages/Login";
-import Register from "./features/auth/pages/Register";
-import KakaoCallback from "./features/auth/pages/KakaoCallback";
+import Login from "./features/auth/pages/Login.tsx";
+import Register from "./features/auth/pages/Register.tsx";
+import KakaoCallback from "./features/auth/pages/KakaoCallback.tsx";
 import AppointmentNameInput from "./ver3temporarystorage/AppointmentNameInput";
 // import TimeSelectionModal from "./sharedcomponent/TimeSelectionModal"; // TODO: File doesn't exist yet
 

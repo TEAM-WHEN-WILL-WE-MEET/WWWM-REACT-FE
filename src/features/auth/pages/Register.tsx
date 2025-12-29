@@ -8,6 +8,11 @@ import { Button } from "../../../sharedcomponent/Button.tsx";
 import Loading from "../../../sharedcomponent/Loading.tsx";
 import "../styles/Register.css";
 
+interface DomainOption {
+  value: string;
+  label: string;
+}
+
 const Register = () => {
   const BASE_URL =
     import.meta.env.PROD
@@ -17,29 +22,29 @@ const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [emailId, setEmailId] = useState("");
-  const [emailDomain, setEmailDomain] = useState("gmail.com");
-  const [showDomainDropdown, setShowDomainDropdown] = useState(false);
-  const [customDomain, setCustomDomain] = useState(false);
-  const [password, setPassword] = useState("");
-  const [responseMessage, setResponseMessage] = useState("");
-  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [emailId, setEmailId] = useState<string>("");
+  const [emailDomain, setEmailDomain] = useState<string>("gmail.com");
+  const [showDomainDropdown, setShowDomainDropdown] = useState<boolean>(false);
+  const [customDomain, setCustomDomain] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
+  const [responseMessage, setResponseMessage] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
 
   // 비밀번호 관련 상태 추가 (컴포넌트 최상단 state 선언부에 추가)
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
-  const [isEmailValid, setIsEmailValid] = useState(false);
-  const [isNameValid, setIsNameValid] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
+  const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
+  const [isNameValid, setIsNameValid] = useState<boolean>(false);
 
   // 도메인 관련 상태 추가
-  const [domainError, setDomainError] = useState("");
+  const [domainError, setDomainError] = useState<string>("");
 
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
-  const domainOptions = [
+  const domainOptions: DomainOption[] = [
     { value: "gmail.com", label: "gmail.com" },
     { value: "naver.com", label: "naver.com" },
     { value: "custom", label: "직접 입력" },
@@ -54,7 +59,7 @@ const Register = () => {
     password.trim().length > 0;
 
   // 비밀번호 유효성 검사 함수 추가 (handleSubmit 함수 위에 추가)
-  const validatePassword = (value) => {
+  const validatePassword = (value: string) => {
     if (value.length < 4) {
       setPasswordError("비밀번호는 최소 4자 이상이어야 합니다.");
       setIsPasswordValid(false);
@@ -68,14 +73,14 @@ const Register = () => {
   };
 
   // password onChange 핸들러 수정
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
     validatePassword(value);
   };
 
   // 이메일 ID 핸들러
-  const handleEmailIdChange = (e) => {
+  const handleEmailIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmailId(value);
     const isValid =
@@ -87,15 +92,15 @@ const Register = () => {
   };
 
   // 이메일 도메인 핸들러
-  const handleEmailDomainChange = (e) => {
+  const handleEmailDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmailDomain(value);
-    
+
     // 커스텀 도메인인 경우 유효성 검사
     if (customDomain) {
       validateDomain(value);
     }
-    
+
     const isValid =
       emailId.trim().length > 0 &&
       (customDomain ? value.includes(".") && !domainError : value.trim().length > 0);
@@ -103,10 +108,10 @@ const Register = () => {
   };
 
   // 도메인 유효성 검사 함수
-  const validateDomain = (domain) => {
+  const validateDomain = (domain: string) => {
     // 도메인 형식 검증 (최소한 점이 포함되고 올바른 형식)
     const domainPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
-    
+
     if (!domain.trim()) {
       setDomainError("도메인을 입력해주세요.");
     } else if (!domainPattern.test(domain.trim())) {
@@ -116,13 +121,13 @@ const Register = () => {
     }
   };
 
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value);
     setIsNameValid(value.trim().length > 0);
   };
 
-  const handleDomainSelect = (domain) => {
+  const handleDomainSelect = (domain: string) => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
@@ -137,7 +142,7 @@ const Register = () => {
     setShowDomainDropdown(false);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!isFormValid) {
@@ -169,7 +174,7 @@ const Register = () => {
 
 
       // 응답 본문 확인 (성공/실패 모두)
-      let responseBody = null;
+      let responseBody: any = null;
       const responseText = await response.text();
 
       try {
@@ -183,10 +188,10 @@ const Register = () => {
 
         setTimeout(() => {
           const redirectUrl = searchParams.get("redirect");
-          const loginPath = redirectUrl 
+          const loginPath = redirectUrl
             ? `/login?redirect=${encodeURIComponent(redirectUrl)}`
             : "/login";
-          
+
           navigate(loginPath, {
             state: {
               registeredName: name,
@@ -198,21 +203,21 @@ const Register = () => {
       } else if (response.status === 409) {
         // 이미 등록된 이메일
         let errorMessage = "이미 등록된 이메일입니다.";
-        
+
         // 서버 응답에서 더 구체적인 메시지 확인
         if (responseBody && responseBody.error) {
           errorMessage = responseBody.error;
         } else if (responseBody && responseBody.message) {
           errorMessage = responseBody.message;
         }
-        
+
         setError(true);
         setResponseMessage(errorMessage);
       } else if (response.status === 400) {
         // 잘못된 요청 형식 - 이메일 중복도 400으로 올 수 있음
-        
+
         let errorMessage = "이미 등록된 이메일입니다."; // 기본값을 이메일 중복으로 변경
-        
+
         // 서버 응답에서 더 구체적인 메시지 확인
         if (responseBody) {
           if (responseBody.error) {
@@ -220,34 +225,34 @@ const Register = () => {
           } else if (responseBody.message) {
             errorMessage = responseBody.message;
           }
-          
+
           // 만약 이메일 중복이 아닌 다른 400 에러라면 구분
-          if (errorMessage.toLowerCase().includes("password") || 
+          if (errorMessage.toLowerCase().includes("password") ||
               errorMessage.toLowerCase().includes("비밀번호") ||
               errorMessage.toLowerCase().includes("name") ||
               errorMessage.toLowerCase().includes("이름")) {
             errorMessage = "입력 정보가 올바르지 않습니다.";
           }
         }
-        
+
         setError(true);
         setResponseMessage(errorMessage);
       } else if (response.status === 422) {
         // 유효성 검사 실패 (이메일 중복 등)
         let errorMessage = "이미 등록된 이메일입니다.";
-        
+
         if (responseBody && responseBody.error) {
           errorMessage = responseBody.error;
         } else if (responseBody && responseBody.message) {
           errorMessage = responseBody.message;
         }
-        
+
         setError(true);
         setResponseMessage(errorMessage);
       } else {
         setError(true);
         let errorMessage;
-        
+
         if (response.status === 500) {
           errorMessage = "서버에서 회원가입 처리 중 오류가 발생했습니다. 관리자에게 문의하거나 나중에 다시 시도해주세요.";
         } else if (response.status === 404) {
@@ -257,14 +262,14 @@ const Register = () => {
         } else {
           errorMessage = "회원가입에 실패했습니다.";
         }
-        
+
         // 서버 응답에서 오류 메시지 확인
         if (responseBody && responseBody.error) {
           errorMessage = responseBody.error;
         } else if (responseBody && responseBody.message) {
           errorMessage = responseBody.message;
         }
-        
+
         setResponseMessage(errorMessage);
       }
     } catch (error) {
@@ -275,7 +280,7 @@ const Register = () => {
     }
   };
 
-  const inputClasses = (isEmpty, hasError) =>
+  const inputClasses = (isEmpty: boolean, hasError: boolean) =>
     cn(
       "flex h-16 px-5 py-4",
       "items-center flex-shrink-0 rounded-lg",
@@ -585,8 +590,8 @@ const Register = () => {
                 <div
                   className={cn(
                     "text-center  whitespace-nowrap  overflow-x-auto",
-                    error 
-                      ? colorVariants({ color: "red-300" }) 
+                    error
+                      ? colorVariants({ color: "red-300" })
                       : colorVariants({ color: "green-600" })
                   )}
                   style={{ whiteSpace: "nowrap" }}

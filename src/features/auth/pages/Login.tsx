@@ -8,6 +8,11 @@ import { Button } from "../../../sharedcomponent/Button.tsx";
 import Loading from "../../../sharedcomponent/Loading.tsx";
 import "../styles/Register.css";
 
+interface DomainOption {
+  value: string;
+  label: string;
+}
+
 const Login = () => {
   const BASE_URL =
     import.meta.env.PROD
@@ -17,25 +22,25 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [loading, setLoading] = useState(false);
-  const [emailId, setEmailId] = useState("");
-  const [emailDomain, setEmailDomain] = useState("gmail.com");
-  const [showDomainDropdown, setShowDomainDropdown] = useState(false);
-  const [customDomain, setCustomDomain] = useState(false);
-  const [password, setPassword] = useState("");
-  const [responseMessage, setResponseMessage] = useState("");
-  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [emailId, setEmailId] = useState<string>("");
+  const [emailDomain, setEmailDomain] = useState<string>("gmail.com");
+  const [showDomainDropdown, setShowDomainDropdown] = useState<boolean>(false);
+  const [customDomain, setCustomDomain] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
+  const [responseMessage, setResponseMessage] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
 
   // 비밀번호 관련 상태 추가
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [passwordError, setPasswordError] = useState<string>("");
 
   // 도메인 관련 상태 추가
-  const [domainError, setDomainError] = useState("");
+  const [domainError, setDomainError] = useState<string>("");
 
   const email = customDomain ? emailId : `${emailId}@${emailDomain}`;
 
-  const domainOptions = [
+  const domainOptions: DomainOption[] = [
     { value: "gmail.com", label: "gmail.com" },
     { value: "naver.com", label: "naver.com" },
     { value: "custom", label: "직접 입력" },
@@ -45,7 +50,7 @@ const Login = () => {
   useEffect(() => {
     if (location.state?.registeredEmail) {
       // 회원가입한 이메일을 파싱해서 설정
-      const registeredEmail = location.state.registeredEmail;
+      const registeredEmail = location.state.registeredEmail as string;
       if (registeredEmail.includes("@")) {
         const [id, domain] = registeredEmail.split("@");
         setEmailId(id);
@@ -68,16 +73,16 @@ const Login = () => {
     password.trim().length > 0;
 
   // 이메일 ID 핸들러
-  const handleEmailIdChange = (e) => {
+  const handleEmailIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmailId(value);
   };
 
   // 이메일 도메인 핸들러
-  const handleEmailDomainChange = (e) => {
+  const handleEmailDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmailDomain(value);
-    
+
     // 커스텀 도메인인 경우 유효성 검사
     if (customDomain) {
       validateDomain(value);
@@ -85,10 +90,10 @@ const Login = () => {
   };
 
   // 도메인 유효성 검사 함수
-  const validateDomain = (domain) => {
+  const validateDomain = (domain: string) => {
     // 도메인 형식 검증 (최소한 점이 포함되고 올바른 형식)
     const domainPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/;
-    
+
     if (!domain.trim()) {
       setDomainError("도메인을 입력해주세요.");
     } else if (!domainPattern.test(domain.trim())) {
@@ -98,7 +103,7 @@ const Login = () => {
     }
   };
 
-  const handleDomainSelect = (domain) => {
+  const handleDomainSelect = (domain: string) => {
     if (domain === "custom") {
       setCustomDomain(true);
       setEmailDomain("");
@@ -112,7 +117,7 @@ const Login = () => {
   };
 
   // 비밀번호 유효성 검사 함수 추가
-  const validatePassword = (value) => {
+  const validatePassword = (value: string) => {
     if (value.length < 4) {
       setPasswordError("비밀번호는 최소 4자 이상이어야 합니다.");
     } else if (value.length > 12) {
@@ -123,7 +128,7 @@ const Login = () => {
   };
 
   // password onChange 핸들러 수정
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
     validatePassword(value);
@@ -140,10 +145,10 @@ const Login = () => {
     //   const response = await fetch(`${BASE_URL}/oauth2/authorization/google`, {
     //     method: "GET",
     //   });
-      
+
     //   //서버가 OAuth 제공자(카카오)로 리다이렉트하라는 응답을 보냈는지 확인.
     //   //맞다면 해당 소셜 로그인 페이지로 강제 이동
-    //   if (response.redirected) { 
+    //   if (response.redirected) {
     //     window.location.href = response.url;
     //   }
     // } catch (error) {
@@ -154,7 +159,7 @@ const Login = () => {
     // }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!isFormValid) {
@@ -206,7 +211,7 @@ const Login = () => {
 
 
       // 응답 본문 확인 (성공/실패 모두)
-      let responseBody = null;
+      let responseBody: any = null;
       const responseText = await response.text();
 
       try {
@@ -279,7 +284,7 @@ const Login = () => {
         setResponseMessage(errorMessage);
       } else {
         let errorMessage;
-        
+
         // 일반적인 인증 실패 상태 코드들
         if (response.status === 403 || response.status === 404) {
           errorMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
@@ -305,7 +310,7 @@ const Login = () => {
     }
   };
 
-  const inputClasses = (isEmpty, hasError) =>
+  const inputClasses = (isEmpty: boolean, hasError: boolean) =>
     cn(
       "flex h-16 px-5 py-4",
       "items-center flex-shrink-0 rounded-lg",
