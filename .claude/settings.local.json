@@ -7,7 +7,9 @@
       "Bash(npm uninstall:*)",
       "Bash(tree:*)",
       "Bash(git mv:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)"
     ],
     "defaultMode": "acceptEdits"
   }

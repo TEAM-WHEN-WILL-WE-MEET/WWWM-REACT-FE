@@ -615,7 +615,7 @@ const Login = () => {
               additionalClass={cn(
                 "rounded-[0.8rem] mt-[1.2rem]",
                 isFormValid
-                  ? "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]"
+                  ? "border border-[var(--NB-300)] bg-[var(--white)] text-[var(--NB-300)] shadow-[1px_1px_0_0_var(--NB-300)]"
                   : "bg-[var(--gray-100)] border border-[var(--gray-500)] text-[var(--gray-900)]"
               )}
             >

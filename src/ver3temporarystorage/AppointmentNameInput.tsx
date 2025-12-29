@@ -54,7 +54,7 @@ const AppointmentNameInput: React.FC<AppointmentNameInputProps> = ({ className =
                 type="text"
                 value={appointmentName}
                 onChange={(e) => setAppointmentName(e.target.value)}
-                className={`w-full ${typographyVariants({ variant: "h3-md" })} ${colorVariants({ color: "gray-900" })} px-[1.6rem] py-[0.8rem] rounded-[0.8rem] border border-[#aac4ff] focus:outline-none `}
+                className={`w-full ${typographyVariants({ variant: "h3-md" })} ${colorVariants({ color: "gray-900" })} px-[1.6rem] py-[0.8rem] rounded-[0.8rem] border border-[var(--NB-100)] focus:outline-none `}
                 placeholder=""
               />
             </div>

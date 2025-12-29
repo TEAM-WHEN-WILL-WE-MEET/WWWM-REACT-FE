@@ -7,9 +7,9 @@ import moment from "moment-timezone";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { colorVariants } from "../../../../styles/color.ts";
-import { typographyVariants } from "../../../../styles/typography.ts";
-import { useCalendarStore } from "../../../../store/index.ts";
+import { colorVariants } from "../../../styles/color.ts";
+import { typographyVariants } from "../../../styles/typography.ts";
+import { useCalendarStore } from "../../../store/index.ts";
 
 const MonthView = () => {
   const navigate = useNavigate();

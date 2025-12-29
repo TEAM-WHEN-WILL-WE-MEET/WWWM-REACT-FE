@@ -14,7 +14,7 @@ const Section1 = ({navigate, handleNewAppointment }) => (
     className={`
       flex flex-col p-4
       h-[69.5rem]
-      bg-gradient-to-b from-[#CCE3FF] via-35% via-[#FFFFFF] to-[#FFFFFF]
+      bg-gradient-to-b from-[var(--NB-100)] via-35% via-[#FFFFFF] to-[#FFFFFF]
     `}
     aria-label="빠른 약속 시간 체크할 때, 언제 볼까?"
   >
@@ -69,9 +69,9 @@ const Section1 = ({navigate, handleNewAppointment }) => (
           transition: { delay: 0.8, duration: 1.2, ease: [0.25, 1, 0.5, 1] },
         }}
       >
-        <Button 
+        <Button
           label="새 약속 만들기"
-          size="participate" 
+          property="participate"
           onClick={handleNewAppointment}
           additionalClass="hover:opacity-80 text-[1.6rem] w-[14.2rem] h-[4.8rem]"
           role="button"
@@ -109,7 +109,7 @@ const Section2 = () => {
         flex flex-col space-y-4 p-4
         h-[69.5rem]
         gap-4
-        bg-[linear-gradient(to_bottom,#007BE3_0%,#007BE3_70%,#30A0FF_100%)]
+        bg-[linear-gradient(to_bottom,var(--NB-300)_0%,var(--NB-300)_70%,var(--NB-200)_100%)]
         p-8
         py-14
         rounded-[2rem]
@@ -170,7 +170,7 @@ const Section2 = () => {
         h-[13.8rem]
         rounded-[1.5rem]
         justify-between
-        bg-gradient-to-b from-[#FFFFFF] via-[#FFFFFF]/100 to-[#CCE3FF]
+        bg-gradient-to-b from-[#FFFFFF] via-[#FFFFFF]/100 to-[var(--NB-100)]
         rounded-lg p-4 flex items-center space-x-4 pl-[3.6rem] pr-[1em] 
         font-pretendard font-semibold text-[1.8rem] text-black tracking-[0em] leading-[2.8rem]
       ">
@@ -287,11 +287,11 @@ const Section3 = () => {
             {title}
           </h2>
           <div className="flex flex-col items-center justify-center">
-            <p className="text-[#2B85D9] text-[1.5rem] tracking-[-0.03em]">
+            <p className="text-[var(--NB-300)] text-[1.5rem] tracking-[-0.03em]">
               {description[0]}
             </p>
             {description[1] && (
-              <p className="text-[#2B85D9] text-[1.5rem] tracking-[-0.03em]">
+              <p className="text-[var(--NB-300)] text-[1.5rem] tracking-[-0.03em]">
                 {description[1]}
               </p>
             )}
@@ -347,7 +347,7 @@ const Section4 = () => {
       <section
         className="
           flex flex-col justify-center py-10
-          bg-[#0087FC] min-h-[65.7rem] h-auto rounded-[2rem]
+          bg-[var(--NB-900)] min-h-[65.7rem] h-auto rounded-[2rem]
         "
         aria-label="언제볼까? 팀 소개"
       >
@@ -389,7 +389,7 @@ const Section4 = () => {
             </header>
           </motion.div>
           <figure className="relative flex items-center justify-center">
-            <ul className="w-60 h-60 bg-[#299BFF] rounded-full list-none">
+            <ul className="w-60 h-60 bg-[var(--NB-200)] rounded-full list-none">
               {positions.map((item, index) => {
                 const targetPosition = calculateMovement(item.x, item.y, index);
                 return (
@@ -472,7 +472,7 @@ const Section4 = () => {
         className="flex flex-col py-10 bg-[#FFFFF] min-h-[40rem] font-pretendard pt-[19em] pb-[1em] gap-20"
         aria-label="함께해요! 그래서 우리, 언제 볼까요?"
       >
-        <header className="font-semibold text-[2rem] text-[#007BE3] tracking-[-0.02em] leading-[1.8em] text-center">
+        <header className="font-semibold text-[2rem] text-[var(--NB-300)] tracking-[-0.02em] leading-[1.8em] text-center">
           {messages.map((message, index) => (
             <motion.div
               key={index}

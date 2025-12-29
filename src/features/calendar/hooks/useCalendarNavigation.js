@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import moment from "moment-timezone";
-import { useCalendarStore } from "../../../../../store/index.ts";
+import { useCalendarStore } from "../../../store/index.ts";
 
 export const useCalendarNavigation = () => {
   const [isMonthModalOpen, setIsMonthModalOpen] = useState(false);

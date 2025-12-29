@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { typographyVariants } from "../../../../styles/typography.ts";
-import { colorVariants, colors } from "../../../../styles/color.ts";
-import { Button } from "../../../../sharedcomponent/Button.tsx";
-import { cn } from "../../../../utils/cn";
-import { useCalendarStore } from "../../../../store/index.ts";
+import { typographyVariants } from "../../../styles/typography.ts";
+import { colorVariants, colors } from "../../../styles/color.ts";
+import { Button } from "../../../sharedcomponent/Button.tsx";
+import { cn } from "../../../utils/cn";
+import { useCalendarStore } from "../../../store/index.ts";
 
 const TimePicker = ({ onCreateCalendar }) => {
   const {
@@ -294,7 +294,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                             })} ${colorVariants({
                               color: "blue-400",
                               bg: "white",
-                            })} !text-[var(--blue-400)]`
+                            })} !text-[var(--NB-300)]`
                           : ` ${typographyVariants({
                               variant: "h4-md",
                             })} ${colorVariants({
@@ -368,7 +368,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                               })} ${colorVariants({
                                 color: "blue-400",
                                 bg: "white",
-                              })} !text-[var(--blue-400)]`
+                              })} !text-[var(--NB-300)]`
                             : ` ${typographyVariants({
                                 variant: "h4-md",
                               })} ${colorVariants({
@@ -402,7 +402,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                               })} ${colorVariants({
                                 color: "blue-400",
                                 bg: "white",
-                              })} !text-[var(--blue-400)]`
+                              })} !text-[var(--NB-300)]`
                             : ` ${typographyVariants({
                                 variant: "h4-md",
                               })} ${colorVariants({
@@ -481,7 +481,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                             })} ${colorVariants({
                               color: "blue-400",
                               bg: "white",
-                            })} !text-[var(--blue-400)]`
+                            })} !text-[var(--NB-300)]`
                           : ` ${typographyVariants({
                               variant: "h4-md",
                             })} ${colorVariants({
@@ -536,7 +536,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                               })} ${colorVariants({
                                 color: "blue-400",
                                 bg: "white",
-                              })} !text-[var(--blue-400)]`
+                              })} !text-[var(--NB-300)]`
                             : ` ${typographyVariants({
                                 variant: "h4-md",
                               })} ${colorVariants({
@@ -567,7 +567,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                               })} ${colorVariants({
                                 color: "blue-400",
                                 bg: "white",
-                              })} !text-[var(--blue-400)]`
+                              })} !text-[var(--NB-300)]`
                             : ` ${typographyVariants({
                                 variant: "h4-md",
                               })} ${colorVariants({
@@ -632,7 +632,7 @@ const TimePicker = ({ onCreateCalendar }) => {
                   className={`
                     !${colorVariants({ color: "blue-400" })}
                     ${typographyVariants({ variant: "h3-md" })}
-                    flex !w-[11rem] h-[4rem] px-3 py-3 justify-center items-center rounded-[0.6rem] border border-[var(--blue-400)] bg-white
+                    flex !w-[11rem] h-[4rem] px-3 py-3 justify-center items-center rounded-[0.6rem] border border-[var(--NB-300)] bg-white
                   `}
                 >
                   만들기

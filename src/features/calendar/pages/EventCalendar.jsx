@@ -3,17 +3,17 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import moment from "moment";
 
 import "moment/locale/ko";
-import { typographyVariants } from "../../../../styles/typography.ts";
-import { colorVariants } from "../../../../styles/color.ts";
-import { Button } from "../../../../sharedcomponent/Button.tsx";
+import { typographyVariants } from "../../../styles/typography.ts";
+import { colorVariants } from "../../../styles/color.ts";
+import { Button } from "../../../sharedcomponent/Button.tsx";
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import Loading from "../../../../sharedcomponent/Loading";
-import { fetchApi } from "../../../../utils/api";
-import { API_ENDPOINTS } from "../../../../config/environment";
-import { useAppointmentStore } from "../../../../store/appointmentStore";
-import { useUserStore } from "../../../../store/userStore";
+import Loading from "../../../sharedcomponent/Loading";
+import { fetchApi } from "../../../utils/api";
+import { API_ENDPOINTS } from "../../../config/environment";
+import { useAppointmentStore } from "../../../store/appointmentStore";
+import { useUserStore } from "../../../store/userStore";
 
 const EventCalendar = () => {
   
@@ -528,11 +528,11 @@ const EventCalendar = () => {
                   if (TotalUsers > 0 && userCount / TotalUsers > 0) {
                     const ratio = userCount / TotalUsers;
                     if (ratio <= 0.3) {
-                      colorClass = `${colorVariants({bg: "blue-50"})} border-[var(--blue-100)]`;
+                      colorClass = `${colorVariants({bg: "blue-50"})} border-[var(--NB-100)]`;
                     } else if (ratio <= 0.6) {
-                      colorClass = `${colorVariants({bg: "blue-100"})} border-[var(--blue-200)]`;
+                      colorClass = `${colorVariants({bg: "blue-100"})} border-[var(--NB-200)]`;
                     } else if (ratio < 0.99) {
-                      colorClass = `${colorVariants({bg: "blue-200"})} border-[var(--blue-300)]`;
+                      colorClass = `${colorVariants({bg: "blue-200"})} border-[var(--NB-300)]`;
                     } else if (ratio === 1) {
                       colorClass = `${colorVariants({bg: "magen-50"})} border-[var(--magen-300)]`;
                     }

@@ -150,7 +150,7 @@ export const ButtonVariants = cva(
           "h-[4rem]",
           "flex-shrink-0",
           "rounded-[0.6rem]",
-          "bg-[var(--gray-900)]",
+          "bg-[var(--NB-300)]",
           "whitespace-nowrap",
           typographyVariants({ variant: "b1-sb" }),
           `text-[var(--white)]`,

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../../sharedcomponent/Button.tsx";
-import { fetchApi } from "../../../../utils/api.ts";
-import { API_ENDPOINTS } from "../../../../config/environment.ts";
-import { useUserStore } from "../../../../store/userStore";
+import { Button } from "../../sharedcomponent/Button.tsx";
+import { fetchApi } from "../../utils/api.ts";
+import { API_ENDPOINTS } from "../../config/environment.ts";
+import { useUserStore } from "../../store/userStore";
 
-import { colorVariants } from "../../../../styles/color.ts";
-import { typographyVariants } from "../../../../styles/typography.ts";
+import { colorVariants } from "../../styles/color.ts";
+import { typographyVariants } from "../../styles/typography.ts";
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(true);

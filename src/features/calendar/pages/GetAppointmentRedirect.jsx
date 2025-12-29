@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import Loading from "../../../../sharedcomponent/Loading";
-import { useAppointmentStore } from "../../../../store/appointmentStore";
-import { useCalendarStore } from "../../../../store/calendarStore";
-import { useUserStore } from "../../../../store/userStore";
+import Loading from "../../../sharedcomponent/Loading";
+import { useAppointmentStore } from "../../../store/appointmentStore";
+import { useCalendarStore } from "../../../store/calendarStore";
+import { useUserStore } from "../../../store/userStore";
 
 const GetAppointmentRedirect = () => {
   const [searchParams] = useSearchParams();

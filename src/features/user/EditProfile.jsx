@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useUserStore } from "../../../store/userStore";
-import { typographyVariants } from "../../../styles/typography.ts";
-import { colorVariants } from "../../../styles/color.ts";
-import { Button } from "../../../sharedcomponent/Button.tsx";
-import Loading from "../../../sharedcomponent/Loading";
-import { cn } from "../../../utils/cn";
+import { useUserStore } from "../../store/userStore";
+import { typographyVariants } from "../../styles/typography.ts";
+import { colorVariants } from "../../styles/color.ts";
+import { Button } from "../../sharedcomponent/Button.tsx";
+import Loading from "../../sharedcomponent/Loading";
+import { cn } from "../../utils/cn";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -429,7 +429,7 @@ const EditProfile = () => {
               disabled={isSubmitting}
               additionalClass={cn(
                 "rounded-[0.8rem] mt-[2rem]",
-                "border border-[var(--blue-500)] bg-[var(--white)] text-[var(--blue-500)] shadow-[1px_1px_0_0_var(--blue-500)]",
+                "border border-[var(--NB-300)] bg-[var(--white)] text-[var(--NB-300)] shadow-[1px_1px_0_0_var(--NB-300)]",
                 isSubmitting && "opacity-50 cursor-not-allowed"
               )}
             >

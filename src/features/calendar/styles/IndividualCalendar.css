@@ -51,11 +51,11 @@ label {
 }
 /* 체크됐을때의 CSS */
 [type="checkbox"]:checked + .label-box .check-icon {
-  border-color: var(--blue-500);
-  background-color: var(--blue-50);
+  border-color: var(--NB-300);
+  background-color: var(--NB-50);
   border-radius: 2px;
 }
 /* 체크 표시 */
 [type="checkbox"]:checked + .label-box .check-icon::before {
-  border-color: var(--blue-500);
+  border-color: var(--NB-300);
 }
