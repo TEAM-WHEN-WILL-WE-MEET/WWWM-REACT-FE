@@ -217,7 +217,6 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
           {/* Selection Buttons */}
           <div className="flex gap-[0.8rem] justify-center">
             <Button
-              variant="default"
               property={
                 selectionMode === "date" ? "dateSelectActive" : "dateSelect"
               }
@@ -238,7 +237,6 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
               }}
             />
             <Button
-              variant="default"
               property={
                 selectionMode === "period" ? "dateSelectActive" : "dateSelect"
               }
@@ -261,7 +259,6 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
         {/* Action Buttons */}
         <div className="flex-shrink-0 mb-[2.4rem] mt-[2.4rem] mx-auto justify-center flex px-[2.2rem]">
           <Button
-            variant="default"
             property="choiceTime"
             disabled={!isButtonEnabled}
             label="시간 선택하기"

@@ -80,7 +80,6 @@ const AppointmentNameInput: React.FC<AppointmentNameInputProps> = ({ className =
             {/* Bottom Button */}
             <div className="flex justify-center mt-[120px]">
               <Button
-                variant="default"
                 property="enter"
                 disabled={!isButtonEnabled}
                 label="약속 날짜 정하기"

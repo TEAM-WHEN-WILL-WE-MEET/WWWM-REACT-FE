@@ -337,7 +337,7 @@ export const ButtonVariants = cva(
           "px-[1.4rem]",
           "py-0",
           "rounded-[2.3rem]",
-          "bg-#EDF1FD",
+          "bg-[#EDF1FD]",
           "border",
           "border-[var(--NB-100)]",
           "text-[var(--NB-300)]",
