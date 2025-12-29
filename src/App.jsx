@@ -6,9 +6,9 @@ import CreateCalendar from "./features/calendar/pages/CreateCalendar.tsx";
 import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect.tsx";
 import IndividualCalendar from "./features/calendar/pages/IndividualCalendar.tsx";
 import LandingPage from "./sharedcomponent/LandingPage.tsx";
-import Menu from "./features/menu/Menu";
+import Menu from "./features/menu/Menu.tsx";
 
-import EditProfile from "./features/user/EditProfile";
+import EditProfile from "./features/user/EditProfile.tsx";
 import Login from "./features/auth/pages/Login.tsx";
 import Register from "./features/auth/pages/Register.tsx";
 import KakaoCallback from "./features/auth/pages/KakaoCallback.tsx";
