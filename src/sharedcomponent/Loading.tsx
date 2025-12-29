@@ -5,7 +5,7 @@ import Lottie from "lottie-react";
 const containerClasses = cva("bg-white fixed inset-0 flex items-center justify-center z-50");
 
 const Loading = () => {
-  const [animationData, setAnimationData] = useState(null);
+  const [animationData, setAnimationData] = useState<unknown>(null);
 
   useEffect(() => {
     //Loading.json import
@@ -15,7 +15,7 @@ const Loading = () => {
       .catch((error) => console.error("Loading.json 로딩 에러:", error));
   }, []);
 
-  if (!animationData){ 
+  if (!animationData){
     return null; // 애니메이션 데이터가 로드되기 전엔 아무것도 렌더링하지 않음
   }
 

@@ -9,7 +9,7 @@ import { Button } from "../../../sharedcomponent/Button.tsx";
 import { Helmet } from "react-helmet-async";
 import { useAppointmentStore } from "../../../store/appointmentStore";
 import { useUserStore } from "../../../store/userStore";
-import Loading from "../../../sharedcomponent/Loading";
+import Loading from "../../../sharedcomponent/Loading.tsx";
 import { fetchApi } from "../../../utils/api";
 import { API_ENDPOINTS } from "../../../config/environment";
 

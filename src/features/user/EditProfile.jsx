@@ -5,7 +5,7 @@ import { useUserStore } from "../../store/userStore";
 import { typographyVariants } from "../../styles/typography.ts";
 import { colorVariants } from "../../styles/color.ts";
 import { Button } from "../../sharedcomponent/Button.tsx";
-import Loading from "../../sharedcomponent/Loading";
+import Loading from "../../sharedcomponent/Loading.tsx";
 import { cn } from "../../utils/cn";
 
 const EditProfile = () => {

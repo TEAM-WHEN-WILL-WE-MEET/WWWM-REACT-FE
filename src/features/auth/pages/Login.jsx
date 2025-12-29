@@ -5,7 +5,7 @@ import { typographyVariants } from "../../../styles/typography.ts";
 import { colorVariants } from "../../../styles/color.ts";
 import { cn } from "../../../utils/cn";
 import { Button } from "../../../sharedcomponent/Button.tsx";
-import Loading from "../../../sharedcomponent/Loading";
+import Loading from "../../../sharedcomponent/Loading.tsx";
 import "../styles/Register.css";
 
 const Login = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import Loading from "../../../sharedcomponent/Loading";
+import Loading from "../../../sharedcomponent/Loading.tsx";
 
 const KakaoCallback = () => {
   const BASE_URL =

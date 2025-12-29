@@ -9,7 +9,7 @@ import { Button } from "../../../sharedcomponent/Button.tsx";
 // import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import Loading from "../../../sharedcomponent/Loading";
+import Loading from "../../../sharedcomponent/Loading.tsx";
 import { fetchApi } from "../../../utils/api";
 import { API_ENDPOINTS } from "../../../config/environment";
 import { useAppointmentStore } from "../../../store/appointmentStore";

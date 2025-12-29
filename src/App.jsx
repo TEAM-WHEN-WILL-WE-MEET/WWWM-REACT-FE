@@ -5,7 +5,7 @@ import EventCalendar from "./features/calendar/pages/EventCalendar";
 import CreateCalendar from "./features/calendar/pages/CreateCalendar";
 import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect";
 import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
-import LandingPage from "./sharedcomponent/LandingPage";
+import LandingPage from "./sharedcomponent/LandingPage.tsx";
 import Menu from "./features/menu/Menu";
 
 import EditProfile from "./features/user/EditProfile";
