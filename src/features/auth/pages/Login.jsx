@@ -590,7 +590,7 @@ const Login = () => {
             {/* 카카오톡으로 연결 */}
             <Button
               type="button"
-              size="L"
+              property="L"
               onClick={handleKakaoLogin}
               disabled={loading}
               additionalClass={cn(
@@ -610,7 +610,7 @@ const Login = () => {
             {/* 로그인 버튼 */}
             <Button
               type="submit"
-              size="L"
+              property="L"
               disabled={!isFormValid || loading}
               additionalClass={cn(
                 "rounded-[0.8rem] mt-[1.2rem]",

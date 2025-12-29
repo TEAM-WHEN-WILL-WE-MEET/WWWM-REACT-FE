@@ -600,7 +600,7 @@ const Register = () => {
             {/* 카카오톡으로 연결 */}
             <Button
               type="submit"
-              size="L"
+              property="L"
               disabled={
                 !(isPasswordValid && isEmailValid && isNameValid) || loading
               }
@@ -621,7 +621,7 @@ const Register = () => {
             {/* 회원가입 버튼 */}
             <Button
               type="submit"
-              size="L"
+              property="L"
               disabled={
                 !(isPasswordValid && isEmailValid && isNameValid) || loading
               }
