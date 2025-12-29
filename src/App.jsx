@@ -95,18 +95,19 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/MonthView" element={<ProtectedRoute><CreateCalendar /></ProtectedRoute>} />
-          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
-          <Route path="/invite" element={<InviteRedirect />} />
-          <Route path="/menu" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
-
-          <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
-          <Route path="/eventCalendar" element={<EventCalendar />} />
+          <Route path="/MonthView" element={<ProtectedRoute><CreateCalendar /></ProtectedRoute>} />
           <Route path="/individualCalendar" element={<IndividualCalendar />} />
+          <Route path="/eventCalendar" element={<EventCalendar />} />
+          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
+          <Route path="/menu" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
+          <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path="/invite" element={<InviteRedirect />} />
+      
           <Route path="/appointment-name" element={<AppointmentNameInput />} />
+
           {/* <Route path="/time-modal" element={<TimeSelectionModal />} /> */}
         </Routes>
       </div>
