@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../components/Button';
+import { Button } from '../sharedcomponent/Button';
 import { typographyVariants } from '../styles/typography';
 import { colors, colorVariants } from '../styles/color';
 import DateSelectionModal from './DateSelectionModal';

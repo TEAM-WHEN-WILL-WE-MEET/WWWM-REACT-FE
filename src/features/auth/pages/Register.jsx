@@ -4,8 +4,8 @@ import { Helmet } from "react-helmet-async";
 import { typographyVariants } from "../../../styles/typography.ts";
 import { colorVariants } from "../../../styles/color.ts";
 import { cn } from "../../../utils/cn";
-import { Button } from "../../../components/Button.tsx";
-import Loading from "../../../components/Loading";
+import { Button } from "../../../sharedcomponent/Button.tsx";
+import Loading from "../../../sharedcomponent/Loading";
 import "../styles/Register.css";
 
 const Register = () => {

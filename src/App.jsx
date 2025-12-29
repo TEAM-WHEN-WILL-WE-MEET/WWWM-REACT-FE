@@ -5,15 +5,15 @@ import EventCalendar from "./features/calendar/pages/EventCalendar";
 import CreateCalendar from "./features/calendar/pages/CreateCalendar";
 import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect";
 import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
-import LandingPage from "./components/LandingPage";
-import Menu from "./features/layout/components/Menu";
+import LandingPage from "./sharedcomponent/LandingPage";
+import Menu from "./features/menu/Menu";
 
-import EditProfile from "./features/user/pages/EditProfile";
+import EditProfile from "./features/user/EditProfile";
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
 import KakaoCallback from "./features/auth/pages/KakaoCallback";
-import AppointmentNameInput from "./components/AppointmentNameInput";
-import TimeSelectionModal from "./components/TimeSelectionModal";
+import AppointmentNameInput from "./ver3temporarystorage/AppointmentNameInput";
+// import TimeSelectionModal from "./sharedcomponent/TimeSelectionModal"; // TODO: File doesn't exist yet
 
 
 // Protected Route wrapper component
@@ -107,7 +107,7 @@ function App() {
           <Route path="/eventCalendar" element={<EventCalendar />} />
           <Route path="/individualCalendar" element={<IndividualCalendar />} />
           <Route path="/appointment-name" element={<AppointmentNameInput />} />
-          <Route path="/time-modal" element={<TimeSelectionModal />} />
+          {/* <Route path="/time-modal" element={<TimeSelectionModal />} /> */}
         </Routes>
       </div>
     </Router>

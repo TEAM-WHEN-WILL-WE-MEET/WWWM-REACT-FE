@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../../components/Button.tsx";
+import { Button } from "../../../../sharedcomponent/Button.tsx";
 import { fetchApi } from "../../../../utils/api.ts";
 import { API_ENDPOINTS } from "../../../../config/environment.ts";
 import { useUserStore } from "../../../../store/userStore";

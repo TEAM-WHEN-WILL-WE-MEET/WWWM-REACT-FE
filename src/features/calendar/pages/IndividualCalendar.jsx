@@ -2,14 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment-timezone";
 import "moment/locale/ko";
-import "./styles.css";
+import "../styles/IndividualCalendar.css";
 import { typographyVariants } from "../../../../styles/typography.ts";
 import { colorVariants } from "../../../../styles/color.ts";
-import { Button } from "../../../../components/Button.tsx";
+import { Button } from "../../../../sharedcomponent/Button.tsx";
 import { Helmet } from "react-helmet-async";
 import { useAppointmentStore } from "../../../../store/appointmentStore";
 import { useUserStore } from "../../../../store/userStore";
-import Loading from "../../../../components/Loading";
+import Loading from "../../../../sharedcomponent/Loading";
 import { fetchApi } from "../../../../utils/api";
 import { API_ENDPOINTS } from "../../../../config/environment";
 

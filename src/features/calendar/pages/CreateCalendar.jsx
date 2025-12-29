@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import MonthView from "../../components/MonthViewCalendar";
-import TimePicker from "../../components/TimePicker";
-import Loading from "../../../../components/Loading";
+import MonthView from "../components/MonthViewCalendar";
+import TimePicker from "../components/TimePicker";
+import Loading from "../../../../sharedcomponent/Loading";
 import { useCalendarStore } from "../../../../store/index.ts";
 
 const CreateCalendar = () => {

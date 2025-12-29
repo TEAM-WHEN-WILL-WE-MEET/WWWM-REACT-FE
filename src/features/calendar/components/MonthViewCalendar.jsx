@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import { useNavigate } from "react-router-dom";
-import "./styles.css";
+import "../styles/MonthViewCalendar.css";
 // import moment from "moment";
 import moment from "moment-timezone";
 import clsx from "clsx";

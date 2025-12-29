@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import Calendar from "react-calendar";
 import moment from "moment-timezone";
-import { Button } from './Button.tsx';
+import { Button } from '../sharedcomponent/Button';
 import { typographyVariants } from '../styles/typography';
 import { colors, colorVariants } from '../styles/color';
-import { useCalendarNavigation } from '../features/calendar/components/MonthViewCalendar/hooks/useCalendarNavigation';
-import { formatMonthYear, formatDay } from '../features/calendar/components/MonthViewCalendar/utils/dateUtils';
-import '../features/calendar/components/MonthViewCalendar/styles.css';
+import { useCalendarNavigation } from '../features/calendar/hooks/useCalendarNavigation';
+import '../features/calendar/styles/MonthViewCalendar.css';
 import GrayLineSvg from '../../public/grayLine.svg';
 import BlueLineSvg from '../../public/blueLine.svg';
 import BlueEllipseSvg from '../../public/blueEllipse.svg';
