@@ -191,7 +191,6 @@ export const ButtonVariants = cva(
           "leading-[var(--line-height-16)]",
           "tracking-[var(--spacing)]",
         ],
-<<<<<<< HEAD
         // 시간 선택하기
         // 비활성화: 회색 테두리 / 활성화: 파란 테두리
         choiceTime: [
@@ -390,8 +389,6 @@ export const ButtonVariants = cva(
           "tracking-[-0.0325rem]",
           "whitespace-nowrap",
         ],
-=======
->>>>>>> origin/main
       },
     },
     defaultVariants: {
@@ -413,7 +410,6 @@ interface ButtonProps
   handleMouseEnter?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   property:
     | "toast"
-<<<<<<< HEAD
     | "choiceTime"
     | "enter"
     | "inputMyTime"
@@ -422,17 +418,7 @@ interface ButtonProps
     | "dateSelect"
     | "dateSelectActive"
     | "memberNameBlock"
-    | "randomCreate"
-=======
-    | "share"
-    | "participate"
-    | "XL"
-    | "L"
-    | "M"
-    | "S"
-    | "XS"
-    | "XXS";
->>>>>>> origin/main
+    | "randomCreate";
 }
 
 /**
