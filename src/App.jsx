@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
-import EventCalendar from "./features/calendar/pages/EventCalendar";
-import CreateCalendar from "./features/calendar/pages/CreateCalendar";
-import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect";
-import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
+import EventCalendar from "./features/calendar/pages/EventCalendar.tsx";
+import CreateCalendar from "./features/calendar/pages/CreateCalendar.tsx";
+import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect.tsx";
+import IndividualCalendar from "./features/calendar/pages/IndividualCalendar.tsx";
 import LandingPage from "./sharedcomponent/LandingPage.tsx";
 import Menu from "./features/menu/Menu";
 

@@ -28,7 +28,7 @@ export const useCalendarNavigation = () => {
     updateJsonData();
   }, [selectedDates, startTime, endTime, updateJsonData]);
 
-  const tileClassName = ({ date, view }) => {
+  const tileClassName = ({ date, view }: any) => {
     const dateString = moment(date).format("YYYY-MM-DD");
     const today = moment().startOf("day");
     const classes = [];
@@ -44,7 +44,7 @@ export const useCalendarNavigation = () => {
     return classes.join(" ");
   };
 
-  const tileDisabled = ({ date, view }) => {
+  const tileDisabled = ({ date, view }: any) => {
     if (view === "month") {
       const today = moment().startOf("day");
 
@@ -108,12 +108,12 @@ export const useCalendarNavigation = () => {
     setSelectedDates(savedDates[newMonthKey] || []);
   };
 
-  const handleYearSelectInModal = (year) => {
+  const handleYearSelectInModal = (year: number) => {
     setSelectedYear(year);
     setModalMode("month");
   };
 
-  const handleMonthSelect = (monthIndex) => {
+  const handleMonthSelect = (monthIndex: number) => {
     saveCurrentMonthDates();
 
     const newDate = new Date(selectedYear, monthIndex, 1);
