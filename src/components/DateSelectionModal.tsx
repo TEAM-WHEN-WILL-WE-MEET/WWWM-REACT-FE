@@ -103,7 +103,10 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({ isOpen, onClose
       classes.push("disabled-date");
     }
 
-    if (selectedDates.includes(dateString)) {
+    // 현재 캘린더에 표시된 달의 날짜만 선택 상태 표시
+    const isCurrentMonth = moment(date).isSame(calendarDate, 'month');
+
+    if (selectedDates.includes(dateString) && isCurrentMonth) {
       classes.push("selected-date");
 
       // 연속된 날짜가 있으면 타원형 스타일 적용 (모드와 무관)

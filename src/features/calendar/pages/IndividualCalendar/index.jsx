@@ -1123,7 +1123,7 @@ const IndividualCalendar = () => {
                       {[...Array(6)].map((_, buttonIndex) => (
                         <Button
                           key={buttonIndex}
-                          size={"XXS"}
+                          property={"XXS"}
                           data-time-index={timeIndex}
                           data-button-index={buttonIndex}
                           additionalClass={` 
@@ -1171,7 +1171,7 @@ const IndividualCalendar = () => {
               <div className="flex !justify-center">
                 <Button
                   label="내 참여시간 저장"
-                  size={"L"}
+                  property={"L"}
                   onClick={handleSaveClick}
                   additionalClass="items-center !transform-none mb-[1.2rem]"
                 />
@@ -1335,7 +1335,7 @@ const IndividualCalendar = () => {
                 {[...Array(6)].map((_, buttonIndex) => (
                   <Button
                     key={buttonIndex}
-                    size={"XXS"}
+                    property={"XXS"}
                     data-time-index={timeIndex}
                     data-button-index={buttonIndex}
                     additionalClass={` 
@@ -1381,7 +1381,7 @@ const IndividualCalendar = () => {
         <div className="flex !justify-center">
           <Button
             label="내 참여시간 저장"
-            size={"L"}
+            property={"L"}
             onClick={handleSaveClick}
             additionalClass="items-center !transform-none mb-[1.2rem]"
           />

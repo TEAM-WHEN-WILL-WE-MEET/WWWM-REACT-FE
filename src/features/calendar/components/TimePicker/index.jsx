@@ -587,7 +587,7 @@ const TimePicker = ({ onCreateCalendar }) => {
         <Button
           label="캘린더 만들기"
           disabled={!isFormReady}
-          size={"XL"}
+          property={"XL"}
           onClick={handleCreateButtonClick}
           additionalClass="!mt-[44px]"
         />

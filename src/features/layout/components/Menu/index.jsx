@@ -371,7 +371,7 @@ export default function Menu() {
                   >
                     <Button
                       label="취소하기"
-                      size={"S"}
+                      property={"S"}
                       additionalClass={`
                   ${colorVariants({ color: "gray-800" })}
                   border-[var(--gray-500)]
@@ -383,7 +383,7 @@ export default function Menu() {
                     />
                     <Button
                       label="삭제하기"
-                      size="S"
+                      property="S"
                       additionalClass={`
             ${colorVariants({ color: "red-300" })}
             border-[var(--red-300)]

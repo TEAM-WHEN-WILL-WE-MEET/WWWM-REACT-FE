@@ -36,6 +36,13 @@
   --blue-500: #006AC4;
   --blue-900: #003073;
 
+  /* NB (New Blue) */
+  --NB-50: #EDF1FD;
+  --NB-100: #AAC4FF;
+  --NB-200: #749CFF;
+  --NB-300: #4979F5;
+  --NB-900: #0047FF;
+
   --kakao-yellow: #FAE100;
   --kakao-black: #3C1D1E;
 }

@@ -541,7 +541,7 @@ const EventCalendar = () => {
                   return (
                     <Button
                       key={buttonIndex}
-                      size={"XXS"}
+                      property={"XXS"}
                       additionalClass={`
                       ${colorClass}
                      
@@ -590,7 +590,7 @@ const EventCalendar = () => {
         <div className="flex !justify-center">
           <Button
             label="내 참여시간 수정"
-            size={"M"}
+            property={"M"}
             onClick={handleSaveClick}
             additionalClass="items-center !transform-none mb-[2rem]"
           />
@@ -699,7 +699,7 @@ const EventCalendar = () => {
                   />
                   <Button
                     label="카카오톡으로 공유하기"
-                    size={"share"}
+                    property={"share"}
                     onClick={KakaoShare}
                   >
                     <img
@@ -709,7 +709,7 @@ const EventCalendar = () => {
                   </Button>
                   <Button
                     label="링크 복사하기"
-                    size={"share"}
+                    property={"share"}
                     onClick={clipboardShare}
                     additionalClass="mt-[1rem] !border border-gray-300 bg-white text-gray-900"
                   >
@@ -733,7 +733,7 @@ const EventCalendar = () => {
               >
                 <Button
                   label="링크가 복사되었습니다!"
-                  size={"toast"}
+                  property={"toast"}
                   onClick={handleSaveClick}
                   additionalClass="z-50 pointer-events-none"
                 />

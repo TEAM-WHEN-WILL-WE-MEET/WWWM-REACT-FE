@@ -425,7 +425,7 @@ const EditProfile = () => {
             {/* 저장 버튼 */}
             <Button
               type="submit"
-              size="L"
+              property="L"
               disabled={isSubmitting}
               additionalClass={cn(
                 "rounded-[0.8rem] mt-[2rem]",
