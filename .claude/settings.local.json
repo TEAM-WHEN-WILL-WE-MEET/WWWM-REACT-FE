@@ -4,7 +4,12 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(mv:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(tree:*)",
+      "Bash(git mv:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)"
     ],
     "defaultMode": "acceptEdits"
   }

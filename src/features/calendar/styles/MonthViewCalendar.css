@@ -1,0 +1,255 @@
+/* 캘린더 CSS파트 */
+.react-calendar {
+  width: auto;
+  width: 31.5rem;
+  height: auto;
+  background: white;
+  border: none;
+  font-family: Pretendard, Arial, Helvetica, sans-serif;
+  line-height: 1.125em;
+  margin: 0 auto;
+}
+
+.react-calendar__tile {
+  display: flex;
+  justify-content:center;
+  min-height: 4.4rem;
+  justify-content: center;
+  align-items: center;
+  color: var(--gray-600, #767676) ;
+  text-align: center;
+  font-size: var(--Size-14, 1.4rem);
+  font-weight: var(--font-rg, 400);
+  width:4.5rem !important;
+  height:4.5rem;
+  background-color:var(--gray-100, #EEEEEE) ;
+  border-radius: 2.5rem;
+  padding:1.45rem 1.4rem;
+
+}
+.disabled-date {
+  cursor: not-allowed !important;
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.disabled-date:hover {
+  cursor: not-allowed !important;
+}
+
+
+.react-calendar__tile--now {
+  background: var(--white, #FFF);
+  border: 0.1rem solid var(--gray-300, #E0E0E0);
+}
+
+.react-calendar__tile--now.selected-date {
+  border: none !important;
+}
+
+.react-calendar__month-view__days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 0;
+  justify-content: start;
+  width: 100% !important;
+  box-sizing: border-box;
+
+}
+
+.react-calendar--doubleView {
+  width: 70rem;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr[title]::after {
+  content: "";
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+.react-calendar--doubleView .react-calendar__viewContainer {
+  display: flex;
+  margin: -0.5em;
+}
+
+.react-calendar__navigation {
+  display: none;
+  height: 4.4rem;
+  margin-bottom: 1em;
+}
+
+.react-calendar__navigation button {
+  min-width: 4.4rem;
+  background: none;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  color: #747474;
+  font-size: var(--Size-14, 1.4rem);
+  font-weight: var(--font-md, 500);
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  padding: 0;
+  width: 100% !important;
+  box-sizing: border-box;
+  margin-bottom:12px;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  display: flex;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: 2rem;
+  padding: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+
+
+.month-button {
+  border: 0.1rem solid;
+  flex: 1 1 auto;
+  border-color: #e4e4e4;
+  background-color: #ffffff;
+  color: #242424;
+  font-size: var(--Size-14, 1.4rem);
+  font-weight: var(--font-rg, 400);
+  height: 4.5rem;
+  width: 4.5rem !important;
+  border-radius: 3rem !important;
+}
+
+.monthview-year-buttons {
+  display: grid;
+  gap: auto;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: center;
+  justify-items: stretch;
+  margin-top: 7rem;
+  margin-left: 4rem;
+}
+
+.monthview-year-button {
+  border: 0.1rem solid;
+  flex: 0 0 auto;
+  border-color: #e4e4e4;
+  background-color: #ffffff;
+  color: #242424;
+  font-size: var(--Size-14, 1.4rem);
+  font-weight: var(--font-rg, 400);
+  height: 4.5rem;
+  width: 4.5rem !important;
+  border-radius: 3rem !important;
+}
+
+.selected-date {
+  border-radius: 2.5rem;
+  background: var(--NB-300, #1D5FEE);
+  color:var(--white, #FFF);
+  font-size: var(--font-size-14, 1.4rem);
+  font-weight: var(--font-md, 500);
+  line-height: var(--line-height-16, 1.6rem);
+  letter-spacing: -0.35px;
+}
+
+/* 기간 선택 스타일 */
+.period-single {
+  /* 단독 날짜는 기본 원형 유지 */
+  border-radius: 2.5rem !important;
+}
+
+.period-middle {
+  border-radius: 0 !important;
+  position: relative;
+  background: var(--NB-50, #E8EFFE);
+  color: var(--NB-300, #1D5FEE);
+  
+
+
+}
+
+
+
+.period-middle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--NB-50, #E8EFFE);
+  z-index: -1;
+}
+
+/* 주의 가장자리(일요일/토요일) 테두리 둥글게 */
+.period-left-edge {
+  border-radius: 2.5rem 0 0 2.5rem !important;
+}
+
+.period-right-edge {
+  border-radius: 0 2.5rem 2.5rem 0 !important;
+}
+
+/* 가장자리에 있으면서 양쪽 모두 둥글어야 하는 경우 */
+.period-left-edge.period-right-edge {
+  border-radius: 2.5rem !important;
+}
+.period-start::after {
+  content: '';
+  position: absolute;
+  border-radius: 2.5rem 2.5rem;
+  width:4.5rem;
+  top: 0;
+  height: 100%;
+  background: var(--NB-300, #E8EFFE);
+  display: block;
+  visibility: visible;
+  z-index: -1;
+
+}
+.period-start {
+  border-radius: 2.5rem 0 0 2.5rem;
+  background: var(--NB-50, #E8EFFE);
+  color:var(--white, #FFF);
+  position: relative;
+  z-index: 1;
+}
+
+
+
+
+
+.period-end::before {
+  content: '';
+  position: absolute;
+  border-radius: 2.5rem 2.5rem;
+  width:1rem;
+  top: 0;
+  height: 100%;
+  width: 4.5rem;
+  background: var(--NB-300, #E8EFFE);
+  display: block;
+  visibility: visible;
+  z-index: -1;
+}
+.period-end {
+  border-radius:  0 2.5rem 2.5rem 0  ;
+  background: var(--NB-50, #E8EFFE);
+  color:var(--white, #FFF);
+  position: relative;
+  z-index: 1;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  visibility: hidden;
+
+
+}

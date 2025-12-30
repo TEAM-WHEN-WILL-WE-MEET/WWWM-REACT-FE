@@ -4,7 +4,7 @@
 
   /* gray */
   --gray-50: #FBFBFB;
-  --gray-100: #F2F2F2;
+  --gray-100: #F7F7F7;
   --gray-200: #EEEEEE;
   --gray-300: #E0E0E0;
   --gray-400: #CFCFCF;
@@ -14,6 +14,7 @@
   --gray-800: #444444;
   --gray-900: #242424;
 
+  
   /* magenta */
   --magen-50:#FAD1FF;
   --magen-100:#F7B4FF;
@@ -34,6 +35,13 @@
   --blue-400: #007BE3;
   --blue-500: #006AC4;
   --blue-900: #003073;
+
+  /* NB (New Blue) */
+  --NB-50: #EDF1FD;
+  --NB-100: #AAC4FF;
+  --NB-200: #749CFF;
+  --NB-300: #4979F5;
+  --NB-900: #0047FF;
 
   --kakao-yellow: #FAE100;
   --kakao-black: #3C1D1E;

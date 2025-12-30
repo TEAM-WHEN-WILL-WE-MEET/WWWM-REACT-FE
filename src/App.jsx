@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
-import EventCalendar from "./features/calendar/pages/EventCalendar";
-import CreateCalendar from "./features/calendar/pages/CreateCalendar";
-import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect";
-import IndividualCalendar from "./features/calendar/pages/IndividualCalendar";
-import LandingPage from "./components/LandingPage";
-import Menu from "./features/layout/components/Menu";
+import EventCalendar from "./features/calendar/pages/EventCalendar.tsx";
+import CreateCalendar from "./features/calendar/pages/CreateCalendar.tsx";
+import GetAppointmentRedirect from "./features/calendar/pages/GetAppointmentRedirect.tsx";
+import IndividualCalendar from "./features/calendar/pages/IndividualCalendar.tsx";
+import LandingPage from "./sharedcomponent/LandingPage.tsx";
+import Menu from "./features/menu/Menu.tsx";
 
-import EditProfile from "./features/user/pages/EditProfile";
-import Login from "./features/auth/pages/Login";
-import Register from "./features/auth/pages/Register";
-import KakaoCallback from "./features/auth/pages/KakaoCallback";
+import EditProfile from "./features/user/EditProfile.tsx";
+import Login from "./features/auth/pages/Login.tsx";
+import Register from "./features/auth/pages/Register.tsx";
+import KakaoCallback from "./features/auth/pages/KakaoCallback.tsx";
+import AppointmentNameInput from "./ver3temporarystorage/AppointmentNameInput";
+// import TimeSelectionModal from "./sharedcomponent/TimeSelectionModal"; // TODO: File doesn't exist yet
 
 
 // Protected Route wrapper component
@@ -93,17 +95,20 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/MonthView" element={<ProtectedRoute><CreateCalendar /></ProtectedRoute>} />
-          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
-          <Route path="/invite" element={<InviteRedirect />} />
-          <Route path="/menu" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
-
-          <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
-          <Route path="/eventCalendar" element={<EventCalendar />} />
+          <Route path="/MonthView" element={<ProtectedRoute><CreateCalendar /></ProtectedRoute>} />
           <Route path="/individualCalendar" element={<IndividualCalendar />} />
+          <Route path="/eventCalendar" element={<EventCalendar />} />
+          <Route path="/getAppointment" element={<GetAppointmentRedirect />} />
+          <Route path="/menu" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
+          <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path="/invite" element={<InviteRedirect />} />
+      
+          <Route path="/appointment-name" element={<AppointmentNameInput />} />
+
+          {/* <Route path="/time-modal" element={<TimeSelectionModal />} /> */}
         </Routes>
       </div>
     </Router>
